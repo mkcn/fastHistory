@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Distribution / packaging
+venv/
+.idea/
+notes/
+
+# Log files
+*.log
+
+
+# Ignored file for bashlex
+smartHistory/parser/bashlex/parsetab.py
+smartHistory/parser/bashlex/parser.out
+*.pyc
+*.swp
+.coverage
+.vagrant
