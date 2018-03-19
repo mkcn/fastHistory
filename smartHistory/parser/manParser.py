@@ -9,7 +9,7 @@ class ManParser(object):
     """
 
     _regexp_flag = r"^ {4,7}(.+, )*%s([,=].+)?( .*)?\n( +\S.*\n)*$"
-    _regex_name = "^NAME\n {4,7}%s [-—] (.*)$" # usually just 7 space
+    _regex_name = "^NAME\n {4,7}%s [-—] (.*)$"  # usually just 7 space
     _regex_name_no_group = "^ {7}ls - .*"
 
     _error_man_page_message = "<man page not found>"

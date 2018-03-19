@@ -1,6 +1,7 @@
 # -*-coding:utf-8-*-
 
 import curses
+import logging
 
 from parser import bashlex
 from parser.bashParser import BashParser
@@ -20,6 +21,7 @@ KEY_ESC = 27
 KEYS_GO_BACK = (curses.KEY_BTAB, KEY_ESC)
 KEY_RIGHT = curses.KEY_RIGHT
 KEY_LEFT = curses.KEY_LEFT
+KEY_RESIZE = curses.KEY_RESIZE
 
 DEFAULT_TITLE = "Smart History search"
 
@@ -67,11 +69,8 @@ class Picker(object):
 
         self.page_selector = None
 
-        # if default_index >= len(options):
-        #    raise ValueError('default_index should be less than the length of options')
-
-        # if multi_select and min_selection_count > len(options):
-        #    raise ValueError('min_selection_count is bigger than the available options, you will not be able to make any selection')
+        self.current_line = 0
+        self.option_to_draw = None
 
     def draw_smart(self):
         """
@@ -103,16 +102,68 @@ class Picker(object):
         self.drawer.refresh()
 
     def move_up(self):
-        self.index -= 1
-        if self.index < 0:
-            self.index = len(self.options) - 1
+        """
+        if it is not already on the first line move up
+        :return:
+        """
+        logging.debug("self.index " + str(self.index))
+        if self.index > 0:
+            self.index -= 1
+            number_option_to_draw = self.drawer.get_max_y() - 3
+            # the current line is the first line
+            if self.current_line == 0:
+                self.option_to_draw = self.options[self.index:self.index+number_option_to_draw]
+                logging.debug("self.index: " + str(self.index))
+                logging.debug("self.current_line: " + str(self.current_line))
+                logging.debug("number_option_to_draw: " + str(number_option_to_draw))
+                logging.debug("option_to_draw: " + str(len(self.option_to_draw)))
+            else:
+                self.current_line -= 1
 
     def move_down(self):
-        self.index += 1
-        if self.index >= len(self.options):
+        """
+        if it is not already on the last line move down
+        :return:
+        """
+        logging.debug("self.index " + str(self.index))
+        if self.index + 1 < len(self.options):
+            self.index += 1
+            number_option_to_draw = self.drawer.get_max_y() - 3
+            # the current line is the last line
+            if self.current_line + 1 >= number_option_to_draw:
+                self.option_to_draw = self.options[self.index-number_option_to_draw:self.index]
+                logging.debug("self.index: " + str(self.index))
+                logging.debug("self.current_line: " + str(self.current_line))
+                logging.debug("number_option_to_draw: " + str(number_option_to_draw))
+                logging.debug("option_to_draw: " + str(len(self.option_to_draw)))
+            else:
+                self.current_line += 1
+
+    def initialize_options_to_draw(self, initialize_index=False):
+        """
+        set variable option to draw based on the size of the screen
+        :type initialize_index:     True to reset index to the first option
+        :return:
+        """
+        number_option_to_draw = self.drawer.get_max_y() - 3
+
+        if initialize_index:
             self.index = 0
+            self.current_line = 0
+        else:
+            # check if the current selected line is too big set the last line as selected line
+            if self.current_line >= number_option_to_draw:
+                self.index -= self.current_line - number_option_to_draw + 1
+                self.current_line = number_option_to_draw - 1
+
+        self.option_to_draw = self.options[0:number_option_to_draw]
+        logging.debug("option_to_draw: " + str(self.option_to_draw))
 
     def mark_index(self):
+        """
+        TODO
+        :return:
+        """
         if self.multi_select:
             if self.index in self.all_selected:
                 self.all_selected.remove(self.index)
@@ -120,8 +171,9 @@ class Picker(object):
                 self.all_selected.append(self.index)
 
     def get_selected(self):
-        """return the current selected option as a tuple: (option, index)
-           or as a list of tuples (in case multi_select==True)
+        """
+        return the current selected option as a tuple: (option, index)
+        or as a list of tuples (in case multi_select==True)
         """
         if self.multi_select:
             return_tuples = []
@@ -132,10 +184,17 @@ class Picker(object):
             return self.options[self.index], self.index
 
     def get_smart_options(self):
-        options = []
+        """
+        get list of options to show
+        :return:
+        """
+        if self.option_to_draw is None:
+            self.initialize_options_to_draw()
 
-        for index, option in enumerate(self.options):
-            if index == self.index:
+        options = []
+        for row_index, option in enumerate(self.option_to_draw):
+            # TODO set bool if it is selected (multi selection)
+            if row_index == self.current_line:
                 options.append([True, option])
             else:
                 options.append([False, option])
@@ -192,7 +251,6 @@ class Picker(object):
             # wait for char
             c = self.drawer.wait_next_char()
 
-            self.debug_line += "[" + str(c) + "]"
             if c == KEYS_UP:
                 self.move_up()
             elif c == KEYS_DOWN:
@@ -201,13 +259,10 @@ class Picker(object):
                 if self.multi_select and len(self.all_selected) < self.min_selection_count:
                     continue
                 return self.get_selected()
-            elif c is KEYS_SELECT and self.multi_select:
+            elif c == KEYS_SELECT and self.multi_select:
                 self.mark_index()
-            elif c is -1:
-                # TODO check and remove
-                self.drawer.refresh()
             # tab command
-            elif c is KEYS_TAB:
+            elif c == KEYS_TAB:
                 self.is_selected_info_shown = True
                 selected_option = self.page_selector.get_selected_option()
                 self.flags_for_info_cmd = self.load_data_for_info_cmd(
@@ -225,15 +280,24 @@ class Picker(object):
                 self.debug_line += "[chr: " + str(c) + "]"
                 self.search_text += chr(c)
                 self.search_text_lower += chr(c).lower()
+                self.option_to_draw = None
                 self.options = self.data_retriever.filter(self.search_text)
+                # update the options to show
+                self.initialize_options_to_draw(initialize_index=True)
             # delete a char of the search
             elif c in KEYS_DELETE:
                 if len(self.search_text) > 0:
                     self.search_text = self.search_text[:-1]
                     self.search_text_lower = self.search_text_lower[:-1]
                     self.options = self.data_retriever.filter(self.search_text_lower)
+                    # update the options to show
+                    self.initialize_options_to_draw(initialize_index=True)
+            elif c == KEY_RESIZE:
+                self.drawer.reset()
+                # update the options to show
+                self.initialize_options_to_draw()
             else:
-                self.debug_line += "[" + str(c) + "]"
+                logging.error("char not handled: " + str(c))
 
     def _start(self, screen):
         self.drawer = Drawer(screen)
@@ -251,81 +315,3 @@ def pick(search_text="", default_index=0, multi_select=False, min_selection_coun
     """
     picker = Picker(search_text, default_index, multi_select, min_selection_count)
     return picker.start()
-
-
-"""
-    def register_custom_handler(self, key, func):
-        self.custom_handlers[key] = func
-
-    def get_title_lines(self):
-        if self.title:
-            return [self.title + ": " + self.search_text] + ['']
-        return []
-
-
-    def get_option_lines(self):
-        lines = []
-        for index, option in enumerate(self.options):
-            if index == self.index:
-                prefix = self.indicator
-            else:
-                prefix = len(self.indicator) * ' '
-
-            if self.multi_select and index in self.all_selected:
-                format = curses.color_pair(1)
-                line = ('{0} {1}'.format(prefix, option), format)
-            else:
-                line = '{0} {1}'.format(prefix, option)
-            lines.append(line)
-
-        return lines
-
-
-    def get_debug_line(self):
-        if self.debug_line:
-            return self.debug_line.split('\n') + ['']
-        return []
-
-
-    def get_lines(self):
-        title_lines = self.get_title_lines()
-        option_lines = self.get_option_lines()
-        debug_lines = self.get_debug_line()
-        lines = title_lines + option_lines + debug_lines
-        current_line = self.index + len(title_lines) + 1
-        return lines, current_line
-
-
-    def draw(self):
-        TODO remove this method
-        draw the curses ui on the screen, handle scroll if needed
-
-        self.screen.clear()
-
-        x, y = 1, 1  # start point
-        max_y, max_x = self.screen.getmaxyx()
-        max_rows = max_y - y  # the max rows we can draw
-
-        lines, current_line = self.get_lines()
-
-        # calculate how many lines we should scroll, relative to the top
-        scroll_top = getattr(self, 'scroll_top', 0)
-        if current_line <= scroll_top:
-            scroll_top = 0
-        elif current_line - scroll_top > max_rows:
-            scroll_top = current_line - max_rows
-        self.scroll_top = scroll_top
-
-        lines_to_draw = lines[scroll_top:scroll_top + max_rows]
-
-        for line in lines_to_draw:
-            if type(line) is tuple:
-                self.screen.addnstr(y, x, line[0], max_x - 2, line[1])
-            else:
-                self.screen.addnstr(y, x, line, max_x - 2)
-            if y == 1:
-                self.screen.addstr(" ", curses.color_pair(1))
-            y += 1
-
-        self.screen.refresh()
-    """
