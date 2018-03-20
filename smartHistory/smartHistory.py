@@ -16,13 +16,14 @@ def handle_search_request(input_cmd_str):
 	"""
 	# local import to not affect the response time of the bash command
 	from console.consoleUtils import ConsoleUtils
-	from pick.picker import pick
+	from pick.picker import Picker
 
 	logging.info("search request: '" + input_cmd_str + "'")
 	# set SIGINT handler
 	ConsoleUtils.handle_close_signal()
 	# open picker to select from history
-	selected_option, index = pick(search_text=input_cmd_str)
+	picker = Picker(search_text=input_cmd_str)
+	selected_option, index = picker.start()
 	selected_string = selected_option[0]
 	# show selected cmd
 	ConsoleUtils.fill_terminal_input(selected_string)

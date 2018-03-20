@@ -1,6 +1,6 @@
 
 DB_SAMPLE = [
-	["ls -la", ["file", "list"], "A command description"],
+	["ls -la file_1", ["file", "list"], "A command description"],
 	["ls -ld /etc", ["file", "list"], "A command description"],
 	["ls  -Rla", ["file", "list"], "A command description"],
 	["ls -l -a file", ["file", "list", "file", "list", "file", "list", "file", "list", "file", "list", "file", "list", "file", "list", "file", "list"], "long tags"],
@@ -24,12 +24,13 @@ DB_SAMPLE = [
 	["tar -rvt hello5", ["zip", "archive"], "tar unzip"],
 	["tar -rvt hello6", ["zip", "archive"], "tar unzip"],
 	["tar -rvt hello3", ["zip", "archive"], "tar unzip"],
-	["tar -rvt hello4", ["zip", "archive"], "tar unzip"],
+	["tar -rvt hello4", ["szip", "archive"], "tar unzip"],
 	["tar -rvt hello5", ["zip", "archive"], "tar unzip"],
 	["tar -rvt hello6", ["zip", "archive"], "tar unzip"],
 	["tar -rvt hello3", ["zip", "archive"], "tar unzip"],
 	["tar -rvt hello4", ["zip", "archive"], "tar unzip"],
 	["tar -rvt hello5", ["zip", "archive"], "tar unzip"],
 	["tar -rvt hello6", ["zip", "archive"], "tar unzip"],
-	["tar -rvt hello7", ["zip", "archive"], "tar unzip"]
+	["tar -rvt hello7", ["zip", "archive"], "tar unzip"],
+	["tar -rvt hello8_last", ["zip", "archive"], "tar unzip"]
 ]

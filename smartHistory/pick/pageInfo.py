@@ -8,9 +8,8 @@ class PageInfo(object):
     Class to draw the info page
     """
 
-    def __init__(self, drawer, debug_line, page_selector):
+    def __init__(self, drawer, page_selector):
         self.drawer = drawer
-        self.debug_line = debug_line
         self.page_selector = page_selector
 
     def draw_page_info(self, option, search_text_lower, flags_for_info_cmd):

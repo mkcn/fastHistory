@@ -15,17 +15,8 @@ class PageSelector(object):
 
     DEBUG_MODE = False
 
-    def __init__(self, drawer, debug_line):
+    def __init__(self, drawer):
         self.drawer = drawer
-        self.debug_line = debug_line
-        self.selected_option = None
-
-    def get_selected_option(self):
-        """
-        get currently selected option
-        :return:
-        """
-        return self.selected_option
 
     def draw_page_select(self, search_text_lower, title, search_text, smart_options):
         """
@@ -58,12 +49,6 @@ class PageSelector(object):
                              search=search_text_lower,
                              selected=selected,
                              last_column_size=index_tab_column)
-            if selected:
-                self.selected_option = value_option
-
-        # debug line
-        if self.DEBUG_MODE:
-            self.draw_debug_line()
 
         # help line in the last line
         self.draw_help_line_selector()
@@ -186,10 +171,6 @@ class PageSelector(object):
                         self.drawer.draw_row(text[index_sub_str + len_sub_str:], color=color_default)
                 else:
                     self.drawer.draw_row(text, color=color_default)
-
-    def draw_debug_line(self):
-        self.drawer.set_y(self.drawer.get_max_y() - 2)
-        self.drawer.draw_row(self.debug_line, color=self.drawer.color_border)
 
     def draw_help_line_selector(self):
         self.drawer.set_y(self.drawer.get_max_y() - 1)
