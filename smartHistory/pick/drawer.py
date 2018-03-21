@@ -1,4 +1,5 @@
 import curses
+import logging
 
 
 class Drawer(object):
@@ -179,16 +180,26 @@ class Drawer(object):
                 return
             # if no space left
             elif self.max_x - self.x <= 0:
-                self.smart_screen.addstr(self.y, self.max_x - len(self._TEXT_TO_LONG), self._TEXT_TO_LONG, color)
+                self.smart_screen.addstr(self.y, self.max_x - len(self._TEXT_TO_LONG) - 1, self._TEXT_TO_LONG, color)
             # enough space for text
-            elif self.max_x - self.x - text_len >= 0:
+            elif self.max_x - self.x - text_len > 0:
                 self.smart_screen.addstr(self.y, self.x, str(text), color)
                 self.x += text_len
-            # space left but not enough for text
+            # start draw from the beginning of the line and draw for the entire line
+            elif self.x == 0 and self.max_x - text_len == 0:
+                # note: this is a corner case of the previous case but
+                #       because of a strange behavior of the 'addstr' method (maybe a bug)
+                #       we cannot draw a string which could perfectly fit in the remaining space if
+                #       the start point (x) is different from 0
+                #       example: before   [sample string      ]
+                #                after    [sample string value] -> crash
+                #       but:     before   [                   ]
+                #                after    [one single big line] -> that ok
+                self.smart_screen.addstr(self.y, self.x, str(text), color)
+                self.x += text_len
             else:
                 # cut part of text longer than max
                 cut_text = text[:(self.max_x - self.x - 1)]
-                # TODO fix bug when screen is smaller then the help description
                 self.smart_screen.addstr(self.y, self.x, str(cut_text), color)
                 self.x += len(cut_text)
                 self.smart_screen.addstr(self.y, self.max_x - len(self._TEXT_TO_LONG) - 1, self._TEXT_TO_LONG, color)

@@ -6,6 +6,9 @@ class PageSelector(object):
     Class to draw the page with the commands to select
     """
 
+    CMD_COLUMN_NAME = "Commands"
+    TAG_AND_DESCRIPTION_COLUMN_NAME = "Tags & Description"
+
     SELECTOR_START = ">"
     SELECTOR_END = "<"
     SELECTOR_NOT = " "
@@ -33,8 +36,8 @@ class PageSelector(object):
         # draw row colored
         self.drawer.new_line()
         self.drawer.draw_row(" " * (self.drawer.get_max_x()), color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Commands", x=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Tags and Description", x=self.drawer.max_x - index_tab_column,
+        self.drawer.draw_row(self.CMD_COLUMN_NAME, x=2, color=self.drawer.color_columns_title)
+        self.drawer.draw_row(self.TAG_AND_DESCRIPTION_COLUMN_NAME, x=self.drawer.max_x - index_tab_column,
                              color=self.drawer.color_columns_title)
 
         # options
@@ -86,7 +89,7 @@ class PageSelector(object):
         self.drawer.draw_row(" ", color=background_color)
 
         #  cmd section
-        cmd = self.drawer.shift_string(cmd, max_x=self.drawer.max_x - last_column_size)
+        cmd = self.drawer.shift_string(cmd, max_x=self.drawer.max_x - last_column_size - 3)
         self.draw_marked_string(cmd, search, color_marked=self.drawer.color_search, color_default=background_color)
 
         if last_column_size:

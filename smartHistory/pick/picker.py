@@ -101,17 +101,12 @@ class Picker(object):
         if it is not already on the first line move up
         :return:
         """
-        logging.debug("self.index " + str(self.index))
         if self.index > 0:
             self.index -= 1
             number_option_to_draw = self.drawer.get_max_y() - 3
             # the current line is the first line
             if self.current_line_index == 0:
                 self.option_to_draw = self.options[self.index:self.index+number_option_to_draw]
-                logging.debug("self.index: " + str(self.index))
-                logging.debug("self.current_line: " + str(self.current_line_index))
-                logging.debug("number_option_to_draw: " + str(number_option_to_draw))
-                logging.debug("option_to_draw: " + str(len(self.option_to_draw)))
             else:
                 self.current_line_index -= 1
 
@@ -120,7 +115,6 @@ class Picker(object):
         if it is not already on the last line move down
         :return:
         """
-        logging.debug("self.index " + str(self.index))
         if self.index + 1 < len(self.options):
             self.index += 1
             number_option_to_draw = self.drawer.get_max_y() - 3
@@ -134,15 +128,8 @@ class Picker(object):
                 # end     3(pointer) + 1  = 4
                 # result  [1,2,3]
                 self.option_to_draw = self.options[self.index + 1 - number_option_to_draw:self.index + 1]
-                logging.debug("self.index: " + str(self.index))
-                logging.debug("self.current_line: " + str(self.current_line_index))
-                logging.debug("number_option_to_draw: " + str(number_option_to_draw))
-                logging.debug("option_to_draw: " + str(len(self.option_to_draw)))
             else:
-                logging.debug("current_line +1")
                 self.current_line_index += 1
-        else:
-            logging.debug("index > len option")
 
     def get_number_options_to_draw(self):
         """
