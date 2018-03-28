@@ -1,6 +1,9 @@
-
+import logging
+import sre_constants
 import subprocess
 import re
+
+import sys
 
 
 class ManParser(object):
@@ -42,10 +45,14 @@ class ManParser(object):
         if self.man_page is None:
             return None
         else:
-            result = re.search(self._regexp_flag % flag, self.man_page, re.MULTILINE)
-            if result is not None:
-                result = result.group(0)
-            else:
+            try:
+                result = re.search(self._regexp_flag % flag, self.man_page, re.MULTILINE)
+                if result is not None:
+                    result = result.group(0)
+                else:
+                    return None
+            except sre_constants.error:
+                logging.error("flag meaning parser: ", sys.exc_info()[0])
                 return None
 
         rows = result.split("\n")

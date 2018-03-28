@@ -1,6 +1,6 @@
 from parser.bashParser import BashParser
 from parser.manParser import ManParser
-from database.dataRetriever import DataRetriever
+from database.dataManager import DataManager
 
 
 class PageInfo(object):
@@ -25,16 +25,16 @@ class PageInfo(object):
         value_option = option
 
         # draw option row
-        self.page_selector.draw_option(cmd=value_option[DataRetriever.INDEX_OPTION_CMD],
-                                       tags=value_option[DataRetriever.INDEX_OPTION_TAGS],
-                                       desc=value_option[DataRetriever.INDEX_OPTION_DESC],
+        self.page_selector.draw_option(cmd=value_option[DataManager.INDEX_OPTION_CMD],
+                                       tags=value_option[DataManager.INDEX_OPTION_TAGS],
+                                       desc=value_option[DataManager.INDEX_OPTION_DESC],
                                        search=search_text_lower,
                                        selected=True,
                                        last_column_size=0)
         self.drawer.new_line()
-        self.draw_info_option(cmd_string=value_option[DataRetriever.INDEX_OPTION_CMD],
-                              tags=value_option[DataRetriever.INDEX_OPTION_TAGS],
-                              desc=value_option[DataRetriever.INDEX_OPTION_DESC],
+        self.draw_info_option(cmd_string=value_option[DataManager.INDEX_OPTION_CMD],
+                              tags=value_option[DataManager.INDEX_OPTION_TAGS],
+                              desc=value_option[DataManager.INDEX_OPTION_DESC],
                               search_text=search_text_lower,
                               flags_for_info_cmd=flags_for_info_cmd)
 

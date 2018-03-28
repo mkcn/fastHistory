@@ -9,8 +9,8 @@ venv/
 .idea/
 notes/
 
-# Log files
-*.log
+# Log and user data
+smartHistory/data/
 
 
 # Ignored file for bashlex

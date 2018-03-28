@@ -6,7 +6,7 @@ import logging
 from parser import bashlex
 from parser.bashParser import BashParser
 from parser.manParser import ManParser
-from database.dataRetriever import DataRetriever
+from database.dataManager import DataManager
 from pick.drawer import Drawer
 from pick.pageSelect import PageSelector
 
@@ -33,16 +33,17 @@ class Picker(object):
 
     DEBUG_MODE = True
 
-    def __init__(self, search_text="", multi_select=False):
+    def __init__(self, data_manager, search_text="", multi_select=False):
         """
         initialize variables and get filtered list starting options to show
+        :param data_manager          the data manager object to retrieve data
         :param search_text:         (optional) if defined the results will be filtered with this text, default emtpy string
         :param multi_select:        (optional) if true its possible to select multiple values by hitting SPACE, defaults to False
         """
 
         self.search_text = search_text
         self.search_text_lower = search_text.lower()
-        self.data_retriever = DataRetriever()
+        self.data_manager = data_manager
         self.all_selected = []
 
         self.drawer = None
@@ -61,12 +62,10 @@ class Picker(object):
 
         self.index = 0
         self.current_line_index = 0
+        self.options = None
         self.option_to_draw = None
 
         self.current_selected_option = None
-
-        # get filtered starting options
-        self.options = self.data_retriever.filter(self.search_text_lower)
 
     def draw_smart(self):
         """
@@ -262,7 +261,10 @@ class Picker(object):
     def run_loop(self):
         """
         Loop to capture user input keys
+
         """
+        # get filtered starting options
+        self.options = self.data_manager.filter(self.search_text_lower, self.get_number_options_to_draw())
         self.initialize_options_to_draw()
 
         while True:
@@ -276,6 +278,11 @@ class Picker(object):
                 self.move_up()
             elif c == KEYS_DOWN:
                 self.move_down()
+                # retrieve more data from db when user want to view more
+                if self.index % (self.get_number_options_to_draw() - 1) == 0:
+                    self.options = self.data_manager.filter(
+                        self.search_text_lower,
+                        self.index + self.get_number_options_to_draw())
             elif c in KEYS_ENTER:
                 return self.get_selected()
             elif c == KEYS_SELECT and self.is_multi_select:
@@ -284,7 +291,7 @@ class Picker(object):
             elif c == KEYS_TAB:
                 self.is_info_page_shown = True
                 self.flags_for_info_cmd = self.load_data_for_info_cmd(
-                    cmd_text=self.current_selected_option[DataRetriever.INDEX_OPTION_CMD])
+                    cmd_text=self.current_selected_option[DataManager.INDEX_OPTION_CMD])
             elif c in KEYS_GO_BACK:
                 self.is_info_page_shown = False
             # -> command
@@ -298,7 +305,7 @@ class Picker(object):
                 self.search_text += chr(c)
                 self.search_text_lower += chr(c).lower()
                 self.option_to_draw = None
-                self.options = self.data_retriever.filter(self.search_text)
+                self.options = self.data_manager.filter(self.search_text_lower, self.get_number_options_to_draw())
                 # update the options to show
                 self.update_options_to_draw(initialize_index=True)
             # delete a char of the search
@@ -306,12 +313,15 @@ class Picker(object):
                 if len(self.search_text) > 0:
                     self.search_text = self.search_text[:-1]
                     self.search_text_lower = self.search_text_lower[:-1]
-                    self.options = self.data_retriever.filter(self.search_text_lower)
+                    self.options = self.data_manager.filter(self.search_text_lower, self.get_number_options_to_draw())
                     # update the options to show
                     self.update_options_to_draw(initialize_index=True)
             elif c == KEY_RESIZE:
                 # this occurs when the console size changes
                 self.drawer.reset()
+                # TODO make this more efficient
+                # update list option
+                self.options = self.data_manager.filter(self.search_text_lower, self.index + self.get_number_options_to_draw())
                 # update the options to show
                 self.update_options_to_draw()
             else:
@@ -320,6 +330,7 @@ class Picker(object):
     def _start(self, screen):
         self.drawer = Drawer(screen)
         self.page_selector = PageSelector(self.drawer)
+
         return self.run_loop()
 
     def start(self):

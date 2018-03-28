@@ -3,14 +3,17 @@
 import sys
 import os
 import logging
+from database.dataManager import DataManager
+
+LOG_FILE_NAME = "data/smartHistory.log"
+DATABASE_MODE = DataManager.DATABASE_MODE_SQLITE
 
 
-LOG_FILE_NAME = "logs/smartHistory.log"
-
-
-def handle_search_request(input_cmd_str):
+def handle_search_request(input_cmd_str, project_dir):
 	"""
 	take input and show the filtered list of command to select
+
+	:param project_dir: 	path of the project
 	:param input_cmd_str:	input cmd
 	:return:
 	"""
@@ -21,25 +24,29 @@ def handle_search_request(input_cmd_str):
 	logging.info("search request: '" + input_cmd_str + "'")
 	# set SIGINT handler
 	ConsoleUtils.handle_close_signal()
+	# create data manger obj
+	data_manager = DataManager(project_dir, DATABASE_MODE)
 	# open picker to select from history
-	picker = Picker(search_text=input_cmd_str)
+	picker = Picker(data_manager, search_text=input_cmd_str)
 	selected_option, index = picker.start()
 	selected_string = selected_option[0]
 	# show selected cmd
 	ConsoleUtils.fill_terminal_input(selected_string)
 
 
-def handle_add_request(input_cmd_str, feedback=False):
+def handle_add_request(input_cmd_str, project_dir, feedback=False):
 	"""
 	take input and add store it
+
+	:param project_dir: 	path of the project
 	:param input_cmd_str:	input cmd
 	:param feedback:		if true prints feedback message in the console, otherwise hides all
 	:return:
 	"""
-	# local import to not affect the response time of the bash command
+	# local import to not affect the response time of the bash commandv
 	from parser import tagParser
-	from collector.saver import Saver
 	from console.loggerBash import log_on_console_info, log_on_console_error
+	from collector.saver import Saver
 
 	# define log class
 	logging.info("add request: '" + input_cmd_str + "'")
@@ -48,8 +55,15 @@ def handle_add_request(input_cmd_str, feedback=False):
 	if not tagParser.TagParser.is_privacy_mode_enable(input_cmd):
 		# parse tags and store the cmd
 		parser_res = tagParser.TagParser.parse_cmd(input_cmd_str)
+
+		cmd = parser_res[0]
+		tags = parser_res[2]
+
+		data_retriever = DataManager(project_dir, DATABASE_MODE)
+		data_retriever.add_new_element(cmd, "", tags)
+
 		# log_info(parser_res)
-		x = Saver(input_text=parser_res)
+		# x = Saver(input_text=parser_res)
 		if feedback:
 			log_on_console_info("command: added")
 	else:
@@ -63,19 +77,18 @@ if __name__ == "__main__":
 	"""
 	# check number of parameters
 	if len(sys.argv) == 3:
-
-		doc_path = os.path.dirname(os.path.realpath(__file__)) + "/"
-		logging.basicConfig(filename=doc_path + LOG_FILE_NAME, level=logging.DEBUG)
+		project_dir = os.path.dirname(os.path.realpath(__file__)) + "/"
+		logging.basicConfig(filename=project_dir + LOG_FILE_NAME, level=logging.DEBUG)
 		logging.debug("bash input: " + str(sys.argv))
 
 		mode = str(sys.argv[1])
 		input_cmd = str(sys.argv[2])
 		if mode == "search":
-			handle_search_request(input_cmd)
+			handle_search_request(input_cmd, project_dir)
 		elif mode == "add":
-			handle_add_request(input_cmd, True)
+			handle_add_request(input_cmd, project_dir, True)
 		elif mode == "add-silent" and len(input_cmd) > 0:
-			handle_add_request(input_cmd)
+			handle_add_request(input_cmd, project_dir)
 	else:
 		# TODO print usage
 		pass

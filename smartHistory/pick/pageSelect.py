@@ -1,4 +1,4 @@
-from database.dataRetriever import DataRetriever
+from database.dataManager import DataManager
 
 
 class PageSelector(object):
@@ -110,7 +110,7 @@ class PageSelector(object):
 
             # description
             # note, at least 3 chars are needed to search in the description
-            if len(search) >= DataRetriever.MIN_LENGTH_SEARCH_FOR_DESC:
+            if len(search) >= DataManager.MIN_LENGTH_SEARCH_FOR_DESC:
                 # get a matched word in the description
                 res = self.get_matching_word_from_sentence(desc, search)
                 if res is not None:
