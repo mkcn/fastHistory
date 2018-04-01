@@ -86,7 +86,8 @@ class DatabaseSQLite(object):
             tags TEXT
         )
         """)
-        # note: sqlite automatically adds a column called "rowid"
+        # note: sqlite automatically adds a column called "rowID"
+        # the "rowID" value is a 64-bit signed integers
 
     def get_all_data(self, filter=None):
         self.cursor.execute("SELECT * FROM history ")
@@ -105,7 +106,6 @@ class DatabaseSQLite(object):
                                 "FROM history "
                                 "ORDER BY rowid DESC LIMIT ?", (n,))
         else:
-            # TODO join
             self.cursor.execute("SELECT command, description, tags "
                                 "FROM history "
                                 "WHERE "
@@ -130,67 +130,95 @@ class DatabaseSQLite(object):
         :param tags:            array of tag
         :return:
         """
-        logging.debug("database - add command: " + cmd)
-        logging.debug("database - description: " + description)
+        # remove whitespaces on the left and right
+        cmd = cmd.strip()
+        # TODO check if description and tags contains illegal chars (@ and #)
+
+        logging.debug("database - add command: " + str(cmd))
+        logging.debug("database - description: " + str(description))
         logging.debug("database - tags: " + str(tags))
         self.cursor.execute("SELECT rowid, counter, description, tags FROM history WHERE Command=?", (cmd,))
         matches = self.cursor.fetchall()
         matches_number = len(matches)
         if matches_number == 0:
+            if description is None:
+                description = ""
             tags_str = self._tag_array_to_string(tags)
             self.cursor.execute("INSERT INTO history values (?, ?, ?, ?)", (cmd, 0, description, tags_str,))
             logging.debug("database - added NEW command")
         elif matches_number == 1:
             match = matches[0]
-            #
+            # get old values
             match_id = match[0]
             match_counter = int(match[1])
             match_desc = match[2]
             match_tags_str = match[3]
+
+            # set new counter
             new_counter = match_counter + 1
-            # update counter
-            self.cursor.execute("UPDATE history "
-                                "SET counter = ? "
-                                "WHERE rowid = ?", (new_counter, match_id,))
-            logging.debug("database - updated counter: " + str(new_counter))
-            # TODO possible improvement: set new rowid to put the updated row to the top (last used)
-
-            if description is None or description != match_desc:
-                new_description = match_desc + ". " + description
-                self.cursor.execute("UPDATE history "
-                                    "SET description = ? "
-                                    "WHERE rowid = ?", (new_description, match_id,))
-                logging.debug("database - updated description: " + new_description)
-
+            # set new description
+            if description is not None and description is not "" and description != match_desc:
+                # TODO possible improvement: keep (or ask to keep) also the previous description
+                new_description = description
+            else:
+                new_description = match_desc
+            # set new tags list
             if tags is not None and type(tags) == list and len(tags) > 0:
                 update_tags = False
                 match_tags = self._tags_string_to_array(match_tags_str)
                 for tag in tags:
-                    if tag not in match_tags:
+                    if tag not in match_tags and tag != "":
                         # new tag
                         match_tags.append(tag)
                         update_tags = True
-
                 if update_tags:
                     new_tags_str = self._tag_array_to_string(match_tags)
-                    self.cursor.execute("UPDATE history "
-                                        "SET tags = ?  "
-                                        "WHERE rowid = ?", (new_tags_str, match_id,))
-                    logging.debug("database - updated tags: " + new_tags_str)
+                else:
+                    new_tags_str = match_tags_str
+            else:
+                new_tags_str = match_tags_str
+
+            # delete old row
+            self.cursor.execute("DELETE FROM history WHERE rowid=?", (match_id,))
+
+            logging.debug("new_tags_str: " + str(new_tags_str))
+            # create new row which will have the highest rowID (last used command)
+            self.cursor.execute("INSERT INTO history values (?, ?, ?, ?)", (
+                cmd,
+                new_counter,
+                new_description,
+                new_tags_str,))
+            logging.error("database - command updated: " + cmd)
 
         else:
             logging.error("database - command entry is not unique: " + cmd)
             return False
+
         self.save_changes()
 
     def _tags_string_to_array(self, tags_string):
+        """
+        given the string of tags form the db it split the tags word and put it into an array
+        if the string is empty and empty array is returned
+        :param tags_string:     #tag1#tag2#tag3
+        :return:                ["tag1","tag2","tag3"]
+        """
+        if tags_string == "":
+            return []
         tags = tags_string.split(self.tag_separator)
-        if len(tags) > 1:
+        if len(tags) >= 2:
             # remove first always empty value
             tags = tags[1:]
-        return tags
+            return tags
+        else:
+            return []
 
     def _tag_array_to_string(self, tags):
+        """
+        given a tags array it returns the tags string to store it into the db
+        :param tags:
+        :return:
+        """
         tags_string = ""
         for tag in tags:
             tags_string += self.tag_separator + tag

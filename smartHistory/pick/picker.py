@@ -199,6 +199,9 @@ class Picker(object):
                 return_tuples.append((self.options[selected], selected))
             return return_tuples
         else:
+            # if not option available return an emtpy response
+            if len(self.options) == 0:
+                return ["", [], None], -1
             return self.options[self.index], self.index
 
     def get_smart_options(self):
@@ -214,49 +217,6 @@ class Picker(object):
             else:
                 options.append([False, option])
         return options
-
-    def load_data_for_info_cmd(self, cmd_text):
-        """
-        retrieve info about the currently selected cmd from the man page
-
-        TODO move this method to different class
-        :param cmd_text:    the bash cmd string
-        :return:            a structured list with info for each cmd and flags
-        """
-        # here the man search and parse
-        parser = BashParser()
-        # create a result var to fill
-        flags_for_info_cmd = list()
-        # parse the cmd string
-        cmd_parsed = bashlex.parse(cmd_text)
-        # find all flags for each commands
-        parser.get_flags_from_bash_node(cmd_parsed, flags_for_info_cmd)
-        # for each cmd and flag find the meaning from the man page
-        man_parsed = ManParser()
-        for item in flags_for_info_cmd:
-            cmd_main = item[BashParser.INDEX_CMD]
-            cmd_flags = item[BashParser.INDEX_FLAGS]
-            if man_parsed.load_man_page(cmd_main[BashParser.INDEX_VALUE]):
-                # save cmd meaning
-                cmd_main[BashParser.INDEX_MEANING] = man_parsed.get_cmd_meaning()
-                # cmd meaning found in the man page
-                if cmd_main[BashParser.INDEX_MEANING]:
-                    cmd_flags_updated = list()
-                    for flag_i in range(len(cmd_flags)):
-                        flag = cmd_flags[flag_i]
-                        flag[BashParser.INDEX_MEANING] = man_parsed.get_flag_meaning(flag[BashParser.INDEX_VALUE])
-                        # if flag found in the man page
-                        if flag[BashParser.INDEX_MEANING]:
-                            cmd_flags_updated.append(flag)
-                        else:
-                            # try to check if flag is concatenated
-                            conc_flags = BashParser.decompose_possible_concatenated_flags(flag[BashParser.INDEX_VALUE])
-                            for conc_flag in conc_flags:
-                                conc_flag_meaning = man_parsed.get_flag_meaning(conc_flag)
-                                cmd_flags_updated.append([conc_flag, conc_flag_meaning])
-                    # set the updated flags as new list of flags, the old list is deleted
-                    item[BashParser.INDEX_FLAGS] = cmd_flags_updated
-        return flags_for_info_cmd
 
     def run_loop(self):
         """
@@ -290,7 +250,7 @@ class Picker(object):
             # tab command
             elif c == KEYS_TAB:
                 self.is_info_page_shown = True
-                self.flags_for_info_cmd = self.load_data_for_info_cmd(
+                self.flags_for_info_cmd = BashParser.load_data_for_info_cmd(
                     cmd_text=self.current_selected_option[DataManager.INDEX_OPTION_CMD])
             elif c in KEYS_GO_BACK:
                 self.is_info_page_shown = False

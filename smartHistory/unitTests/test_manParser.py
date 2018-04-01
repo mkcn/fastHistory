@@ -17,6 +17,7 @@ class TestManParser(TestCase):
         ]
         for t in test_string:
             self.assertTrue(parser.load_man_page(t))
+            print(parser.get_cmd_meaning())
 
     def test_get_cmd_meaning(self):
         parser = ManParser()

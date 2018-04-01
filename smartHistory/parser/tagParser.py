@@ -10,11 +10,11 @@ class TagParser(object):
     Class used to parse input commands
     """
 
-    COMMENT = "#"
+    TAG_SIGN = "#"
+    DESCRIPTION_SIGN = "@"
     PRIVACY_SIGN = "##"
-    TAG_SEPARATOR = ","
 
-    TAGS_REGEXP = "^([0-9a-zA-Z ]*#)*([0-9a-zA-Z ])+$"
+    TAGS_REGEXP = "^([0-9a-zA-Z ]*#)*([0-9a-zA-Z @])+$"
 
     @staticmethod
     def is_privacy_mode_enable(cmd):
@@ -24,43 +24,67 @@ class TagParser(object):
 
     @staticmethod
     def parse_cmd(cmd):
+        """
+        parse the input cmd and retrieve the cmd, tags and description
+        accepted input:     cmd_string [#[tag[#tag...]][@description]]
+
+        examples:
+                            ls -la #list#file @show list files
+                            ls -la #list #file @show list files
+                            ls -la #list
+                            ls -la #@show list files
+
+        :param cmd:         input console cmd
+        :return:            array with following structure
+                                0 cmd string without tag and description
+                                1 description string
+                                2 tag array
+        """
 
         try:
-            sections = cmd.split(TagParser.COMMENT, maxsplit=1)
+            sections = cmd.split(TagParser.TAG_SIGN, maxsplit=1)
             # at least one
             if len(sections) == 2:
                 clean_cmd = sections[0]
                 section_tags = sections[1]
                 logging.debug("last section tag: " + section_tags)
-                # to match # tag, tag1, tag2
-                match = re.search(TagParser.TAGS_REGEXP, section_tags)
+
+                # TODO use regex to match tags and description
+                # match = re.search(TagParser.TAGS_REGEXP, section_tags)
 
                 # do not use group, i do not think it supports repeated groups
                 # vals = m.groups()
 
-                tags = section_tags.split(TagParser.COMMENT)
+                if TagParser.DESCRIPTION_SIGN in section_tags:
+                    sections_desc = section_tags.split(TagParser.DESCRIPTION_SIGN)
+                    section_description = sections_desc[1]
+                    section_tags = sections_desc[0]
+                else:
+                    section_description = None
+
+                tags = section_tags.split(TagParser.TAG_SIGN)
                 # clean tag list from spaces
                 for i in range(len(tags)):
-                    # TODO check if we need s.strip(' \t\n\r')
                     tags[i] = tags[i].strip()
                     logging.debug("TAG found: '" + tags[i] + "'")
             else:
                 clean_cmd = cmd
                 tags = []
+                section_description = None
                 logging.debug("no # found")
         except:
-            clean_cmd = cmd
             logging.error("error with TAG parser")
+            clean_cmd = cmd
+            section_description = None
             tags = []
         try:
-            # NOTE: the parser class does not show the comments, so we parse it
-            # parse cmd
-            parts = bashlex.parse(clean_cmd)
-            # for ast in parts:
-            # print type(ast)
-            # print ast.dump()
+            if section_description:
+                description = section_description
+            else:
+                # TODO parse cmd and find cmd meaning from man page
+                description = None
         except:
-            parts = None
+            description = None
             logging.error("error with CMD parser")
 
-        return [clean_cmd, parts, tags]
+        return [clean_cmd, description, tags]

@@ -46,7 +46,6 @@ def handle_add_request(input_cmd_str, project_dir, feedback=False):
 	# local import to not affect the response time of the bash commandv
 	from parser import tagParser
 	from console.loggerBash import log_on_console_info, log_on_console_error
-	from collector.saver import Saver
 
 	# define log class
 	logging.info("add request: '" + input_cmd_str + "'")
@@ -57,16 +56,16 @@ def handle_add_request(input_cmd_str, project_dir, feedback=False):
 		parser_res = tagParser.TagParser.parse_cmd(input_cmd_str)
 
 		cmd = parser_res[0]
+		description = parser_res[1]
 		tags = parser_res[2]
 
 		data_retriever = DataManager(project_dir, DATABASE_MODE)
-		data_retriever.add_new_element(cmd, "", tags)
-
-		# log_info(parser_res)
-		# x = Saver(input_text=parser_res)
+		data_retriever.add_new_element(cmd, description, tags)
+		logging.info("command: added")
 		if feedback:
 			log_on_console_info("command: added")
 	else:
+		logging.info("PRIVACY mode ENABLED")
 		if feedback:
 			log_on_console_info("PRIVACY mode ENABLED")
 

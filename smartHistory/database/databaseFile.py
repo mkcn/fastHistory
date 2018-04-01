@@ -16,7 +16,7 @@ class DatabaseFile(object):
 	def get_first_50_elements(self, filter=None):
 		pass
 
-	def get_last_N_elements(self, filter=None, N=50):
+	def get_last_N_elements(self, filter=None, n=50):
 		pass
 
 	def add_element(self, cmd, description, tags ):
