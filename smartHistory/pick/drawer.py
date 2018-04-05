@@ -65,7 +65,7 @@ class Drawer(object):
         hide the cursor
         :return:
         """
-        self.smart_screen.curs_set(0)
+        curses.curs_set(0)
         pass
 
     def wait_next_char(self):

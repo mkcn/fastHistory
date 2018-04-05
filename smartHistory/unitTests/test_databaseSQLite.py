@@ -7,7 +7,7 @@ from database.databaseSQLite import DatabaseSQLite
 
 class TestDatabaseSQLite(unittest.TestCase):
 
-    log_file_name = "data/test.log"
+    log_file_name = "data/test_databaseSQLite.log"
 
     def setUp(self):
         current_path = os.path.dirname(os.path.realpath(__file__)) + "/../"

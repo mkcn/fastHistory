@@ -186,7 +186,6 @@ class BashParser(object):
         """
         retrieve info about the currently selected cmd from the man page
 
-        TODO move this method to different class
         :param cmd_text:    the bash cmd string
         :return:            a structured list with info for each cmd and flags
         """

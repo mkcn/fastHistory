@@ -42,7 +42,7 @@ class PageInfo(object):
         self.draw_help_line_info()
 
         # cursor set position
-        self.drawer.move_cursor(9, 4)
+        self.drawer.hide_cursor()
 
     def draw_help_line_info(self):
         """
@@ -105,39 +105,48 @@ class PageInfo(object):
                 self.drawer.draw_row(cmd_main[BashParser.INDEX_VALUE], color=self.drawer.color_selected_row)
                 self.drawer.draw_row(": ")
                 # the cmd meaning could be on more line
-                for line in cmd_main[BashParser.INDEX_MEANING]:
-                    self.drawer.draw_row(line[ManParser.INDEX_MEANING_VALUE])
-
+                self.draw_cmd_meaning(None, cmd_main[BashParser.INDEX_MEANING])
                 # print each flag meaning
                 for flag in cmd_flags:
                     # if flag found in the man page
                     if flag[BashParser.INDEX_MEANING]:
-                        self.draw_cmd_flag_meaning(flag[BashParser.INDEX_VALUE], flag[BashParser.INDEX_MEANING])
+                        self.draw_cmd_meaning(flag[BashParser.INDEX_VALUE], flag[BashParser.INDEX_MEANING], is_flag=True)
                 self.drawer.new_line()
+            self.drawer.new_line()
         if not info_man_shown:
             self.drawer.new_line()
             self.drawer.draw_row(char_column)
             self.drawer.draw_row(" ")
             self.drawer.draw_row("No info available")
 
-    def draw_cmd_flag_meaning(self, flag, flag_meaning):
+    def draw_cmd_meaning(self, word_to_underline, meaning_obj, is_flag=False):
+        """
+        given the meaning of a cmd or of a relative flag, it prints the each line with different indentations.
+        this will create a sort of tree effect to easily detect which flags belong to which command
+        :param word_to_underline:
+        :param meaning_obj:
+        :param is_flag:
+        :return:
+        """
+        if is_flag:
+            indent = 4
+        else:
+            indent = 2
+        indent_more = 6
 
-        indent_flag = 4
-        indent_flag_more = 6
-
-        for row in flag_meaning:
-            self.drawer.new_line()
+        for row in meaning_obj:
             if row[ManParser.INDEX_IS_FIRST_LINE]:
-                self.drawer.draw_row(" " * indent_flag)
+                self.drawer.draw_row(" " * indent)
                 self.draw_marked_string(row[ManParser.INDEX_MEANING_VALUE],
-                                        flag,
+                                        word_to_underline,
                                         color_marked=self.drawer.color_selected_row,
                                         case_sensitive=True,
                                         recursive=False)
             else:
                 self.drawer.draw_row(" ")
-                self.drawer.draw_row(" " * (indent_flag + indent_flag_more))
+                self.drawer.draw_row(" " * indent_more)
                 self.drawer.draw_row(row[ManParser.INDEX_MEANING_VALUE])
+            self.drawer.new_line()
 
     def draw_marked_string(self, text, sub_str, index_sub_str=None, color_default=1, color_marked=None,
                            case_sensitive=False, recursive=True):
@@ -154,7 +163,7 @@ class PageInfo(object):
         :return:
         """
         # if sub string is empty draw normally the text
-        if len(sub_str) == 0:
+        if sub_str is None or len(sub_str) == 0:
             self.drawer.draw_row(text, color=color_default)
         else:
             if len(text) > 0:

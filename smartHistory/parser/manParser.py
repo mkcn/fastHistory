@@ -11,8 +11,21 @@ class ManParser(object):
     Class used to parse man pages
     """
 
-    _regexp_flag = r"^ {4,7}(.+, )*%s([,=].+)?( .*)?\n( +\S.*\n)*$"
-    _regex_name = "^NAME\n {4,7}%s [-—] (.*)$"  # usually just 7 space
+    # regex notes:
+    # name:
+    #   - the initial space size is not fixed ( "   -a" or "       -a")
+    #   - the dash can be done with different char ("-" or "—")
+    #   - the search must use the IGNORE CASE option
+    # flags:
+    #   - the flag can be at the beginning or as secondary item ("-a" or "--all, -a" or "-a\n     --all")
+    #       - each item must start with "-"
+    #   - after a flag we can found:
+    #                       - comma     -a, --other
+    #                       - equal     -a=PATTERN
+    #                       - bracket   -a[=WHEN]
+    # - the flag is always preceded by a new line ("\n       -a")
+    _regex_name = "^NAME\n {2,7}%s {1,3}[-—] (.*\n( +.*\n)*)$"
+    _regexp_flag = r"^(\n {2,7}-.+)?\n {2,7}(-.+, )*%s((\[)?[,=].+(\])?)?( .*)?\n( +.*\n)*$"
     _regex_name_no_group = "^ {7}ls - .*"
 
     _error_man_page_message = "<man page not found>"
@@ -37,6 +50,7 @@ class ManParser(object):
             self.man_page = subprocess.check_output(["man", cmd]).decode('utf-8')
             return True
         except subprocess.CalledProcessError as e:
+            logging.error("load_man_page: " + str(cmd))
             self.man_page = None
             return False
 
@@ -50,41 +64,48 @@ class ManParser(object):
                 if result is not None:
                     result = result.group(0)
                 else:
+                    logging.debug("get_flag_meaning: regex does not match")
                     return None
             except sre_constants.error:
                 logging.error("flag meaning parser: ", sys.exc_info()[0])
                 return None
 
         rows = result.split("\n")
+        first = True
         for i in range(len(rows)):
             # remove starting and ending spaces
             row = rows[i].strip()
             if len(row) > 0:
-                if i == 0:
-                    first = True
+                if first:
+                    # this check if done to handle the case of flags on multi lines ( es "-a\n--all")
+                    if flag in row:
+                        first = False
+                    final_result.append([True, row])
                 else:
-                    first = False
-                final_result.append([first, row])
-
+                    final_result.append([False, row])
         return final_result
 
     def get_cmd_meaning(self):
         if self.man_page is None:
+            logging.error("get_cmd_meaning: man_page is empty")
             return None
         else:
-            search = re.search(self._regex_name % self.cmd, self.man_page, re.MULTILINE)
+            search = re.search(self._regex_name % self.cmd, self.man_page, re.MULTILINE | re.IGNORECASE)
             if search is not None:
                 result = search.group(1)
             else:
+                logging.debug("get_cmd_meaning: regex does not match")
                 return None
 
         final_result = []
         rows = result.split("\n")
+        first = True
         for i in range(len(rows)):
             # remove starting and ending spaces
             row = rows[i].strip()
             if len(row) > 0:
-                if i == 0:
+                if first:
+                    first = False
                     # [INDEX_IS_FIRST_LINE, INDEX_MEANING_VALUE]
                     final_result.append([True, row])
                 else:
