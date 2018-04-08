@@ -50,7 +50,8 @@ class TestManParser(TestCase):
             "tar",
             "ls",
             "netstat",
-            "wget"
+            "wget",
+            "grep"
         ]
         for t in test_string:
             logging.info("test: " + str(t))

@@ -14,7 +14,8 @@ class TagParser(object):
     DESCRIPTION_SIGN = "@"
     PRIVACY_SIGN = "##"
 
-    TAGS_REGEXP = "^([0-9a-zA-Z ]*#)*([0-9a-zA-Z @])+$"
+    # https://regex101.com/r/Cs8C45/3
+    TAGS_REGEXP = "\ ((?:#[\w\d\-\_\ \t]*)+)(@[\w\d\-\_\.\,\!\?\ \t]*)?$"
 
     @staticmethod
     def is_privacy_mode_enable(cmd):
@@ -37,54 +38,45 @@ class TagParser(object):
         :param cmd:         input console cmd
         :return:            array with following structure
                                 0 cmd string without tag and description
-                                1 description string
-                                2 tag array
+                                1 tags array
+                                2 description string
+                            None in case a command without tags or description
+                            None in case of generic errors
         """
 
-        try:
-            sections = cmd.split(TagParser.TAG_SIGN, maxsplit=1)
-            # at least one
-            if len(sections) == 2:
-                clean_cmd = sections[0]
-                section_tags = sections[1]
-                logging.debug("last section tag: " + section_tags)
+        match = re.search(TagParser.TAGS_REGEXP, cmd, flags=re.UNICODE)
+        if match:
+            logging.debug("tag parser: regex matches")
+            tags_str = match.group(1)
+            desc_str = match.group(2)
+            char_to_cut = 1
+            if tags_str:
+                char_to_cut += len(tags_str)
+            if desc_str:
+                char_to_cut += len(desc_str)
+            cmd = cmd[:-char_to_cut]
+        else:
+            logging.debug("tag parser: regex does NOT match")
+            return None
 
-                # TODO use regex to match tags and description
-                # match = re.search(TagParser.TAGS_REGEXP, section_tags)
-
-                # do not use group, i do not think it supports repeated groups
-                # vals = m.groups()
-
-                if TagParser.DESCRIPTION_SIGN in section_tags:
-                    sections_desc = section_tags.split(TagParser.DESCRIPTION_SIGN)
-                    section_description = sections_desc[1]
-                    section_tags = sections_desc[0]
-                else:
-                    section_description = None
-
-                tags = section_tags.split(TagParser.TAG_SIGN)
-                # clean tag list from spaces
-                for i in range(len(tags)):
-                    tags[i] = tags[i].strip()
-                    logging.debug("TAG found: '" + tags[i] + "'")
-            else:
-                clean_cmd = cmd
-                tags = []
-                section_description = None
-                logging.debug("no # found")
-        except:
-            logging.error("error with TAG parser")
-            clean_cmd = cmd
-            section_description = None
+        # tags
+        tags = []
+        tags_tmp = tags_str.split(TagParser.TAG_SIGN)
+        if len(tags_tmp) >= 2:
+            tags_tmp = tags_tmp[1:]
+            for i in range(len(tags_tmp)):
+                # remove spaces from each tag
+                tag = tags_tmp[i].strip()
+                if tag != "":
+                    tags.append(tag)
+        else:
             tags = []
-        try:
-            if section_description:
-                description = section_description
-            else:
-                # TODO parse cmd and find cmd meaning from man page
-                description = None
-        except:
-            description = None
-            logging.error("error with CMD parser")
 
-        return [clean_cmd, description, tags]
+        # remove @ and spaces from description
+        if desc_str is not None:
+            desc = desc_str[1:].strip()
+        else:
+            desc = None
+
+        return [cmd, tags, desc]
+

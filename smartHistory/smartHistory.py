@@ -55,15 +55,25 @@ def handle_add_request(input_cmd_str, project_dir, feedback=False):
 		# parse tags and store the cmd
 		parser_res = tagParser.TagParser.parse_cmd(input_cmd_str)
 
-		cmd = parser_res[0]
-		description = parser_res[1]
-		tags = parser_res[2]
+		if parser_res is None:
+			log_on_console_info("wrong syntax")
+		else:
+			cmd = parser_res[0]
+			tags = parser_res[1]
+			description = parser_res[2]
 
-		data_retriever = DataManager(project_dir, DATABASE_MODE)
-		data_retriever.add_new_element(cmd, description, tags)
-		logging.info("command: added")
-		if feedback:
-			log_on_console_info("command: added")
+			if description is None:
+				# TODO
+				# 1) extract cmd from string
+				# 2) get meaning for each cmd
+				# 3) concatenate and set them as description
+				pass
+
+			data_retriever = DataManager(project_dir, DATABASE_MODE)
+			data_retriever.add_new_element(cmd, description, tags)
+			logging.info("command: added")
+			if feedback:
+				log_on_console_info("command: added")
 	else:
 		logging.info("PRIVACY mode ENABLED")
 		if feedback:
