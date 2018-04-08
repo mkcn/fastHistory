@@ -3,24 +3,25 @@
 import curses
 import logging
 
-from parser import bashlex
 from parser.bashParser import BashParser
-from parser.manParser import ManParser
 from database.dataManager import DataManager
 from pick.drawer import Drawer
 from pick.pageSelect import PageSelector
 
 KEYS_ENTER = (curses.KEY_ENTER, ord('\n'), ord('\r'))
-KEYS_UP = curses.KEY_UP
-KEYS_DOWN = curses.KEY_DOWN
-KEYS_DELETE = (curses.KEY_BACKSPACE, curses.KEY_DC)
-KEYS_TAB = 9
+KEY_UP = curses.KEY_UP
+KEY_DOWN = curses.KEY_DOWN
+KEY_DELETE = curses.KEY_BACKSPACE
+KEY_CANC = curses.KEY_DC
+KEY_TAB = 9
 KEY_ESC = 27  # NOTE: the KEY_ESC can be received with some delay
-KEYS_GO_BACK = (curses.KEY_BTAB, KEY_ESC)
+KEY_TAG = 35
+KEY_AT = 64
+KEY_SHIFT_TAB = curses.KEY_BTAB
 KEY_RIGHT = curses.KEY_RIGHT
 KEY_LEFT = curses.KEY_LEFT
 KEY_RESIZE = curses.KEY_RESIZE
-KEYS_SELECT = None  # TODO decide
+KEY_SELECT = None  # TODO decide
 
 
 class Picker(object):
@@ -49,9 +50,6 @@ class Picker(object):
         self.drawer = None
         self.flags_for_info_cmd = None
 
-        # bool to change the context to the info page
-        self.is_info_page_shown = False
-
         self.is_multi_select = multi_select
 
         self.cmd_meaning = None
@@ -67,30 +65,85 @@ class Picker(object):
 
         self.current_selected_option = None
 
-    def draw_smart(self):
+    def has_minimum_size(self):
         """
-        main controller of page drawer
+        # draw screen if screen has minimum size
+        :return:    true if the console has at least the minimum size
+        """
+        return self.drawer.get_max_y() < 4 or self.drawer.get_max_x() < 40
+
+    def draw_edit_description(self):
+        """
+        controller of description page drawer
         :return:
         """
-        # clear screen
+        if self.has_minimum_size():
+            return
         self.drawer.clear()
-        # reset terminal
         self.drawer.reset()
 
-        if self.is_info_page_shown:
-            # import this locally to improve performance when the program is loaded
-            from pick.pageInfo import PageInfo
-            page_info = PageInfo(self.drawer, self.page_selector)
-            page_info.draw_page_info(option=self.current_selected_option,
-                                     search_text_lower=self.search_text_lower,
-                                     flags_for_info_cmd=self.flags_for_info_cmd)
-        else:
-            smart_options = self.get_smart_options()
-            self.page_selector.draw_page_select(
-                search_text_lower=self.search_text_lower,
-                title=self.SMART_HISTORY_TITLE,
-                search_text=self.search_text,
-                smart_options=smart_options)
+        # import this locally to improve performance when the program is loaded
+        from pick.pageEditDescription import PageEditDescription
+        page_tags = PageEditDescription(self.drawer, self.page_selector)
+        page_tags.draw_page(option=self.current_selected_option, search_text_lower=self.search_text_lower)
+
+        # refresh screen
+        self.drawer.refresh()
+
+    def draw_edit_tags(self):
+        """
+        controller of tags page drawer
+        :return:
+        """
+        if self.has_minimum_size():
+            return
+        self.drawer.clear()
+        self.drawer.reset()
+
+        # import this locally to improve performance when the program is loaded
+        from pick.pageEditTags import PageEditTags
+        page_tags = PageEditTags(self.drawer, self.page_selector)
+        page_tags.draw_page(option=self.current_selected_option, search_text_lower=self.search_text_lower)
+
+        # refresh screen
+        self.drawer.refresh()
+
+    def draw_info(self):
+        """
+        controller of info page drawer
+        :return:
+        """
+        if self.has_minimum_size():
+            return
+        self.drawer.clear()
+        self.drawer.reset()
+
+        # import this locally to improve performance when the program is loaded
+        from pick.pageInfo import PageInfo
+        page_info = PageInfo(self.drawer, self.page_selector)
+        page_info.draw_page_info(option=self.current_selected_option,
+                                 search_text_lower=self.search_text_lower,
+                                 flags_for_info_cmd=self.flags_for_info_cmd)
+
+        # refresh screen
+        self.drawer.refresh()
+
+    def draw_select(self):
+        """
+        controller of select page drawer
+        :return:
+        """
+        if self.has_minimum_size():
+            return
+        self.drawer.clear()
+        self.drawer.reset()
+
+        smart_options = self.get_smart_options()
+        self.page_selector.draw_page_select(
+            search_text_lower=self.search_text_lower,
+            title=self.SMART_HISTORY_TITLE,
+            search_text=self.search_text,
+            smart_options=smart_options)
 
         # refresh screen
         self.drawer.refresh()
@@ -218,9 +271,110 @@ class Picker(object):
                 options.append([False, option])
         return options
 
-    def run_loop(self):
+    def run_loop_edit_description(self):
         """
-        Loop to capture user input keys
+        Loop to capture user input keys to interact with the "add description" page
+
+        :return:
+        """
+        while True:
+            self.draw_edit_description()
+            # wait for char
+            c = self.drawer.wait_next_char()
+
+            # save and exit
+            if c in KEYS_ENTER:
+                return
+            # exit without saving
+            elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
+                return None
+            # -> command
+            elif c == KEY_RIGHT:
+                self.drawer.move_shift_right()
+            # <- command
+            elif c == KEY_LEFT:
+                self.drawer.move_shift_left()
+            else:
+                logging.error("char not handled: " + str(c))
+
+    def run_loop_edit_tags(self):
+        """
+        Loop to capture user input keys to interact with the "add tag" page
+
+        :return:
+        """
+        while True:
+            self.draw_edit_tags()
+            # wait for char
+            c = self.drawer.wait_next_char()
+
+            # save and exit
+            if c in KEYS_ENTER:
+                return
+            # exit without saving
+            elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
+                return None
+            # -> command
+            elif c == KEY_RIGHT:
+                self.drawer.move_shift_right()
+            # <- command
+            elif c == KEY_LEFT:
+                self.drawer.move_shift_left()
+            else:
+                logging.error("char not handled: " + str(c))
+
+    def run_loop_info(self):
+        """
+        Loop to capture user input keys to interact with the info page
+
+        :return:
+        """
+        self.flags_for_info_cmd = BashParser.load_data_for_info_cmd(
+            cmd_text=self.current_selected_option[DataManager.INDEX_OPTION_CMD])
+
+        while True:
+            self.draw_info()
+            # wait for char
+            c = self.drawer.wait_next_char()
+
+            # select current entry
+            if c in KEYS_ENTER:
+                return self.get_selected()
+            # delete selected entry
+            elif c == KEY_CANC:
+                # TODO implement delete entry
+                logging.info("TODO delete selected entry")
+                pass
+            # go back to select page
+            elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
+                return None
+            # -> command
+            elif c == KEY_RIGHT:
+                self.drawer.move_shift_right()
+            # <- command
+            elif c == KEY_LEFT:
+                self.drawer.move_shift_left()
+            # normal search char
+            elif c == KEY_TAG:  # "#"
+                self.run_loop_edit_tags()
+            # delete a char of the search
+            elif c == KEY_AT:  # "@"
+                self.run_loop_edit_description()
+            elif c == KEY_RESIZE:
+                # this occurs when the console size changes
+                self.drawer.reset()
+                # TODO make this more efficient
+                # update list option
+                self.options = self.data_manager.filter(self.search_text_lower,
+                                                        self.index + self.get_number_options_to_draw())
+                # update the options to show
+                self.update_options_to_draw()
+            else:
+                logging.error("char not handled: " + str(c))
+
+    def run_loop_select(self):
+        """
+        Loop to capture user input keys to interact with the select page
 
         """
         # get filtered starting options
@@ -228,15 +382,14 @@ class Picker(object):
         self.initialize_options_to_draw()
 
         while True:
-            # draw screen if screen has minimum size
-            if self.drawer.get_max_y() > 3 and self.drawer.get_max_x() > 40:
-                self.draw_smart()
+            self.draw_select()
             # wait for char
             c = self.drawer.wait_next_char()
 
-            if c == KEYS_UP:
+            # check char and execute command
+            if c == KEY_UP:
                 self.move_up()
-            elif c == KEYS_DOWN:
+            elif c == KEY_DOWN:
                 self.move_down()
                 # retrieve more data from db when user want to view more
                 if self.index % (self.get_number_options_to_draw() - 1) == 0:
@@ -245,15 +398,13 @@ class Picker(object):
                         self.index + self.get_number_options_to_draw())
             elif c in KEYS_ENTER:
                 return self.get_selected()
-            elif c == KEYS_SELECT and self.is_multi_select:
+            elif c == KEY_SELECT and self.is_multi_select:
                 self.mark_index()
             # tab command
-            elif c == KEYS_TAB:
-                self.is_info_page_shown = True
-                self.flags_for_info_cmd = BashParser.load_data_for_info_cmd(
-                    cmd_text=self.current_selected_option[DataManager.INDEX_OPTION_CMD])
-            elif c in KEYS_GO_BACK:
-                self.is_info_page_shown = False
+            elif c == KEY_TAB:
+                res = self.run_loop_info()
+                if res is not None:
+                    return res
             # -> command
             elif c == KEY_RIGHT:
                 self.drawer.move_shift_right()
@@ -269,13 +420,17 @@ class Picker(object):
                 # update the options to show
                 self.update_options_to_draw(initialize_index=True)
             # delete a char of the search
-            elif c in KEYS_DELETE:
+            elif c == KEY_DELETE:
                 if len(self.search_text) > 0:
                     self.search_text = self.search_text[:-1]
                     self.search_text_lower = self.search_text_lower[:-1]
                     self.options = self.data_manager.filter(self.search_text_lower, self.get_number_options_to_draw())
                     # update the options to show
                     self.update_options_to_draw(initialize_index=True)
+            elif c == KEY_CANC:
+                # TODO implement delete entry
+                logging.info("TODO delete selected entry")
+                pass
             elif c == KEY_RESIZE:
                 # this occurs when the console size changes
                 self.drawer.reset()
@@ -291,7 +446,7 @@ class Picker(object):
         self.drawer = Drawer(screen)
         self.page_selector = PageSelector(self.drawer)
 
-        return self.run_loop()
+        return self.run_loop_select()
 
     def start(self):
         return curses.wrapper(self._start)

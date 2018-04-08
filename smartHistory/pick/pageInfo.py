@@ -1,3 +1,5 @@
+import logging
+
 from parser.bashParser import BashParser
 from parser.manParser import ManParser
 from database.dataManager import DataManager
@@ -50,14 +52,23 @@ class PageInfo(object):
         :return:
         """
         self.drawer.set_y(self.drawer.get_max_y() - 1)
-        self.drawer.draw_row("Shift-tab", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Go back", x_indent=1)
-
         self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title)
         self.drawer.draw_row("Select", x_indent=1)
 
         self.drawer.draw_row("<-|->", x_indent=2, color=self.drawer.color_columns_title)
         self.drawer.draw_row("Scroll", x_indent=1)
+
+        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title)
+        self.drawer.draw_row("Go back", x_indent=1)
+
+        self.drawer.draw_row("Canc", x_indent=2, color=self.drawer.color_columns_title)
+        self.drawer.draw_row("Delete", x_indent=1)
+
+        self.drawer.draw_row("#", x_indent=2, color=self.drawer.color_columns_title)
+        self.drawer.draw_row("Tag", x_indent=1)
+
+        self.drawer.draw_row("@", x_indent=2, color=self.drawer.color_columns_title)
+        self.drawer.draw_row("Description", x_indent=1)
 
     def draw_info_option(self, cmd_string, tags, desc, search_text, flags_for_info_cmd):
         indent = 2
@@ -65,27 +76,43 @@ class PageInfo(object):
 
         char_column = " "
 
+        no_tag_message = "To add a tag press "
+        no_desc_message = "To add a description press "
+        no_man_page_available = "No info available"
+
+        # tags in not empty
         self.drawer.new_line()
         self.drawer.draw_row(" " * sub_title_len, x=indent, color=self.drawer.color_columns_title)
         self.drawer.draw_row("Tags", x=indent + 1, color=self.drawer.color_columns_title)
         self.drawer.new_line()
         self.drawer.draw_row(" " * indent)
-        for tag in tags:
-            self.drawer.draw_row("#", color=self.drawer.color_hash_tag)
-            self.draw_marked_string(tag, search_text)
-            self.drawer.draw_row(" ")
+        if tags is not None and len(tags) > 0:
+            for tag in tags:
+                self.drawer.draw_row("#", color=self.drawer.color_hash_tag)
+                self.draw_marked_string(tag, search_text)
+                self.drawer.draw_row(" ")
+        else:
+            self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
+            self.drawer.draw_row(no_tag_message)
+            self.drawer.draw_row("#]", color=self.drawer.color_hash_tag)
         self.drawer.new_line()
 
         # description if not empty
-
         self.drawer.new_line()
         self.drawer.draw_row(" " * sub_title_len, x=indent, color=self.drawer.color_columns_title)
         self.drawer.draw_row("Description", x=indent + 1, color=self.drawer.color_columns_title)
         self.drawer.new_line()
-        self.drawer.draw_row("@", x=indent, color=self.drawer.color_hash_tag)
-        self.draw_marked_string(desc, search_text)
+        self.drawer.draw_row(" " * indent)
+        if desc is not None and len(desc) > 0:
+            self.drawer.draw_row("@", color=self.drawer.color_hash_tag)
+            self.draw_marked_string(desc, search_text)
+        else:
+            self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
+            self.drawer.draw_row(no_desc_message)
+            self.drawer.draw_row("@]", color=self.drawer.color_hash_tag)
         self.drawer.new_line()
 
+        # man page info
         self.drawer.new_line()
         self.drawer.draw_row(" " * sub_title_len, x=indent, color=self.drawer.color_columns_title)
         self.drawer.draw_row("Man page info", x=indent + 1, color=self.drawer.color_columns_title)
@@ -93,6 +120,7 @@ class PageInfo(object):
         # these information are calculate when the cmd is selected
         # iterate for each cmd (one bash string can contain more commands) and print all the flags
         info_man_shown = False
+
         for item in flags_for_info_cmd:
             cmd_main = item[BashParser.INDEX_CMD]
             cmd_flags = item[BashParser.INDEX_FLAGS]
@@ -111,13 +139,11 @@ class PageInfo(object):
                     # if flag found in the man page
                     if flag[BashParser.INDEX_MEANING]:
                         self.draw_cmd_meaning(flag[BashParser.INDEX_VALUE], flag[BashParser.INDEX_MEANING], is_flag=True)
-                self.drawer.new_line()
-            self.drawer.new_line()
         if not info_man_shown:
-            self.drawer.new_line()
-            self.drawer.draw_row(char_column)
-            self.drawer.draw_row(" ")
-            self.drawer.draw_row("No info available")
+            self.drawer.draw_row(" " * indent)
+            self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
+            self.drawer.draw_row(no_man_page_available)
+            self.drawer.draw_row("]", color=self.drawer.color_hash_tag)
 
     def draw_cmd_meaning(self, word_to_underline, meaning_obj, is_flag=False):
         """

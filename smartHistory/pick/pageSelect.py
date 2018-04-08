@@ -57,6 +57,7 @@ class PageSelector(object):
         self.draw_help_line_selector()
 
         # cursor set position
+        self.drawer.show_cursor()
         self.drawer.move_cursor(len(title + ": ") + len(search_text), 0)
 
     def draw_option(self, cmd, tags, desc, search, last_column_size=0, selected=False):
@@ -177,21 +178,17 @@ class PageSelector(object):
 
     def draw_help_line_selector(self):
         self.drawer.set_y(self.drawer.get_max_y() - 1)
-        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("More", x_indent=1)
-
         self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title)
         self.drawer.draw_row("Select", x_indent=1)
 
         self.drawer.draw_row("<-|->", x_indent=2, color=self.drawer.color_columns_title)
         self.drawer.draw_row("Scroll", x_indent=1)
 
-        self.drawer.draw_row("#", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("tag", x_indent=1)
+        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title)
+        self.drawer.draw_row("More", x_indent=1)
 
-        # TODO fix bug (when screen is too short and there is no space for Description)
-        self.drawer.draw_row("@", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Description", x_indent=1)
+        self.drawer.draw_row("Canc", x_indent=2, color=self.drawer.color_columns_title)
+        self.drawer.draw_row("Delete", x_indent=1)
 
     def get_matching_word_from_sentence(self, sentence, search):
         """

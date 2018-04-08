@@ -68,6 +68,14 @@ class Drawer(object):
         curses.curs_set(0)
         pass
 
+    def show_cursor(self):
+        """
+        show the cursor
+        :return:
+        """
+        curses.curs_set(1)
+        pass
+
     def wait_next_char(self):
         """
         wait input from user
