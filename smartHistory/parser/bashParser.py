@@ -182,7 +182,7 @@ class BashParser(object):
         return flags
 
     @staticmethod
-    def load_data_for_info_cmd(cmd_text):
+    def load_data_for_info_from_man_page(cmd_text):
         """
         retrieve info about the currently selected cmd from the man page
 

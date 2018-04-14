@@ -4,16 +4,19 @@ import sys
 import os
 import logging
 from database.dataManager import DataManager
+from console.loggerBash import log_on_console_info, log_on_console_error
 
-LOG_FILE_NAME = "data/smartHistory.log"
+LOG_FILE_NAME = "data/history.log"
+DATABASE_FILENAME = "data/history.db"
+
 DATABASE_MODE = DataManager.DATABASE_MODE_SQLITE
 
 
-def handle_search_request(input_cmd_str, project_dir):
+def handle_search_request(input_cmd_str, project_directory):
 	"""
 	take input and show the filtered list of command to select
 
-	:param project_dir: 	path of the project
+	:param project_directory: 	path of the project
 	:param input_cmd_str:	input cmd
 	:return:
 	"""
@@ -25,59 +28,69 @@ def handle_search_request(input_cmd_str, project_dir):
 	# set SIGINT handler
 	ConsoleUtils.handle_close_signal()
 	# create data manger obj
-	data_manager = DataManager(project_dir, DATABASE_MODE)
+	data_manager = DataManager(project_directory + DATABASE_FILENAME, DATABASE_MODE)
+
 	# open picker to select from history
 	picker = Picker(data_manager, search_text=input_cmd_str)
 	selected_option, index = picker.start()
 	selected_string = selected_option[0]
 	# show selected cmd
-	ConsoleUtils.fill_terminal_input(selected_string)
+	try:
+		ConsoleUtils.fill_terminal_input(selected_string)
+	except:
+		logging.error("your terminal does not support automatic input injection")
+		log_on_console_error("Your terminal does not support automatic input injection")
 
 
-def handle_add_request(input_cmd_str, project_dir, feedback=False):
+def handle_add_request(input_cmd_str, project_directory, feedback=False):
 	"""
 	take input and add store it
 
-	:param project_dir: 	path of the project
+	:param project_directory: 	path of the project
 	:param input_cmd_str:	input cmd
 	:param feedback:		if true prints feedback message in the console, otherwise hides all
 	:return:
 	"""
-	# local import to not affect the response time of the bash commandv
-	from parser import tagParser
-	from console.loggerBash import log_on_console_info, log_on_console_error
+	# local import to not affect the response time of the bash command
+	from parser.tagParser import TagParser
 
 	# define log class
-	logging.info("add request: '" + input_cmd_str + "'")
+	logging.debug("add request: '" + input_cmd_str + "'")
 
-	# if no privacy mode add the command
-	if not tagParser.TagParser.is_privacy_mode_enable(input_cmd):
-		# parse tags and store the cmd
-		parser_res = tagParser.TagParser.parse_cmd(input_cmd_str)
+	# parse tags and store the cmd
+	parser_res = TagParser.parse_cmd(input_cmd_str)
 
-		if parser_res is None:
-			log_on_console_info("wrong syntax")
-		else:
-			cmd = parser_res[0]
-			tags = parser_res[1]
-			description = parser_res[2]
-
-			if description is None:
-				# TODO
-				# 1) extract cmd from string
-				# 2) get meaning for each cmd
-				# 3) concatenate and set them as description
-				pass
-
-			data_retriever = DataManager(project_dir, DATABASE_MODE)
-			data_retriever.add_new_element(cmd, description, tags)
-			logging.info("command: added")
-			if feedback:
-				log_on_console_info("command: added")
+	if parser_res is None:
+		log_on_console_error("Wrong input")
+		log_on_console_info("Syntax : hadd command [#[tag [#tag ...]][@description]]")
+		log_on_console_info("Example: hadd ls -la #tag1 #tag2 #tag2 @a long description")
+		# TODO create and print help page
 	else:
-		logging.info("PRIVACY mode ENABLED")
-		if feedback:
-			log_on_console_info("PRIVACY mode ENABLED")
+		cmd = parser_res[TagParser.INDEX_CMD]
+		description = parser_res[TagParser.INDEX_DESC]
+		tags = parser_res[TagParser.INDEX_TAGS]
+
+		# TODO idea to test
+		if description is None:
+			# 1) extract cmd from input string (without tags and description)
+			# 2) get meaning for the cmd from man page
+			# 3) set it as description
+			pass
+
+		data_manager = DataManager(project_directory + DATABASE_FILENAME, DATABASE_MODE)
+		stored = data_manager.add_new_element(cmd, description, tags)
+		if stored:
+			logging.info("command added")
+			if feedback:
+				log_on_console_info("command added: \t" + cmd)
+				if tags and len(tags) > 0:
+					log_on_console_info("tags: \t\t" + str(tags))
+				if description and len(description) > 0:
+					log_on_console_info("description: \t" + description)
+		else:
+			logging.info("command: fail")
+			if feedback:
+				log_on_console_info("command add fail, please check your log file")
 
 
 if __name__ == "__main__":

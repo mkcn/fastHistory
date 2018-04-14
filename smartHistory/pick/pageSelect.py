@@ -1,3 +1,5 @@
+import logging
+
 from database.dataManager import DataManager
 
 
@@ -21,14 +23,29 @@ class PageSelector(object):
     def __init__(self, drawer):
         self.drawer = drawer
 
-    def draw_page_select(self, search_text_lower, title, search_text, smart_options):
+    def draw_page_select(self, filters, title, search_text, smart_options):
         """
         draw page where the user can select the command
+
+
         :return:
         """
         # title
         self.drawer.draw_row(title + ": ")
-        self.drawer.draw_row(search_text, color=self.drawer.color_search)
+        if filters[DataManager.INDEX_OPTION_IS_ADVANCED]:
+            if filters[DataManager.INDEX_OPTION_CMD] != "":
+                self.drawer.draw_row(filters[DataManager.INDEX_OPTION_CMD], color=self.drawer.color_search)
+                self.drawer.draw_row(" ")
+            for tag in filters[DataManager.INDEX_OPTION_TAGS]:
+                self.drawer.draw_row("#", color=self.drawer.color_hash_tag)
+                self.drawer.draw_row(tag, color=self.drawer.color_search)
+                self.drawer.draw_row(" ")
+            if filters[DataManager.INDEX_OPTION_DESC] is not None:
+                self.drawer.draw_row("@", color=self.drawer.color_hash_tag)
+                self.drawer.draw_row(filters[DataManager.INDEX_OPTION_DESC], color=self.drawer.color_search)
+                self.drawer.draw_row(" ")
+        else:
+            self.drawer.draw_row(search_text, color=self.drawer.color_search)
 
         # columns titles
         index_tab_column = 20
@@ -46,10 +63,12 @@ class PageSelector(object):
             value_option = smart_options[i][self.INDEX_SELECTED_VALUE]
 
             # draw option row
-            self.draw_option(cmd=value_option[0],
-                             tags=value_option[1],
-                             desc=value_option[2],
-                             search=search_text_lower,
+            self.draw_option(cmd=value_option[DataManager.INDEX_OPTION_CMD],
+                             desc=value_option[DataManager.INDEX_OPTION_DESC],
+                             tags=value_option[DataManager.INDEX_OPTION_TAGS],
+                             filter_cmd=filters[DataManager.INDEX_OPTION_CMD],
+                             filter_desc=filters[DataManager.INDEX_OPTION_DESC],
+                             filter_tags=filters[DataManager.INDEX_OPTION_TAGS],
                              selected=selected,
                              last_column_size=index_tab_column)
 
@@ -60,13 +79,16 @@ class PageSelector(object):
         self.drawer.show_cursor()
         self.drawer.move_cursor(len(title + ": ") + len(search_text), 0)
 
-    def draw_option(self, cmd, tags, desc, search, last_column_size=0, selected=False):
+    def draw_option(self, cmd, tags, desc, filter_cmd, filter_desc, filter_tags, last_column_size=0, selected=False):
         """
-        draw option line with the following parameters
+        draw option line
+
         :param cmd:                 bash command
         :param tags:                tags
         :param desc:                description
-        :param search:              string used to filter tags and description
+        :param filter_cmd:          string used to filter cmd
+        :param filter_desc:         string used to filter description (in default search it is the same of filter_cmd)
+        :param filter_tags:         string used to filter tags (in default search it is the same of filter_cmd)
         :param last_column_size:    tag and description column size
         :param selected:            if True the option is selected and underlined
         :return:
@@ -91,7 +113,7 @@ class PageSelector(object):
 
         #  cmd section
         cmd = self.drawer.shift_string(cmd, max_x=self.drawer.max_x - last_column_size - 3)
-        self.draw_marked_string(cmd, search, color_marked=self.drawer.color_search, color_default=background_color)
+        self.draw_marked_string(cmd, filter_cmd, color_marked=self.drawer.color_search, color_default=background_color)
 
         if last_column_size:
             # tag and description section
@@ -99,21 +121,22 @@ class PageSelector(object):
 
             # print matched tags
             for tag in tags:
-                index_tag = tag.lower().find(search)
-                if index_tag != -1:
-                    self.drawer.draw_row(" ", color=background_color)
-                    self.drawer.draw_row("#", color=self.drawer.color_hash_tag)
-                    self.draw_marked_string(tag,
-                                            search,
-                                            index_sub_str=index_tag,
-                                            color_default=background_color,
-                                            color_marked=self.drawer.color_search)
+                for filter_tag in filter_tags:
+                    index_tag = tag.lower().find(filter_tag)
+                    if index_tag != -1:
+                        self.drawer.draw_row(" ", color=background_color)
+                        self.drawer.draw_row("#", color=self.drawer.color_hash_tag)
+                        self.draw_marked_string(tag,
+                                                filter_tag,
+                                                index_sub_str=index_tag,
+                                                color_default=background_color,
+                                                color_marked=self.drawer.color_search)
+                        break
 
             # description
-            # note, at least 3 chars are needed to search in the description
-            if len(search) >= DataManager.MIN_LENGTH_SEARCH_FOR_DESC:
-                # get a matched word in the description
-                res = self.get_matching_word_from_sentence(desc, search)
+            # get a matched word in the description
+            if filter_desc is not None and len(desc) > 0:
+                res = self.get_matching_word_from_sentence(desc, filter_desc)
                 if res is not None:
                     start = res[0]
                     middle = res[1]
@@ -144,7 +167,7 @@ class PageSelector(object):
         :return:
         """
         # if sub string is empty draw normally the text
-        if len(sub_str) == 0:
+        if sub_str is None or len(sub_str) == 0:
             self.drawer.draw_row(text, color=color_default)
         else:
             if len(text) > 0:
@@ -195,16 +218,21 @@ class PageSelector(object):
         Search a string in a sentence and return the entire matching word
         NOTE: currently only the first match is return
 
+        Given "hello how are you\nfine" and "" it returns ["hello how are you\nfine","", ""]
         Given "hello how are you\nfine" and "are" it returns ["","are", ""]
         Given "hello how are you\nfine" and "el" it returns ["h","el",lo"]
         Given "hello how are you\nfine" and "error" it returns None
         :param sentence:    sentence
         :param search:      string to search
-        :return:        None if nothing found or a list strutted as explained in the description
+        :return:            None if nothing found or a list strutted as explained in the description
         """
+
         start_word = 0
         end_word = len(sentence)
         search_len = len(search)
+
+        if search_len == 0:
+            return [sentence, "", ""]
 
         index_sub = sentence.lower().find(search)
         if index_sub != -1:

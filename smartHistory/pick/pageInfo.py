@@ -14,9 +14,13 @@ class PageInfo(object):
         self.drawer = drawer
         self.page_selector = page_selector
 
-    def draw_page_info(self, option, search_text_lower, flags_for_info_cmd):
+    def draw_page_info(self, option, filters, data_from_man_page):
         """
-        draw info option
+        draw option line (the one of which the user want to have more info)
+
+        :param option:                  selected option
+        :param filters:                 strings used to filter description (in default search there are the same)
+        :param data_from_man_page:      data retrieved from the man page
         :return:
         """
         # draw colored title
@@ -30,23 +34,25 @@ class PageInfo(object):
         self.page_selector.draw_option(cmd=value_option[DataManager.INDEX_OPTION_CMD],
                                        tags=value_option[DataManager.INDEX_OPTION_TAGS],
                                        desc=value_option[DataManager.INDEX_OPTION_DESC],
-                                       search=search_text_lower,
+                                       filter_cmd=filters[DataManager.INDEX_OPTION_CMD],
+                                       filter_desc=filters[DataManager.INDEX_OPTION_DESC],
+                                       filter_tags=filters[DataManager.INDEX_OPTION_TAGS],
                                        selected=True,
                                        last_column_size=0)
         self.drawer.new_line()
-        self.draw_info_option(cmd_string=value_option[DataManager.INDEX_OPTION_CMD],
-                              tags=value_option[DataManager.INDEX_OPTION_TAGS],
-                              desc=value_option[DataManager.INDEX_OPTION_DESC],
-                              search_text=search_text_lower,
-                              flags_for_info_cmd=flags_for_info_cmd)
+        self._draw_info_option(tags=value_option[DataManager.INDEX_OPTION_TAGS],
+                               desc=value_option[DataManager.INDEX_OPTION_DESC],
+                               filter_desc=filters[DataManager.INDEX_OPTION_DESC],
+                               filter_tags=filters[DataManager.INDEX_OPTION_TAGS],
+                               data_from_man_page=data_from_man_page)
 
         # help line in the last line
-        self.draw_help_line_info()
+        self._draw_help_line_info()
 
         # cursor set position
         self.drawer.hide_cursor()
 
-    def draw_help_line_info(self):
+    def _draw_help_line_info(self):
         """
         Draw info at the end of the console
         :return:
@@ -70,7 +76,7 @@ class PageInfo(object):
         self.drawer.draw_row("@", x_indent=2, color=self.drawer.color_columns_title)
         self.drawer.draw_row("Description", x_indent=1)
 
-    def draw_info_option(self, cmd_string, tags, desc, search_text, flags_for_info_cmd):
+    def _draw_info_option(self, tags, desc, filter_desc, filter_tags, data_from_man_page):
         indent = 2
         sub_title_len = 15
 
@@ -89,7 +95,15 @@ class PageInfo(object):
         if tags is not None and len(tags) > 0:
             for tag in tags:
                 self.drawer.draw_row("#", color=self.drawer.color_hash_tag)
-                self.draw_marked_string(tag, search_text)
+                found = False
+                for filter_tag in filter_tags:
+                    index_tag = tag.lower().find(filter_tag)
+                    if index_tag != -1:
+                        found = True
+                        self.draw_marked_string(tag, filter_tag)
+                        break
+                if not found:
+                    self.drawer.draw_row(tag)
                 self.drawer.draw_row(" ")
         else:
             self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
@@ -105,7 +119,7 @@ class PageInfo(object):
         self.drawer.draw_row(" " * indent)
         if desc is not None and len(desc) > 0:
             self.drawer.draw_row("@", color=self.drawer.color_hash_tag)
-            self.draw_marked_string(desc, search_text)
+            self.draw_marked_string(desc, filter_desc)
         else:
             self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
             self.drawer.draw_row(no_desc_message)
@@ -120,14 +134,14 @@ class PageInfo(object):
         # these information are calculate when the cmd is selected
         # iterate for each cmd (one bash string can contain more commands) and print all the flags
         info_man_shown = False
+        self.drawer.new_line()
 
-        for item in flags_for_info_cmd:
+        for item in data_from_man_page:
             cmd_main = item[BashParser.INDEX_CMD]
             cmd_flags = item[BashParser.INDEX_FLAGS]
             # cmd meaning found in the man page
             if cmd_main[BashParser.INDEX_MEANING]:
                 info_man_shown = True
-                self.drawer.new_line()
                 self.drawer.draw_row(char_column)
                 self.drawer.draw_row(" ")
                 self.drawer.draw_row(cmd_main[BashParser.INDEX_VALUE], color=self.drawer.color_selected_row)
@@ -139,6 +153,7 @@ class PageInfo(object):
                     # if flag found in the man page
                     if flag[BashParser.INDEX_MEANING]:
                         self.draw_cmd_meaning(flag[BashParser.INDEX_VALUE], flag[BashParser.INDEX_MEANING], is_flag=True)
+                self.drawer.new_line()
         if not info_man_shown:
             self.drawer.draw_row(" " * indent)
             self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
@@ -178,6 +193,7 @@ class PageInfo(object):
                            case_sensitive=False, recursive=True):
         """
         Given a string and a sub string it will print the string with the sub string of a different color
+        TODO use the function from page Select or create a common class
 
         :param text:             string to print
         :param sub_str:          sub string to print with a different color

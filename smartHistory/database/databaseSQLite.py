@@ -5,32 +5,34 @@ import os
 
 class DatabaseSQLite(object):
 
-    databaseFileName = "data/history.db"
-    tableName = "history"
-    columnName1 = "cmd"
-    columnName2 = "description"
+    TABLE_NAME = "history"
+    COLUMN_CMD = "cmd"
+    COLUMN_DESCRIPTION = "description"
+    COLUMN_TAGS = "tags"
 
-    tag_separator = "#"
+    CHAR_TAG = "#"
+    CHAR_DESCRIPTION = "@"
+    EMPTY_STRING = ""
 
-    def __init__(self, project_path, delete_old_db=False):
+    def __init__(self, db_path, delete_old_db=False):
         """
         check if database file exit, connect to it and initialize it
 
-        :param project_path:    the current path of the project (used to store the db file)
+        :param db_path:         the current path of the project (used to store the db file)
         :param delete_old_db:   if true the old db file is delete (test purposes)
         """
-        self.db_path = project_path + self.databaseFileName
+        self.db_path = db_path
         if delete_old_db:
             self.reset_entire_db()
-        init = not os.path.exists(self.db_path)
-        self._connect_db(init)
+        self._connect_db()
 
-    def _connect_db(self, init=False):
+    def _connect_db(self):
         """
-        connect to db
-        :param init:    if true the db is initialized
+        connect to db and create it if it does not exit
+
         :return:
         """
+        init = not os.path.isfile(self.db_path)
         self.conn = sqlite3.connect(self.db_path)
         self.cursor = self.conn.cursor()
         if init:
@@ -40,6 +42,7 @@ class DatabaseSQLite(object):
     def save_changes(self):
         """
         after each change to the db a save must be done
+
         :return:
         """
         self.conn.commit()
@@ -47,6 +50,7 @@ class DatabaseSQLite(object):
     def reset_entire_db(self):
         """
         for debug and test purposes delete the db file
+
         :return:
         """
         if os.path.exists(self.db_path):
@@ -55,6 +59,7 @@ class DatabaseSQLite(object):
     def close(self):
         """
         close connection to db
+
         :return:
         """
         self.conn.close()
@@ -76,7 +81,7 @@ class DatabaseSQLite(object):
 
         :return:
         """
-        logging.info("Create database")
+        logging.info("create database")
         self.cursor.execute("""
         CREATE TABLE history 
         (
@@ -93,51 +98,136 @@ class DatabaseSQLite(object):
         self.cursor.execute("SELECT * FROM history ")
         return self.cursor.fetchall()
 
-    def get_last_N_elements(self, filter=None, n=50):
+    def get_last_n_elements_with_simple_search(self, filter=None, n=50):
         """
         get data from db
+        by default if a simple search is done, the string is searched in all values: cmd, tags and description
 
         :param filter:  string which must match part of the command or description or tag
         :param n:       max number of rows returned
-        :return:
+        :return:       filtered data (array of array [command, description, tags])
         """
-        if filter is None:
-            self.cursor.execute("SELECT command, description, tags "
-                                "FROM history "
-                                "ORDER BY rowid DESC LIMIT ?", (n,))
+
+        if filter is None or filter == DatabaseSQLite.EMPTY_STRING:
+            query = "SELECT command, description, tags " \
+                                "FROM history " \
+                                "ORDER BY rowid DESC LIMIT ?"
+            parameters = (n,)
         else:
-            self.cursor.execute("SELECT command, description, tags "
-                                "FROM history "
-                                "WHERE "
-                                "command LIKE ? OR "
-                                "description LIKE ? OR "
-                                "tags LIKE ? "
-                                "ORDER BY rowid DESC LIMIT ?", ("%" + filter + "%",
-                                                                "%" + filter + "%",
-                                                                "%" + filter + "%",
-                                                                 n,))
+            query = "SELECT command, description, tags " \
+                     "FROM history " \
+                     "WHERE " \
+                     "command LIKE ? OR " \
+                     "description LIKE ? OR " \
+                     "tags LIKE ? " \
+                     "ORDER BY rowid DESC LIMIT ?"
+            parameters = ("%" + filter + "%",  "%" + filter + "%", "%" + filter + "%", n,)
+
+        # execute query
+        self.cursor.execute(query, parameters)
+
+        logging.debug("simple search query: " + query + " - " + str(parameters))
+
+        return self.cursor.fetchall()
+
+    def get_last_n_elements_with_advanced_search(self, cmd_filter=None, description_filter=None, tags_filter=None, n=50):
+        """
+        get data from db
+        this is a more specific and advanced search
+        the there are 6 different combination of searching:
+            - cmd
+            - description
+            - tag (single or multiple)
+            - cmd + description
+            - cmd + tag(s)
+            - desc + tag(s)
+        all filters are combined dynamically with "AND" logic
+
+        note: when tag or description are empty, we search for any "not" empty" line (search for # -> all cmd with tags are shown)
+
+        :param cmd_filter:          string to filter cmd
+        :param description_filter:  string to filter documentation
+        :param tags_filter:         array of string to filter
+        :param n:                   max number of rows returned
+        :return:                    filtered data (array of array [command, description, tags])
+        """
+        parameters = ()
+        and_needed = False
+
+        # select
+        query = "SELECT command, description, tags FROM history WHERE "
+
+        if cmd_filter is not None and len(cmd_filter) > 0:
+            query += "command LIKE ? "
+            parameters += ("%" + cmd_filter + "%", )
+            and_needed = True
+
+        if description_filter is not None:
+            if and_needed:
+                query += "AND "
+            else:
+                and_needed = True
+            if description_filter == DatabaseSQLite.EMPTY_STRING:
+                query += "description <> '' "
+                parameters += ()
+            else:
+                query += "description LIKE ? "
+                parameters += ("%" + description_filter + "%", )
+
+        if tags_filter is not None:
+            for tag_filter in tags_filter:
+                if and_needed:
+                    query += "AND "
+                else:
+                    and_needed = True
+
+                if tag_filter == DatabaseSQLite.EMPTY_STRING:
+                    query += "tags <> '' "
+                    parameters += ()
+                else:
+                    query += "tags LIKE ? "
+                    parameters += ("%%" + tag_filter + "%", )
+
+        # sort
+        query += "ORDER BY rowid DESC LIMIT ?"
+        parameters += (n, )
+
+        # execute query
+        self.cursor.execute(query, parameters)
+
+        logging.debug("advance search query: " + query + " - " + str(parameters))
+
         return self.cursor.fetchall()
 
     def add_element(self, cmd, description=None, tags=None):
         """
         insert a new element in the database,
-         if it already in the db just increase the counter
+        if it already in the db just increase the counter
         if the description is different it updates it
         if there are new tags it updates the tags string
 
         :param cmd:             bash command
         :param description:     description
         :param tags:            array of tag
-        :return:
+        :return:                true if the command has been store successfully
         """
         # remove whitespaces on the left and right
         cmd = cmd.strip()
-        # TODO check if description and tags contains illegal chars (@ and #)
+
+        # check if description and tags contains an illegal char (@ or #)
+        if description is not None and (self.CHAR_TAG in description or self.CHAR_DESCRIPTION in description):
+            logging.error("description contains illegal char " + self.CHAR_DESCRIPTION + ": " + description)
+            return False
+        if tags is not None and type(tags) == list:
+            for tag in tags:
+                if self.CHAR_TAG in tag or self.CHAR_DESCRIPTION in tag:
+                    logging.error("tags contains illegal char " + self.CHAR_DESCRIPTION + ": " + tag)
+                    return False
 
         logging.debug("database - add command: " + str(cmd))
         logging.debug("database - description: " + str(description))
         logging.debug("database - tags: " + str(tags))
-        self.cursor.execute("SELECT rowid, counter, description, tags FROM history WHERE Command=?", (cmd,))
+        self.cursor.execute("SELECT rowid, counter, description, tags FROM history WHERE command=?", (cmd,))
         matches = self.cursor.fetchall()
         matches_number = len(matches)
         if matches_number == 0:
@@ -195,17 +285,42 @@ class DatabaseSQLite(object):
             return False
 
         self.save_changes()
+        return True
+
+    def remove_element(self, cmd):
+        """
+        delete specific command from database
+
+        :param cmd:     cmd to delete
+        :return:        true is successfully deleted, false otherwise
+        """
+        logging.info("delete command: " + str(cmd))
+        if cmd is None:
+            logging.error("remove_element: " + "cmd is None")
+            return False
+        # remove whitespaces on the left and right
+        cmd = cmd.strip()
+        if len(cmd) == 0:
+            logging.error("remove_element: " + "cmd is empty")
+            return False
+
+        # delete item
+        self.cursor.execute("DELETE FROM history WHERE  command=?", (cmd,))
+        self.save_changes()
+        logging.info("delete completed")
+        return True
 
     def _tags_string_to_array(self, tags_string):
         """
         given the string of tags form the db it split the tags word and put it into an array
         if the string is empty and empty array is returned
+
         :param tags_string:     #tag1#tag2#tag3
         :return:                ["tag1","tag2","tag3"]
         """
         if tags_string == "":
             return []
-        tags = tags_string.split(self.tag_separator)
+        tags = tags_string.split(self.CHAR_TAG)
         if len(tags) >= 2:
             # remove first always empty value
             tags = tags[1:]
@@ -216,10 +331,13 @@ class DatabaseSQLite(object):
     def _tag_array_to_string(self, tags):
         """
         given a tags array it returns the tags string to store it into the db
+        note: empty tag are not stored
+
         :param tags:
         :return:
         """
         tags_string = ""
         for tag in tags:
-            tags_string += self.tag_separator + tag
+            if len(tag) > 0:
+                tags_string += self.CHAR_TAG + tag
         return tags_string

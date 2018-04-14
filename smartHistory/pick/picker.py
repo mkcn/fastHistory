@@ -48,7 +48,7 @@ class Picker(object):
         self.all_selected = []
 
         self.drawer = None
-        self.flags_for_info_cmd = None
+        self.data_from_man_page = None
 
         self.is_multi_select = multi_select
 
@@ -84,8 +84,9 @@ class Picker(object):
 
         # import this locally to improve performance when the program is loaded
         from pick.pageEditDescription import PageEditDescription
-        page_tags = PageEditDescription(self.drawer, self.page_selector)
-        page_tags.draw_page(option=self.current_selected_option, search_text_lower=self.search_text_lower)
+        page_desc = PageEditDescription(self.drawer, self.page_selector)
+        page_desc.draw_description_page(option=self.current_selected_option,
+                                        filters=self.data_manager.get_search_filters())
 
         # refresh screen
         self.drawer.refresh()
@@ -103,7 +104,7 @@ class Picker(object):
         # import this locally to improve performance when the program is loaded
         from pick.pageEditTags import PageEditTags
         page_tags = PageEditTags(self.drawer, self.page_selector)
-        page_tags.draw_page(option=self.current_selected_option, search_text_lower=self.search_text_lower)
+        page_tags.draw_tags_page(option=self.current_selected_option, filters=self.data_manager.get_search_filters())
 
         # refresh screen
         self.drawer.refresh()
@@ -122,8 +123,8 @@ class Picker(object):
         from pick.pageInfo import PageInfo
         page_info = PageInfo(self.drawer, self.page_selector)
         page_info.draw_page_info(option=self.current_selected_option,
-                                 search_text_lower=self.search_text_lower,
-                                 flags_for_info_cmd=self.flags_for_info_cmd)
+                                 filters=self.data_manager.get_search_filters(),
+                                 data_from_man_page=self.data_from_man_page)
 
         # refresh screen
         self.drawer.refresh()
@@ -140,7 +141,7 @@ class Picker(object):
 
         smart_options = self.get_smart_options()
         self.page_selector.draw_page_select(
-            search_text_lower=self.search_text_lower,
+            filters=self.data_manager.get_search_filters(),
             title=self.SMART_HISTORY_TITLE,
             search_text=self.search_text,
             smart_options=smart_options)
@@ -253,7 +254,8 @@ class Picker(object):
             return return_tuples
         else:
             # if not option available return an emtpy response
-            if len(self.options) == 0:
+            option_count = len(self.options)
+            if option_count == 0 or self.index >= option_count or self.index < 0:
                 return ["", [], None], -1
             return self.options[self.index], self.index
 
@@ -286,7 +288,7 @@ class Picker(object):
             if c in KEYS_ENTER:
                 return
             # exit without saving
-            elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
+            elif c == KEY_AT or c == KEY_ESC:
                 return None
             # -> command
             elif c == KEY_RIGHT:
@@ -312,7 +314,7 @@ class Picker(object):
             if c in KEYS_ENTER:
                 return
             # exit without saving
-            elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
+            elif c == KEY_TAG or c == KEY_ESC:
                 return None
             # -> command
             elif c == KEY_RIGHT:
@@ -329,7 +331,7 @@ class Picker(object):
 
         :return:
         """
-        self.flags_for_info_cmd = BashParser.load_data_for_info_cmd(
+        self.data_from_man_page = BashParser.load_data_for_info_from_man_page(
             cmd_text=self.current_selected_option[DataManager.INDEX_OPTION_CMD])
 
         while True:
@@ -340,11 +342,13 @@ class Picker(object):
             # select current entry
             if c in KEYS_ENTER:
                 return self.get_selected()
-            # delete selected entry
+            # delete current selected option
             elif c == KEY_CANC:
-                # TODO implement delete entry
-                logging.info("TODO delete selected entry")
-                pass
+                self.data_manager.delete_element(self.current_selected_option[DataManager.INDEX_OPTION_CMD])
+                self.options = self.data_manager.filter(self.search_text_lower,
+                                                        self.index + self.get_number_options_to_draw())
+                self.update_options_to_draw()
+                return None
             # go back to select page
             elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
                 return None
@@ -427,10 +431,11 @@ class Picker(object):
                     self.options = self.data_manager.filter(self.search_text_lower, self.get_number_options_to_draw())
                     # update the options to show
                     self.update_options_to_draw(initialize_index=True)
+            # delete current selected option
             elif c == KEY_CANC:
-                # TODO implement delete entry
-                logging.info("TODO delete selected entry")
-                pass
+                self.data_manager.delete_element(self.current_selected_option[DataManager.INDEX_OPTION_CMD])
+                self.options = self.data_manager.filter(self.search_text_lower, self.index + self.get_number_options_to_draw())
+                self.update_options_to_draw()
             elif c == KEY_RESIZE:
                 # this occurs when the console size changes
                 self.drawer.reset()
