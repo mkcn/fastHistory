@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# absolute path of the Smart History project
-# NOTE: change this with YOUR project path
-smart_history_project_directory="$HOME/smartHistory"
+# absolute path of the Smart History folder
+smart_history_project_directory="${BASH_SOURCE[0]%/*}"
 
 # if true the return code of the executed command is check before to store it
 # by default this feature is disable

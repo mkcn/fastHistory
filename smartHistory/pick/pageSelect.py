@@ -47,21 +47,28 @@ class PageSelector(object):
         if filters[DataManager.INDEX_OPTION_IS_ADVANCED]:
             search_text_len = 0
             final_space = False
+            first = True
             if filters[DataManager.INDEX_OPTION_CMD] != "":
                 self.drawer.draw_row(filters[DataManager.INDEX_OPTION_CMD], color=self.drawer.color_search)
                 search_text_len += len(filters[DataManager.INDEX_OPTION_CMD])
+                first = False
             for tag in filters[DataManager.INDEX_OPTION_TAGS]:
-                self.drawer.draw_row(" ")
+                if not first:
+                    self.drawer.draw_row(" ")
+                    search_text_len += 1
                 self.drawer.draw_row("#", color=self.drawer.color_hash_tag)
                 self.drawer.draw_row(tag, color=self.drawer.color_search)
-                search_text_len += len(tag) + 2
+                search_text_len += len(tag) + 1
                 if search_text[-1] == " ":
                     final_space = True
+                first = False
             if filters[DataManager.INDEX_OPTION_DESC] is not None:
-                self.drawer.draw_row(" ")
+                if not first:
+                    self.drawer.draw_row(" ")
+                    search_text_len += 1
                 self.drawer.draw_row("@", color=self.drawer.color_hash_tag)
                 self.drawer.draw_row(filters[DataManager.INDEX_OPTION_DESC], color=self.drawer.color_search)
-                search_text_len += len(filters[DataManager.INDEX_OPTION_DESC]) + 2
+                search_text_len += len(filters[DataManager.INDEX_OPTION_DESC]) + 1
                 if search_text[-1] == " ":
                     final_space = True
             # if the last char of the search text is a space then we need a extra char in the count
