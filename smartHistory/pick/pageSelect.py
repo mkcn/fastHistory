@@ -8,6 +8,9 @@ class PageSelector(object):
     Class to draw the page with the commands to select
     """
 
+    TITLE_DEFAULT = "Smart History search"
+    TITLE_ADVANCE_SEARCH = "Advanced search mode"
+
     CMD_COLUMN_NAME = "Commands"
     TAG_AND_DESCRIPTION_COLUMN_NAME = "Tags & Description"
 
@@ -23,7 +26,7 @@ class PageSelector(object):
     def __init__(self, drawer):
         self.drawer = drawer
 
-    def draw_page_select(self, filters, title, search_text, smart_options):
+    def draw_page_select(self, filters, search_text, smart_options):
         """
         draw page where the user can select the command
 
@@ -31,21 +34,43 @@ class PageSelector(object):
         :return:
         """
         # title
-        self.drawer.draw_row(title + ": ")
         if filters[DataManager.INDEX_OPTION_IS_ADVANCED]:
+            self.drawer.draw_row(self.TITLE_ADVANCE_SEARCH, color=self.drawer.color_hash_tag)
+            title_len = len(self.TITLE_ADVANCE_SEARCH)
+        else:
+            self.drawer.draw_row(self.TITLE_DEFAULT)
+            title_len = len(self.TITLE_DEFAULT)
+        self.drawer.draw_row(": ")
+        title_len += 2
+
+        # search text
+        if filters[DataManager.INDEX_OPTION_IS_ADVANCED]:
+            search_text_len = 0
+            final_space = False
             if filters[DataManager.INDEX_OPTION_CMD] != "":
                 self.drawer.draw_row(filters[DataManager.INDEX_OPTION_CMD], color=self.drawer.color_search)
-                self.drawer.draw_row(" ")
+                search_text_len += len(filters[DataManager.INDEX_OPTION_CMD])
             for tag in filters[DataManager.INDEX_OPTION_TAGS]:
+                self.drawer.draw_row(" ")
                 self.drawer.draw_row("#", color=self.drawer.color_hash_tag)
                 self.drawer.draw_row(tag, color=self.drawer.color_search)
-                self.drawer.draw_row(" ")
+                search_text_len += len(tag) + 2
+                if search_text[-1] == " ":
+                    final_space = True
             if filters[DataManager.INDEX_OPTION_DESC] is not None:
+                self.drawer.draw_row(" ")
                 self.drawer.draw_row("@", color=self.drawer.color_hash_tag)
                 self.drawer.draw_row(filters[DataManager.INDEX_OPTION_DESC], color=self.drawer.color_search)
-                self.drawer.draw_row(" ")
+                search_text_len += len(filters[DataManager.INDEX_OPTION_DESC]) + 2
+                if search_text[-1] == " ":
+                    final_space = True
+            # if the last char of the search text is a space then we need a extra char in the count
+            # note: this is needed because the advance search parser remove any space around words
+            if final_space:
+                search_text_len += 1
         else:
             self.drawer.draw_row(search_text, color=self.drawer.color_search)
+            search_text_len = len(search_text)
 
         # columns titles
         index_tab_column = 20
@@ -77,7 +102,7 @@ class PageSelector(object):
 
         # cursor set position
         self.drawer.show_cursor()
-        self.drawer.move_cursor(len(title + ": ") + len(search_text), 0)
+        self.drawer.move_cursor(title_len + search_text_len, 0)
 
     def draw_option(self, cmd, tags, desc, filter_cmd, filter_desc, filter_tags, last_column_size=0, selected=False):
         """

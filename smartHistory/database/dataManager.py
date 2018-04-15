@@ -99,8 +99,12 @@ class DataManager(object):
 				description_filter=sections[TagParser.INDEX_DESC],
 				tags_filter=sections[TagParser.INDEX_TAGS],
 				n=n)
-			# [True] is used as bool to indicate an "advance search result"
-			self.search_filters = sections + [True]
+			#  the bool to indicate if it is an "advance search result"
+			if sections[TagParser.INDEX_DESC] is None and sections[TagParser.INDEX_TAGS] == []:
+				# if no description and no tags then the result must be consider a simple research
+				self.search_filters = sections + [False]
+			else:
+				self.search_filters = sections + [True]
 
 			return filtered_data
 		else:

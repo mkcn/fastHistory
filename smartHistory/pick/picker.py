@@ -29,7 +29,6 @@ class Picker(object):
     Class used to show the available value and select one (or more)
     """
 
-    SMART_HISTORY_TITLE = "Smart History search"
     DESCRIPTION_CONTEXT_LENGTH = 5
 
     DEBUG_MODE = True
@@ -142,7 +141,6 @@ class Picker(object):
         smart_options = self.get_smart_options()
         self.page_selector.draw_page_select(
             filters=self.data_manager.get_search_filters(),
-            title=self.SMART_HISTORY_TITLE,
             search_text=self.search_text,
             smart_options=smart_options)
 
