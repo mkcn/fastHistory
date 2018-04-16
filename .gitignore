@@ -10,12 +10,11 @@ venv/
 notes/
 
 # Log and user data
-smartHistory/data/
-
+fastHistory/data/
 
 # Ignored file for bashlex
-smartHistory/parser/bashlex/parsetab.py
-smartHistory/parser/bashlex/parser.out
+fastHistory/parser/bashlex/parsetab.py
+fastHistory/parser/bashlex/parser.out
 *.pyc
 *.swp
 .coverage

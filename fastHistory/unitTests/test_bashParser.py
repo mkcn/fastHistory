@@ -32,9 +32,8 @@ class TestBashParser(TestCase):
         ]
 
         for res in test_list:
-            print(str(res[0]))
-            print(str(res[1]))
-            print("\n")
+            # TODO complete
+            pass
 
     def test_decompose_possible_concatenated_flags(self):
         res = bashParser.BashParser.decompose_possible_concatenated_flags("-lsv")

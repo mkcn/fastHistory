@@ -1,6 +1,6 @@
-# smartHistory
+# fastHistory
 
-A console tool to search in your command history in a new and smart way
+A python tool connected to your console to store important commands and search them in a new and faster way
 
 # Status
 Tool under development

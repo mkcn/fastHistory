@@ -138,11 +138,11 @@ class Picker(object):
         self.drawer.clear()
         self.drawer.reset()
 
-        smart_options = self.get_smart_options()
+        options = self.get_options()
         self.page_selector.draw_page_select(
             filters=self.data_manager.get_search_filters(),
             search_text=self.search_text,
-            smart_options=smart_options)
+            options=options)
 
         # refresh screen
         self.drawer.refresh()
@@ -257,7 +257,7 @@ class Picker(object):
                 return ["", [], None], -1
             return self.options[self.index], self.index
 
-    def get_smart_options(self):
+    def get_options(self):
         """
         get list of options to show
         :return:

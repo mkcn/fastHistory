@@ -8,7 +8,7 @@ class PageSelector(object):
     Class to draw the page with the commands to select
     """
 
-    TITLE_DEFAULT = "Smart History search"
+    TITLE_DEFAULT = "Fast History search"
     TITLE_ADVANCE_SEARCH = "Advanced search mode"
 
     CMD_COLUMN_NAME = "Commands"
@@ -26,11 +26,13 @@ class PageSelector(object):
     def __init__(self, drawer):
         self.drawer = drawer
 
-    def draw_page_select(self, filters, search_text, smart_options):
+    def draw_page_select(self, search_text, filters, options):
         """
         draw page where the user can select the command
 
-
+        :param search_text:     string insert by the user to search options
+        :param filters:         filters (derived from the search_text) used to filter the options
+        :param options:         list of options to draw
         :return:
         """
         # title
@@ -90,9 +92,9 @@ class PageSelector(object):
                              color=self.drawer.color_columns_title)
 
         # options
-        for i in range(len(smart_options)):
-            selected = smart_options[i][self.INDEX_SELECTED_TRUE]
-            value_option = smart_options[i][self.INDEX_SELECTED_VALUE]
+        for i in range(len(options)):
+            selected = options[i][self.INDEX_SELECTED_TRUE]
+            value_option = options[i][self.INDEX_SELECTED_VALUE]
 
             # draw option row
             self.draw_option(cmd=value_option[DataManager.INDEX_OPTION_CMD],
