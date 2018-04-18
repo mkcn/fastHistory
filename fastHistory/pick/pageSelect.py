@@ -9,7 +9,7 @@ class PageSelector(object):
     """
 
     TITLE_DEFAULT = "Fast History search"
-    TITLE_ADVANCE_SEARCH = "Advanced search mode"
+    TITLE_ADVANCE_SEARCH = " Advanced search   "
 
     CMD_COLUMN_NAME = "Commands"
     TAG_AND_DESCRIPTION_COLUMN_NAME = "Tags & Description"
@@ -37,7 +37,7 @@ class PageSelector(object):
         """
         # title
         if filters[DataManager.INDEX_OPTION_IS_ADVANCED]:
-            self.drawer.draw_row(self.TITLE_ADVANCE_SEARCH, color=self.drawer.color_hash_tag)
+            self.drawer.draw_row(self.TITLE_ADVANCE_SEARCH, color=self.drawer.color_columns_title)
             title_len = len(self.TITLE_ADVANCE_SEARCH)
         else:
             self.drawer.draw_row(self.TITLE_DEFAULT)
@@ -82,7 +82,7 @@ class PageSelector(object):
             search_text_len = len(search_text)
 
         # columns titles
-        index_tab_column = 20
+        index_tab_column = 25
 
         # draw row colored
         self.drawer.new_line()
@@ -107,7 +107,7 @@ class PageSelector(object):
                              last_column_size=index_tab_column)
 
         # help line in the last line
-        self.draw_help_line_selector()
+        self._draw_help_line_selector()
 
         # cursor set position
         self.drawer.show_cursor()
@@ -153,24 +153,37 @@ class PageSelector(object):
             # tag and description section
             self.drawer.set_x(self.drawer.max_x - last_column_size - 1)
 
+            tag_or_description_match = False
+
             # print matched tags
+
+            unmatched_tags = []
             for tag in tags:
+                found = False
                 for filter_tag in filter_tags:
-                    index_tag = tag.lower().find(filter_tag)
-                    if index_tag != -1:
-                        self.drawer.draw_row(" ", color=background_color)
-                        self.drawer.draw_row("#", color=self.drawer.color_hash_tag)
-                        self.draw_marked_string(tag,
-                                                filter_tag,
-                                                index_sub_str=index_tag,
-                                                color_default=background_color,
-                                                color_marked=self.drawer.color_search)
-                        break
+                    if filter_tag != "":
+                        index_tag = tag.lower().find(filter_tag)
+                        if index_tag != -1:
+                            self.drawer.draw_row(" ", color=background_color)
+                            self.drawer.draw_row("#", color=self.drawer.color_hash_tag)
+                            self.draw_marked_string(tag,
+                                                    filter_tag,
+                                                    index_sub_str=index_tag,
+                                                    color_default=background_color,
+                                                    color_marked=self.drawer.color_search)
+                            found = True
+                            break
+                if not found:
+                    unmatched_tags.append(tag)
 
             # description
+            unmatched_description = True
+
             # get a matched word in the description
-            if filter_desc is not None and len(desc) > 0:
-                res = self.get_matching_word_from_sentence(desc, filter_desc)
+            if len(desc) == 0:
+                unmatched_description = False
+            elif filter_desc is not None and (filter_desc != "" or filter_tags == []):
+                res = self._get_matching_word_from_sentence(desc, filter_desc)
                 if res is not None:
                     start = res[0]
                     middle = res[1]
@@ -185,6 +198,19 @@ class PageSelector(object):
                     self.drawer.draw_row(middle, color=self.drawer.color_search)
                     # print the end of the matched word
                     self.drawer.draw_row(end, color=background_color)
+                    unmatched_description = False
+
+            # print not matched tags
+            for tag in unmatched_tags:
+                self.drawer.draw_row(" ", color=background_color)
+                self.drawer.draw_row("#", color=self.drawer.color_hash_tag)
+                self.drawer.draw_row(tag, color=background_color)
+
+            # print not matching description
+            if unmatched_description:
+                self.drawer.draw_row(" ", color=background_color)
+                self.drawer.draw_row("@", color=self.drawer.color_hash_tag)
+                self.drawer.draw_row(desc, color=background_color)
 
     def draw_marked_string(self, text, sub_str, index_sub_str=None, color_default=1, color_marked=None,
                            case_sensitive=False, recursive=True):
@@ -233,7 +259,7 @@ class PageSelector(object):
                 else:
                     self.drawer.draw_row(text, color=color_default)
 
-    def draw_help_line_selector(self):
+    def _draw_help_line_selector(self):
         self.drawer.set_y(self.drawer.get_max_y() - 1)
         self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title)
         self.drawer.draw_row("Select", x_indent=1)
@@ -247,7 +273,7 @@ class PageSelector(object):
         self.drawer.draw_row("Canc", x_indent=2, color=self.drawer.color_columns_title)
         self.drawer.draw_row("Delete", x_indent=1)
 
-    def get_matching_word_from_sentence(self, sentence, search):
+    def _get_matching_word_from_sentence(self, sentence, search):
         """
         Search a string in a sentence and return the entire matching word
         NOTE: currently only the first match is return

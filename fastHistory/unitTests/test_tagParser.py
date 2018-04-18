@@ -88,7 +88,8 @@ class TestTagParser(TestCase):
             [" ls @allowed", [" ls", "allowed", []]],
             ["ls -la #@desc", ["ls -la #@desc", None, []]],
             ["#", ["", None, [""]]],
-            ["@", ["", "", []]]
+            ["@", ["", "", []]],
+            ["@desc #tag", ["@desc", None, ["tag"]]]  # corner case when the order is not correct
         ]
 
         for test in test_cases:
