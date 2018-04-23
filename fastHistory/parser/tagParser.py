@@ -21,12 +21,15 @@ class TagParser(object):
     # notes:
     #   - before each # a space is needed
     #   - before @ a space is NOT needed
-    TAGS_REGEXP_INSERT_CMD = "((?:\ #[\w\d\-\_\ \t]*)+)(@[\w\d\-\_\.\,\!\?\ \t]*)?$"
+    TAGS_REGEXP_INSERT_CMD = "((?:\ #[\w\d\-\_\ \t]*)+)(@[\w\d\-\_\.\,\!\?\ \t\:\;\%\+\(\)]*)?$"
     # notes:
     #   - it can start with #
     #   - it can start with @
     #   - unless the string start with them, before each # and @ a space is needed
-    TAGS_REGEXP_SEARCH_CMD = "((?:(?:^#|\ #)[\w\d\-\_\ \t]*)*)((?:^@|\ @)[\w\d\-\_\.\,\!\?\ \t]*)?$"
+    TAGS_REGEXP_SEARCH_CMD = "((?:(?:^#|\ #)[\w\d\-\_\ \t]*)*)((?:^@|\ @)[\w\d\-\_\.\,\!\?\ \t\:\;\%\+\(\)]*)?$"
+    # general
+    #   - tag: allowed special chars: ' ' '-' '_' '\t'
+    #   - description: allowed special chars: '-' '_' '.' ',' '!' '?' ' ' '\t' ':' ';' '%' '+' '(' ')'
 
     @staticmethod
     def is_privacy_mode_enable(cmd):
