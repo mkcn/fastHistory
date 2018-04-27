@@ -4,7 +4,7 @@ import sys
 import os
 import logging
 from database.dataManager import DataManager
-from console.loggerBash import log_on_console_info, log_on_console_error
+from console.loggerBash import log_on_console_info, log_on_console_error, log_on_console
 
 LOG_FILE_NAME = "data/history.log"
 DATABASE_FILENAME = "data/history.db"
@@ -32,14 +32,17 @@ def handle_search_request(input_cmd_str, project_directory):
 
 	# open picker to select from history
 	picker = Picker(data_manager, search_text=input_cmd_str)
-	selected_option, index = picker.start()
-	selected_string = selected_option[0]
+
+	selected_option = picker.start()
 	# show selected cmd
 	try:
-		ConsoleUtils.fill_terminal_input(selected_string)
+		ConsoleUtils.fill_terminal_input(selected_option)
 	except:
 		logging.error("your terminal does not support automatic input injection")
 		log_on_console_error("Your terminal does not support automatic input injection")
+		log_on_console("")
+		log_on_console(selected_option)
+		log_on_console("")
 
 
 def handle_add_request(input_cmd_str, project_directory, feedback=False):

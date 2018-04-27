@@ -1,5 +1,6 @@
 import fcntl
 import signal
+import subprocess
 import termios
 import sys
 
@@ -39,3 +40,18 @@ class ConsoleUtils:
 		:return:
 		"""
 		signal.signal(signal.SIGINT, ConsoleUtils.handler_close_signal)
+
+	@staticmethod
+	def open_interactive_man_page(cmd):
+		"""
+		open the real interactive man page
+
+		:return:    return true if the man page has been open correctly
+		"""
+		if cmd is not None:
+			res = subprocess.call(["man", cmd])
+			if res == 0:
+				return True
+			else:
+				return False
+		return None

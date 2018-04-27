@@ -5,6 +5,7 @@ import logging
 
 from parser.bashParser import BashParser
 from database.dataManager import DataManager
+from parser.tagParser import TagParser
 from pick.drawer import Drawer
 from pick.pageSelect import PageSelector
 
@@ -242,8 +243,7 @@ class Picker(object):
 
     def get_selected(self):
         """
-        return the current selected option as a tuple: (option, index)
-        or as a list of tuples (in case multi_select==True)
+        :return: the current selected option as a tuple: (option, index) or as a list of tuples (if multi_select==True)
         """
         if self.is_multi_select:
             return_tuples = []
@@ -254,13 +254,15 @@ class Picker(object):
             # if not option available return an emtpy response
             option_count = len(self.options)
             if option_count == 0 or self.index >= option_count or self.index < 0:
-                return ["", [], None], -1
-            return self.options[self.index], self.index
+                return ""
+            selected_cmd = self.options[self.index][TagParser.INDEX_CMD]
+            # update order of the selected cmd
+            self.data_manager.update_element_order(selected_cmd)
+            return selected_cmd
 
     def get_options(self):
         """
-        get list of options to show
-        :return:
+        :return: list of options to show
         """
         options = []
         for row_index, option in enumerate(self.option_to_draw):
@@ -350,6 +352,12 @@ class Picker(object):
             # go back to select page
             elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
                 return None
+            # open man page
+            elif c == 109:  # char 'm'
+                from console import consoleUtils
+                cmd = self.data_from_man_page[0][BashParser.INDEX_CMD][BashParser.INDEX_VALUE]
+                consoleUtils.ConsoleUtils.open_interactive_man_page(cmd)
+                return ""
             # -> command
             elif c == KEY_RIGHT:
                 self.drawer.move_shift_right()

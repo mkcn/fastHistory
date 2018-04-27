@@ -31,6 +31,14 @@ class DatabaseMYSQL(object):
         """
         return NotImplementedError
 
+    def update_position_element(self, cmd):
+        """
+        TODO
+        :param cmd:
+        :return:
+        """
+        return NotImplementedError
+
     def remove_element(self, cmd):
         """
         delete specific command

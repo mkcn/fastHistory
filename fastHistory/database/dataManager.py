@@ -122,6 +122,9 @@ class DataManager(object):
 		"""
 		return self.database.add_element(cmd, description, tags)
 
+	def update_element_order(self, cmd):
+		return self.database.update_position_element(cmd)
+
 	def delete_element(self, cmd):
 		"""
 		delete a command from db

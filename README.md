@@ -2,6 +2,8 @@
 
 A python tool connected to your terminal to store important commands and search them in a new and faster way
 
+![Search sample](images/search.gif)
+
 ### Why you need it?
 
 How often do you need to reuse a command but you cannot remember it (or all the needed flags)?

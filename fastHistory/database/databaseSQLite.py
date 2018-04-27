@@ -287,6 +287,26 @@ class DatabaseSQLite(object):
         self.save_changes()
         return True
 
+    def update_position_element(self, cmd):
+        logging.debug("database - update_position_element: " + str(cmd))
+        self.cursor.execute("SELECT  rowid, counter, description, tags FROM history WHERE command=?", (cmd,))
+        matches = self.cursor.fetchall()
+        matches_number = len(matches)
+        if matches_number == 1:
+            match = matches[0]
+            matched_id = match[0]
+            # delete old row
+            self.cursor.execute("DELETE FROM history WHERE rowid=?", (matched_id,))
+            # create new row which will have the highest rowID (last used command)
+            self.cursor.execute("INSERT INTO history values (?, ?, ?, ?)", (
+                cmd,
+                match[1],
+                match[2],
+                match[3],))
+            self.save_changes()
+        else:
+            logging.error("database - update entry fail because of no matched command")
+
     def remove_element(self, cmd):
         """
         delete specific command from database

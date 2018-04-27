@@ -189,6 +189,7 @@ class BashParser(object):
         :param cmd_text:    the bash cmd string
         :return:            a structured list with info for each cmd and flags
         """
+
         # here the man search and parse
         parser = BashParser()
         # create a result var to fill
