@@ -64,10 +64,11 @@ def handle_add_request(input_cmd_str, project_directory, feedback=False):
 	parser_res = TagParser.parse_cmd(input_cmd_str)
 
 	if parser_res is None:
-		log_on_console_error("Wrong input")
-		log_on_console_info("Syntax : hadd command [#[tag [#tag ...]][@description]]")
-		log_on_console_info("Example: hadd ls -la #tag1 #tag2 #tag2 @a long description")
-		# TODO create and print help page
+		if feedback:
+			log_on_console_error("Wrong input")
+			log_on_console_info("Syntax : hadd command [#[tag [#tag ...]][@description]]")
+			log_on_console_info("Example: hadd ls -la #tag1 #tag2 #tag2 @a long description")
+			# TODO create and print help page
 	else:
 		cmd = parser_res[TagParser.INDEX_CMD]
 		description = parser_res[TagParser.INDEX_DESC]
