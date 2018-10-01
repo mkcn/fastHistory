@@ -164,6 +164,9 @@ class Drawer(object):
     def get_max_y(self):
         return self.max_y
 
+    def get_shifter(self):
+        return self.shifted
+
     def draw_row(self, text, x=None, x_indent=0, color=1):
         """
         draw data to console and take care to not exceed borders

@@ -111,7 +111,7 @@ f [filter]
 
 #### Advanced search
 ```
-f [command_filter][#tag_filter ...][@description_filter]
+f [command_filter] [#tag_filter ...] [@description_filter]
 ```
 
 **AND search**: match any rows where all the following conditions are true:

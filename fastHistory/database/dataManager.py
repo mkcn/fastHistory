@@ -56,9 +56,10 @@ class DataManager(object):
 		# put all to lower case
 		search = search.lower()
 
-		# note: basic search cannot contains @ or #
-		# in case of a string such as "echo '#'" the advance search is called but
-		# it will correctly parse it as cmd (without tag or description)
+		# this is a simple optimization
+		# basic searches do not contains '@' or '#' (usually)
+		# in case of a string such as "echo ' #'" the advance search is called but
+		# it will correctly parse it as cmd (without tag or description) because the regex is able to handle such cases
 		if self.CHAR_TAG in search or self.CHAR_DESCRIPTION in search:
 			filtered_data = self._advanced_search(search, n)
 		else:

@@ -26,11 +26,12 @@ class PageSelector(object):
     def __init__(self, drawer):
         self.drawer = drawer
 
-    def draw_page_select(self, search_text, filters, options):
+    def draw_page_select(self, search_text, search_text_index, filters, options):
         """
         draw page where the user can select the command
 
         :param search_text:     string insert by the user to search options
+        :param search_text_index: index of the cursor in the search text field
         :param filters:         filters (derived from the search_text) used to filter the options
         :param options:         list of options to draw
         :return:
@@ -47,39 +48,50 @@ class PageSelector(object):
 
         # search text
         if filters[DataManager.INDEX_OPTION_IS_ADVANCED]:
-            search_text_len = 0
-            final_space = False
-            first = True
+
             if filters[DataManager.INDEX_OPTION_CMD] != "":
-                self.drawer.draw_row(filters[DataManager.INDEX_OPTION_CMD], color=self.drawer.color_search)
-                search_text_len += len(filters[DataManager.INDEX_OPTION_CMD])
-                first = False
+                # find index of cmd filter in search text (e.g. "what" in "what #cmd @desc")
+                index_cmd = search_text.find(filters[DataManager.INDEX_OPTION_CMD])
+                if index_cmd != -1:
+                    # print until the end of the cmd option
+                    index_cmd_end = index_cmd + len(filters[DataManager.INDEX_OPTION_CMD])
+                    self.drawer.draw_row(search_text[0:index_cmd])
+                    self.drawer.draw_row(search_text[index_cmd:index_cmd_end], color=self.drawer.color_search)
+                    # cut string with unprinted section
+                    search_text = search_text[index_cmd_end:]
+                else:
+                    logging.error("option cmd string not found in search field: " + filters[DataManager.INDEX_OPTION_CMD])
+
             for tag in filters[DataManager.INDEX_OPTION_TAGS]:
-                if not first:
-                    self.drawer.draw_row(" ")
-                    search_text_len += 1
-                self.drawer.draw_row("#", color=self.drawer.color_hash_tag)
-                self.drawer.draw_row(tag, color=self.drawer.color_search)
-                search_text_len += len(tag) + 1
-                if search_text[-1] == " ":
-                    final_space = True
-                first = False
+                # find index of tag filter in search text (e.g. "cmd" in "what #cmd @desc")
+                index_tag = search_text.find(tag)
+                if index_tag != -1:
+                    # print until the end of the cmd option
+                    index_tag_end = index_tag + len(tag)
+                    self.drawer.draw_row(search_text[0:index_tag])
+                    self.drawer.draw_row(search_text[index_tag:index_tag_end], color=self.drawer.color_search)
+                    # cut string with unprinted section
+                    search_text = search_text[index_tag_end:]
+                else:
+                    logging.error("option tag string not found in search field: " + tag)
+
             if filters[DataManager.INDEX_OPTION_DESC] is not None:
-                if not first:
-                    self.drawer.draw_row(" ")
-                    search_text_len += 1
-                self.drawer.draw_row("@", color=self.drawer.color_hash_tag)
-                self.drawer.draw_row(filters[DataManager.INDEX_OPTION_DESC], color=self.drawer.color_search)
-                search_text_len += len(filters[DataManager.INDEX_OPTION_DESC]) + 1
-                if search_text[-1] == " ":
-                    final_space = True
-            # if the last char of the search text is a space then we need a extra char in the count
-            # note: this is needed because the advance search parser remove any space around words
-            if final_space:
-                search_text_len += 1
+                # find index of desc filter in search text (e.g. "desc" in "what #cmd @desc")
+                index_desc = search_text.find(filters[DataManager.INDEX_OPTION_DESC])
+                if index_desc != -1:
+                    # print until the end of the cmd option
+                    index_desc_end = index_desc + len(filters[DataManager.INDEX_OPTION_DESC])
+                    self.drawer.draw_row(search_text[0:index_desc])
+                    self.drawer.draw_row(search_text[index_desc:index_desc_end], color=self.drawer.color_search)
+                    # cut string with unprinted section
+                    search_text = search_text[index_desc_end:]
+                else:
+                    logging.error("option tag string not found in search field: " + filters[DataManager.INDEX_OPTION_DESC])
+
+            # print the rest of the unprinted text
+            self.drawer.draw_row(search_text)
         else:
             self.drawer.draw_row(search_text, color=self.drawer.color_search)
-            search_text_len = len(search_text)
 
         # columns titles
         index_tab_column = 25
@@ -92,26 +104,66 @@ class PageSelector(object):
                              color=self.drawer.color_columns_title)
 
         # options
-        for i in range(len(options)):
-            selected = options[i][self.INDEX_SELECTED_TRUE]
-            value_option = options[i][self.INDEX_SELECTED_VALUE]
+        number_options = len(options)
+        if number_options == 0:
+            self.draw_no_result(filters[DataManager.INDEX_OPTION_IS_ADVANCED])
+        else:
+            for i in range(number_options):
+                selected = options[i][self.INDEX_SELECTED_TRUE]
+                value_option = options[i][self.INDEX_SELECTED_VALUE]
 
-            # draw option row
-            self.draw_option(cmd=value_option[DataManager.INDEX_OPTION_CMD],
-                             desc=value_option[DataManager.INDEX_OPTION_DESC],
-                             tags=value_option[DataManager.INDEX_OPTION_TAGS],
-                             filter_cmd=filters[DataManager.INDEX_OPTION_CMD],
-                             filter_desc=filters[DataManager.INDEX_OPTION_DESC],
-                             filter_tags=filters[DataManager.INDEX_OPTION_TAGS],
-                             selected=selected,
-                             last_column_size=index_tab_column)
+                # draw option row
+                self.draw_option(cmd=value_option[DataManager.INDEX_OPTION_CMD],
+                                 desc=value_option[DataManager.INDEX_OPTION_DESC],
+                                 tags=value_option[DataManager.INDEX_OPTION_TAGS],
+                                 filter_cmd=filters[DataManager.INDEX_OPTION_CMD],
+                                 filter_desc=filters[DataManager.INDEX_OPTION_DESC],
+                                 filter_tags=filters[DataManager.INDEX_OPTION_TAGS],
+                                 selected=selected,
+                                 last_column_size=index_tab_column)
 
         # help line in the last line
         self._draw_help_line_selector()
 
         # cursor set position
         self.drawer.show_cursor()
-        self.drawer.move_cursor(title_len + search_text_len, 0)
+        self.drawer.move_cursor(title_len + search_text_index, 0)
+
+    def draw_no_result(self, is_advanced_search):
+        """
+        draw "no result" info
+
+        :param is_advanced_search: if true draw also a short "advanced search syntax" help
+        :return:
+        """
+        msg_no_result = "no result"
+        if is_advanced_search:
+            shift = 3
+        else:
+            shift = 1
+
+        for y in range(int(self.drawer.get_max_y()/2 - shift)):
+            self.drawer.new_line()
+        msg_space = int(self.drawer.get_max_x()/2 - len(msg_no_result)/2 - 1)
+
+        self.drawer.draw_row(" " * msg_space)
+        self.drawer.draw_row(msg_no_result)
+
+        self.drawer.new_line()
+        self.drawer.new_line()
+        if is_advanced_search:
+            msg_help_title = " Advanced search syntax "
+            msg_help = "[command_filter] [#tag_filter ...] [@description_filter]"
+
+            msg_space = int(self.drawer.get_max_x() / 2 - len(msg_help_title) / 2)
+            self.drawer.draw_row(" " * msg_space)
+            self.drawer.draw_row(msg_help_title, color=self.drawer.color_columns_title)
+
+            self.drawer.new_line()
+            msg_space = int(self.drawer.get_max_x() / 2 - len(msg_help) / 2)
+            self.drawer.draw_row(" " * msg_space)
+            self.drawer.draw_row(msg_help)
+
 
     def draw_option(self, cmd, tags, desc, filter_cmd, filter_desc, filter_tags, last_column_size=0, selected=False):
         """

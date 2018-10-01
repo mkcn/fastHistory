@@ -44,6 +44,8 @@ class Picker(object):
 
         self.search_text = search_text
         self.search_text_lower = search_text.lower()
+        self.search_text_index = len(search_text)
+
         self.data_manager = data_manager
         self.all_selected = []
 
@@ -143,6 +145,7 @@ class Picker(object):
         self.page_selector.draw_page_select(
             filters=self.data_manager.get_search_filters(),
             search_text=self.search_text,
+            search_text_index=self.search_text_index,
             options=options)
 
         # refresh screen
@@ -412,28 +415,52 @@ class Picker(object):
                 self.mark_index()
             # tab command
             elif c == KEY_TAB:
+                # reset index of search text (to avoid confusion when the scroll is done on the info page)
+                self.search_text_index = len(self.search_text)
+                # call the loop for the info page
                 res = self.run_loop_info()
                 if res is not None:
+                    # if return is not null then return selected result
                     return res
             # -> command
             elif c == KEY_RIGHT:
-                self.drawer.move_shift_right()
+                if self.search_text_index == len(self.search_text):
+                    self.drawer.move_shift_right()
+                else:
+                    # move the search cursor one position right (->)
+                    self.search_text_index += 1
             # <- command
             elif c == KEY_LEFT:
-                self.drawer.move_shift_left()
+                if self.drawer.get_shifter() > 0:
+                    self.drawer.move_shift_left()
+                elif self.search_text_index > 0:
+                    # move the search cursor one position left (<-)
+                    self.search_text_index -= 1
+                else:
+                    # do nothing, the cursor is already on the position 0
+                    pass
             # normal search char
             elif c in range(256):
-                self.search_text += chr(c)
-                self.search_text_lower += chr(c).lower()
+                logging.debug("UNICODE ISSUE: " + str(int(c)))
+                # add char at the position of the cursor inside the search_text field
+                self.search_text = self.search_text[0:self.search_text_index] +\
+                                   chr(c) + \
+                                   self.search_text[self.search_text_index:len(self.search_text)]
+                self.search_text_lower = self.search_text.lower()
+                self.search_text_index += 1
                 self.option_to_draw = None
                 self.options = self.data_manager.filter(self.search_text_lower, self.get_number_options_to_draw())
                 # update the options to show
                 self.update_options_to_draw(initialize_index=True)
             # delete a char of the search
             elif c == KEY_DELETE:
-                if len(self.search_text) > 0:
-                    self.search_text = self.search_text[:-1]
-                    self.search_text_lower = self.search_text_lower[:-1]
+                # the delete is allowed if the search text is not empty and if
+                if len(self.search_text) > 0 and self.search_text_index > 0:
+                    # delete char at the position of the cursor inside the search text field
+                    self.search_text = self.search_text[0:self.search_text_index - 1] +\
+                                   self.search_text[self.search_text_index:len(self.search_text)]
+                    self.search_text_lower = self.search_text.lower()
+                    self.search_text_index -= 1
                     self.options = self.data_manager.filter(self.search_text_lower, self.get_number_options_to_draw())
                     # update the options to show
                     self.update_options_to_draw(initialize_index=True)
@@ -450,6 +477,9 @@ class Picker(object):
                 self.options = self.data_manager.filter(self.search_text_lower, self.index + self.get_number_options_to_draw())
                 # update the options to show
                 self.update_options_to_draw()
+            # TODO
+            # elif ctrl + a -> go to the 'start' of the search text box
+            # elif ctrl + e -> go to the 'end' of the search text box
             else:
                 logging.error("char not handled: " + str(c))
 

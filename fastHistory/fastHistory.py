@@ -6,6 +6,7 @@ import logging
 from database.dataManager import DataManager
 from console.loggerBash import log_on_console_info, log_on_console_error, log_on_console
 
+
 LOG_FILE_NAME = "data/history.log"
 DATABASE_FILENAME = "data/history.db"
 
