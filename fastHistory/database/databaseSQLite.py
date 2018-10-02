@@ -126,7 +126,7 @@ class DatabaseSQLite(object):
         # execute query
         self.cursor.execute(query, parameters)
 
-        logging.debug("simple search query: " + query + " - " + str(parameters))
+        # logging.debug("simple search query: " + query + " - " + str(parameters))
 
         return self.cursor.fetchall()
 

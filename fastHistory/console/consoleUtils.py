@@ -5,6 +5,10 @@ import termios
 import sys
 
 
+import struct
+import os
+
+
 class ConsoleUtils:
 	"""
 	Useful methods to interact with the console
@@ -16,6 +20,11 @@ class ConsoleUtils:
 		Fill terminal input with data
 		# https://unix.stackexchange.com/a/217390
 		"""
+		# check if python version >= 3
+		if sys.version_info >= (3,):
+			# reverse the automatic encoding and pack into a list of bytes
+			data = (struct.pack('B', c) for c in os.fsencode(data))
+
 		# put each char of data in the standard input of the current terminal
 		for c in data:
 			fcntl.ioctl(sys.stdin, termios.TIOCSTI, c)

@@ -9,20 +9,24 @@ from parser.tagParser import TagParser
 from pick.drawer import Drawer
 from pick.pageSelect import PageSelector
 
-KEYS_ENTER = (curses.KEY_ENTER, ord('\n'), ord('\r'))
+KEYS_ENTER = (curses.KEY_ENTER, '\n', '\r')
+KEY_SELECT = None  # TODO decide
 KEY_UP = curses.KEY_UP
 KEY_DOWN = curses.KEY_DOWN
 KEY_DELETE = curses.KEY_BACKSPACE
 KEY_CANC = curses.KEY_DC
-KEY_TAB = 9
-KEY_ESC = 27  # NOTE: the KEY_ESC can be received with some delay
-KEY_TAG = 35
-KEY_AT = 64
 KEY_SHIFT_TAB = curses.KEY_BTAB
 KEY_RIGHT = curses.KEY_RIGHT
 KEY_LEFT = curses.KEY_LEFT
 KEY_RESIZE = curses.KEY_RESIZE
-KEY_SELECT = None  # TODO decide
+KEY_TAB = '\t'
+KEY_ESC = '\x1b'  # NOTE: the KEY_ESC can be received with some delay
+KEY_CTRL_A = '\x01'
+KEY_CTRL_E = '\x05'
+KEY_START = curses.KEY_HOME
+KEY_END = curses.KEY_END
+KEY_TAG = '#'
+KEY_AT = '@'
 
 
 class Picker(object):
@@ -300,7 +304,7 @@ class Picker(object):
             elif c == KEY_LEFT:
                 self.drawer.move_shift_left()
             else:
-                logging.error("char not handled: " + str(c))
+                logging.error("loop edit description - input not handled: " + repr(c))
 
     def run_loop_edit_tags(self):
         """
@@ -326,7 +330,7 @@ class Picker(object):
             elif c == KEY_LEFT:
                 self.drawer.move_shift_left()
             else:
-                logging.error("char not handled: " + str(c))
+                logging.error("loop edit tag - input not handled: " + repr(c))
 
     def run_loop_info(self):
         """
@@ -383,8 +387,9 @@ class Picker(object):
                 # update the options to show
                 self.update_options_to_draw()
             else:
-                logging.error("char not handled: " + str(c))
+                logging.error("loop info - input not handled: " + repr(c))
 
+    @property
     def run_loop_select(self):
         """
         Loop to capture user input keys to interact with the select page
@@ -411,6 +416,7 @@ class Picker(object):
                         self.index + self.get_number_options_to_draw())
             elif c in KEYS_ENTER:
                 return self.get_selected()
+            # note: currently not implemented
             elif c == KEY_SELECT and self.is_multi_select:
                 self.mark_index()
             # tab command
@@ -439,19 +445,6 @@ class Picker(object):
                 else:
                     # do nothing, the cursor is already on the position 0
                     pass
-            # normal search char
-            elif c in range(256):
-                logging.debug("UNICODE ISSUE: " + str(int(c)))
-                # add char at the position of the cursor inside the search_text field
-                self.search_text = self.search_text[0:self.search_text_index] +\
-                                   chr(c) + \
-                                   self.search_text[self.search_text_index:len(self.search_text)]
-                self.search_text_lower = self.search_text.lower()
-                self.search_text_index += 1
-                self.option_to_draw = None
-                self.options = self.data_manager.filter(self.search_text_lower, self.get_number_options_to_draw())
-                # update the options to show
-                self.update_options_to_draw(initialize_index=True)
             # delete a char of the search
             elif c == KEY_DELETE:
                 # the delete is allowed if the search text is not empty and if
@@ -477,11 +470,35 @@ class Picker(object):
                 self.options = self.data_manager.filter(self.search_text_lower, self.index + self.get_number_options_to_draw())
                 # update the options to show
                 self.update_options_to_draw()
-            # TODO
-            # elif ctrl + a -> go to the 'start' of the search text box
-            # elif ctrl + e -> go to the 'end' of the search text box
+            # move cursor to the beginning
+            elif c == KEY_START or c == KEY_CTRL_A:
+                self.search_text_index = 0
+            # move cursor to the end
+            elif c == KEY_END or c == KEY_CTRL_E:
+                self.search_text_index = len(self.search_text)
+            # check if it is a non printable character
+            elif "\\x" in repr(c) or "\\u" in repr(c):
+                # if python3 is not able to print the string then it will be shown as "\xNN" or "\uNNNN"
+                logging.debug("loop select - non printable input char ignored: " + repr(c))
+            # normal search charx
+            elif type(c) is str:
+                # remove special chars such as 'new line' and 'return carriage'
+                c = c.replace('\n', '')
+                c = c.replace('\r', '')
+                # add char at the position of the cursor inside the search_text field
+                self.search_text = self.search_text[0:self.search_text_index] + \
+                                   c + \
+                                   self.search_text[self.search_text_index:len(self.search_text)]
+                self.search_text_lower = self.search_text.lower()
+                self.search_text_index += len(c)
+                self.option_to_draw = None
+                self.options = self.data_manager.filter(self.search_text_lower, self.get_number_options_to_draw())
+                # update the options to show
+                self.update_options_to_draw(initialize_index=True)
+            elif type(c) is int:
+                logging.debug("loop select - integer input not handled: " + repr(c))
             else:
-                logging.error("char not handled: " + str(c))
+                logging.error("loop select - input not handled: " + repr(c))
 
     def _start(self, screen):
         self.drawer = Drawer(screen)

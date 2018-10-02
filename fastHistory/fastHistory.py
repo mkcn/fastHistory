@@ -35,6 +35,7 @@ def handle_search_request(input_cmd_str, project_directory):
 	picker = Picker(data_manager, search_text=input_cmd_str)
 
 	selected_option = picker.start()
+
 	# show selected cmd
 	try:
 		ConsoleUtils.fill_terminal_input(selected_option)

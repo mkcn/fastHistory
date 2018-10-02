@@ -81,7 +81,8 @@ class Drawer(object):
         wait input from user
         :return:
         """
-        c = self.terminal_screen.getch()
+        # this supports wide characters
+        c = self.terminal_screen.get_wch()
         return c
 
     def clear(self):
