@@ -504,7 +504,7 @@ class Picker(object):
         self.drawer = Drawer(screen)
         self.page_selector = PageSelector(self.drawer)
 
-        return self.run_loop_select()
+        return self.run_loop_select
 
     def start(self):
         return curses.wrapper(self._start)
