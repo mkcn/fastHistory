@@ -2,7 +2,6 @@ import logging
 import sre_constants
 import subprocess
 import re
-
 import sys
 
 
@@ -57,16 +56,25 @@ class ManParser(object):
         """
         execute "man cmd"
         More info: https://stackoverflow.com/a/4760517/6815066
+        Note: if the command takes more than 1 second it is terminated (TimeoutExpired)
+              This avoids to block the UI if the man command does not respond
 
         :param cmd: command string
         :return:    True if man page is found, False otherwise
         """
         self.cmd = cmd
         try:
-            self.man_page = subprocess.check_output(["man", cmd]).decode('utf-8')
+            self.man_page = subprocess.check_output(
+                ["man", cmd],
+                stderr=subprocess.DEVNULL,
+                timeout=1).decode('utf-8')
             return True
         except subprocess.CalledProcessError as e:
-            logging.error("load_man_page: " + str(cmd))
+            logging.error("load_man_page - process error: " + str(cmd))
+            self.man_page = None
+            return False
+        except subprocess.TimeoutExpired as e:
+            logging.error("load man page - timeout: " + str(cmd))
             self.man_page = None
             return False
 
@@ -154,17 +162,4 @@ class ManParser(object):
                     final_result.append((False, row))
 
         return final_result
-
-
-"""
-x = ManParser()
-cmd = "ls"
-x.get_man_page(cmd)
-print ("info about: " + cmd + "\n")
-print (x.get_cmd_meaning())
-print ("\n")
-print (x.get_flag_meaning("-l"))
-print (x.get_flag_meaning("-a"))
-print (x.get_flag_meaning("-A"))
-"""
 
