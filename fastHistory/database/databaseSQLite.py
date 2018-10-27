@@ -19,7 +19,7 @@ class DatabaseSQLite(object):
         check if database file exit, connect to it and initialize it
 
         :param db_path:         the current path of the project (used to store the db file)
-        :param delete_old_db:   if true the old db file is delete (test purposes)
+        :param delete_old_db:   if true the old db file is delete (ONLY for test purposes)
         """
         self.db_path = db_path
         if delete_old_db:
@@ -36,6 +36,8 @@ class DatabaseSQLite(object):
         self.conn = sqlite3.connect(self.db_path)
         self.cursor = self.conn.cursor()
         if init:
+            # TODO check if old db file exists and move data from old to new db
+            # after import is completed remove or rename old db
             self._create_db()
             self.save_changes()
 
@@ -278,7 +280,7 @@ class DatabaseSQLite(object):
                 new_counter,
                 new_description,
                 new_tags_str,))
-            logging.error("database - command updated: " + cmd)
+            logging.debug("database - command updated: " + cmd)
 
         else:
             logging.error("database - command entry is not unique: " + cmd)

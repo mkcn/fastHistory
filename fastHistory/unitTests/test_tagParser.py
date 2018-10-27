@@ -72,6 +72,7 @@ class TestTagParser(TestCase):
             ["ls -la #1 #2 #3 @desc", ["ls -la", "desc", ["1", "2", "3"]]],
             ["ls -la #word-0 @desc-0", ["ls -la", "desc-0", ["word-0"]]],
             ["ls -la #òàùè #ÄẞÖÄ #é @special chars", ["ls -la", "special chars", ["òàùè", "ÄẞÖÄ", "é"]]],
+            ["echo 'ඐ 123 لْحُرُ' #unicode", ["echo 'ඐ 123 لْحُرُ'", None, ["unicode"]]],
 
             ["ls -la # @a desc, with other chars! ", ["ls -la", "a desc, with other chars!", [""]]],
             ["echo \#toignore #1", ["echo \#toignore", None, ["1"]]],

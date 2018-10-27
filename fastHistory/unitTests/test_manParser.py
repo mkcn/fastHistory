@@ -32,15 +32,26 @@ class TestManParser(TestCase):
         self._set_text_logger()
         parser = ManParser()
 
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+
         test_strings = [
-            "tar",
-            "ls",
-            "netstat"
+            ["tar", True],
+            ["ls", True],
+            ["netstat", True],
+            ["non-existing-cmd", False],  # this will throw a process error
+            [dir_path + "/" + "adb_test_file", False]  # this will throw a timeout error (note that this file will not be published on git)
         ]
+
         for t in test_strings:
-            self.assertTrue(parser.load_man_page(t))
+            if t[1]:
+                self.assertTrue(parser.load_man_page(t[0]))
+            else:
+                self.assertFalse(parser.load_man_page(t[0]))
             meaning = parser.get_cmd_meaning()
-            self.assertIsNotNone(meaning)
+            if t[1]:
+                self.assertIsNotNone(meaning)
+            else:
+                self.assertIsNone(meaning)
 
     def test_get_cmd_meaning(self):
         self._set_text_logger()

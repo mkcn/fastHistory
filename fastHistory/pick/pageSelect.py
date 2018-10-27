@@ -26,7 +26,7 @@ class PageSelector(object):
     def __init__(self, drawer):
         self.drawer = drawer
 
-    def draw_page_select(self, search_text, search_text_index, filters, options):
+    def draw_page_select(self, search_text, search_text_index, filters, options, last_column_size):
         """
         draw page where the user can select the command
 
@@ -94,7 +94,7 @@ class PageSelector(object):
             self.drawer.draw_row(search_text, color=self.drawer.color_search)
 
         # columns titles
-        index_tab_column = 25
+        index_tab_column = int(self.drawer.get_max_x() * last_column_size / 100)
 
         # draw row colored
         self.drawer.new_line()

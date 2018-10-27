@@ -1,5 +1,5 @@
 import curses
-import logging
+from config.configReader import ConfigReader
 
 
 class Drawer(object):
@@ -8,21 +8,13 @@ class Drawer(object):
     """
     _TEXT_TO_LONG = ".."
 
-    ID_COLOR_RED_BLACK = 1
-    ID_COLOR_BLUE_BLACK = 2
-    ID_COLOR_GREEN_BLACK = 3
-    ID_COLOR_RED_WHITE = 4
-    ID_COLOR_BLUE_WHITE = 5
-    ID_COLOR_WHITE_BLACK = 6
-    ID_COLOR_BLACK_GREEN = 7
-    NULL_COLOR = 1
+    NULL_COLOR = 0
 
-    def __init__(self, screen):
+    def __init__(self, screen, theme):
         self.terminal_screen = screen
         self.max_y, self.max_x = self.terminal_screen.getmaxyx()
         self.x = 0
         self.y = 0
-        # TODO decide if split this in separated class
         self.shifted = 0
 
         # define colors
@@ -32,9 +24,9 @@ class Drawer(object):
         self.color_selected_row = None
         self.color_selector = None
         self.color_columns_title = None
-        self.init_colors()
+        self.init_colors(theme)
 
-    def init_colors(self):
+    def init_colors(self, theme):
         """
         define and set console colors
         :return:
@@ -42,23 +34,38 @@ class Drawer(object):
         # use the default colors of the terminal
         curses.use_default_colors()
 
-        curses.init_pair(self.ID_COLOR_RED_BLACK, curses.COLOR_RED, curses.COLOR_BLACK)
-        curses.init_pair(self.ID_COLOR_BLUE_BLACK, curses.COLOR_BLUE, curses.COLOR_BLACK)
-        curses.init_pair(self.ID_COLOR_GREEN_BLACK, curses.COLOR_GREEN, curses.COLOR_BLACK)
-        curses.init_pair(self.ID_COLOR_WHITE_BLACK, curses.COLOR_WHITE, curses.COLOR_BLACK)
-
-        curses.init_pair(self.ID_COLOR_RED_WHITE, curses.COLOR_RED, curses.COLOR_WHITE)
-        curses.init_pair(self.ID_COLOR_BLUE_WHITE, curses.COLOR_BLACK, curses.COLOR_WHITE)
-
-        curses.init_pair(self.ID_COLOR_BLACK_GREEN, curses.COLOR_BLACK, curses.COLOR_GREEN)
+        id_color_green_white = 1
+        id_color_black_white = 2
+        id_color_black_green = 3
+        id_color_green_black = 4
+        id_color_blue_white = 5
+        id_color_white_black = 6
+        id_color_white_cyan = 7
 
         # set colors
-        self.color_search = curses.color_pair(self.ID_COLOR_BLUE_WHITE)
-        self.color_hash_tag = curses.color_pair(self.ID_COLOR_WHITE_BLACK)
-        self.color_border = curses.color_pair(self.ID_COLOR_GREEN_BLACK)
-        self.color_selected_row = curses.color_pair(self.ID_COLOR_GREEN_BLACK) | curses.A_BOLD
-        self.color_selector = curses.color_pair(self.ID_COLOR_GREEN_BLACK)
-        self.color_columns_title = curses.color_pair(self.ID_COLOR_BLACK_GREEN)
+        if theme == ConfigReader.THEME_AZURE:
+            curses.init_pair(id_color_green_white, curses.COLOR_GREEN, curses.COLOR_WHITE)
+            curses.init_pair(id_color_black_white, curses.COLOR_BLACK, curses.COLOR_WHITE)
+            curses.init_pair(id_color_white_cyan, curses.COLOR_WHITE, curses.COLOR_CYAN)
+
+            self.color_search = curses.color_pair(id_color_black_white)
+            self.color_hash_tag = curses.color_pair(id_color_black_white)
+            self.color_border = curses.color_pair(id_color_black_white)
+            self.color_selected_row = curses.color_pair(id_color_black_white) | curses.A_BOLD
+            self.color_selector = curses.color_pair(id_color_black_white)
+            self.color_columns_title = curses.color_pair(id_color_white_cyan)
+        else:
+            curses.init_pair(id_color_green_black, curses.COLOR_GREEN, curses.COLOR_BLACK)
+            curses.init_pair(id_color_white_black, curses.COLOR_WHITE, curses.COLOR_BLACK)
+            curses.init_pair(id_color_blue_white, curses.COLOR_BLACK, curses.COLOR_WHITE)
+            curses.init_pair(id_color_black_green, curses.COLOR_BLACK, curses.COLOR_GREEN)
+
+            self.color_search = curses.color_pair(id_color_blue_white)
+            self.color_hash_tag = curses.color_pair(id_color_white_black)
+            self.color_border = curses.color_pair(id_color_green_black)
+            self.color_selected_row = curses.color_pair(id_color_green_black) | curses.A_BOLD
+            self.color_selector = curses.color_pair(id_color_green_black)
+            self.color_columns_title = curses.color_pair(id_color_black_green)
 
     def hide_cursor(self):
         """
@@ -154,6 +161,9 @@ class Drawer(object):
     def set_y(self, y, x=0):
         self.x = x
         self.y = y
+        
+    def reset_shifted(self):
+        self.shifted = 0
 
     def new_line(self, x=0):
         self.y += 1
@@ -165,7 +175,7 @@ class Drawer(object):
     def get_max_y(self):
         return self.max_y
 
-    def get_shifter(self):
+    def get_shifted(self):
         return self.shifted
 
     def draw_row(self, text, x=None, x_indent=0, color=1):

@@ -6,7 +6,7 @@ _fast_history_project_directory="${BASH_SOURCE[0]%/*}"
 # if true the return code of the executed command is check before to store it
 # by default this feature is disable
 _fast_history_check_return_code=false
-_fast_history_debug=false
+_fast_history_bash_debug=false
 
 _fast_history_hooked_cmd=""
 _fast_history_short_cmd=false
@@ -31,7 +31,7 @@ f() {
 fadd() {
     # trick to capture all input (otherwise the comments are removed)
     arguments=${_fast_history_hooked_cmd:${#FUNCNAME[0]} + 1}
-    python3 "$_fast_history_project_directory"/fastHistory/fastHistory.py "add" "$arguments";
+    python3 "$_fast_history_project_directory"/fastHistory/fastHistory.py "add-explicit" "$arguments";
     unset _fast_history_hooked_cmd;
     }
 
@@ -50,21 +50,21 @@ precmd() {
 	# check if variable is set
 	if [[ $_fast_history_hooked_cmd ]]; then
 		if ! $_fast_history_check_return_code || [ $? -eq 0 ]; then
-		    	# check if the hooked cmd contains the comment char, any command without it will be ignored
-		    	# this is just a preliminary check, a further regex check will be done by the python module
+		    	# check if the hooked cmd contains the 'comment' char, any command without it will be ignored
+		    	# this is just a preliminary check, in the python module a strict regex will be used
+		    	# this is only done to avoid to load the python module for each command
 		    	if [[ "$_fast_history_hooked_cmd" = *"#"* ]]; then
-				# spawn thread in a subshell, to not affect the response time of the bash command
-				(python3 "$_fast_history_project_directory"/fastHistory/fastHistory.py "add-silent" "$_fast_history_hooked_cmd" &)
+				python3 "$_fast_history_project_directory"/fastHistory/fastHistory.py "add" "$_fast_history_hooked_cmd"
 				# clean the cmd, this is needed because precmd can be trigged without preexec (example ctrl+c)
 				unset _fast_history_hooked_cmd;
 			else
-				if $_fast_history_debug ; then echo "[fastHistory][DEBUG] '#' not found: command ignored"; fi;
+				if $_fast_history_bash_debug ; then echo "[fastHistory][DEBUG] '#' not found: command ignored"; fi;
 			fi;
 		else
-			if $_fast_history_debug ; then echo "[fastHistory][DEBUG] error code detected: command ignored"; fi;
+			if $_fast_history_bash_debug ; then echo "[fastHistory][DEBUG] error code detected: command ignored"; fi;
 		fi;
 	else
-		if $_fast_history_debug ; then echo "[fastHistory][DEBUG] _fast_history_hooked_cmd: empty"; fi;
+		if $_fast_history_bash_debug ; then echo "[fastHistory][DEBUG] _fast_history_hooked_cmd: empty"; fi;
 	fi;
      }
 

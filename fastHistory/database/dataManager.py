@@ -5,7 +5,7 @@ from parser.tagParser import TagParser
 
 class DataManager(object):
 	"""
-	TODO rewrite and describe
+	Class use to manage data and interact with the database
 	"""
 
 	# TODO find a common place where to retrieve these chars

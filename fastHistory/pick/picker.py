@@ -38,7 +38,7 @@ class Picker(object):
 
     DEBUG_MODE = True
 
-    def __init__(self, data_manager, search_text="", multi_select=False):
+    def __init__(self, data_manager, theme, last_column_size, search_text="", multi_select=False):
         """
         initialize variables and get filtered list starting options to show
         :param data_manager          the data manager object to retrieve data
@@ -51,6 +51,8 @@ class Picker(object):
         self.search_text_index = len(search_text)
 
         self.data_manager = data_manager
+        self.theme = theme
+        self.last_column_size = last_column_size
         self.all_selected = []
 
         self.drawer = None
@@ -150,7 +152,8 @@ class Picker(object):
             filters=self.data_manager.get_search_filters(),
             search_text=self.search_text,
             search_text_index=self.search_text_index,
-            options=options)
+            options=options,
+            last_column_size=self.last_column_size)
 
         # refresh screen
         self.drawer.refresh()
@@ -437,7 +440,7 @@ class Picker(object):
                     self.search_text_index += 1
             # <- command
             elif c == KEY_LEFT:
-                if self.drawer.get_shifter() > 0:
+                if self.drawer.get_shifted() > 0:
                     self.drawer.move_shift_left()
                 elif self.search_text_index > 0:
                     # move the search cursor one position left (<-)
@@ -454,6 +457,8 @@ class Picker(object):
                                    self.search_text[self.search_text_index:len(self.search_text)]
                     self.search_text_lower = self.search_text.lower()
                     self.search_text_index -= 1
+                    # reset shift value
+                    self.drawer.reset_shifted()
                     self.options = self.data_manager.filter(self.search_text_lower, self.get_number_options_to_draw())
                     # update the options to show
                     self.update_options_to_draw(initialize_index=True)
@@ -479,7 +484,7 @@ class Picker(object):
             # check if it is a non printable character
             elif "\\x" in repr(c) or "\\u" in repr(c):
                 # if python3 is not able to print the string then it will be shown as "\xNN" or "\uNNNN"
-                logging.debug("loop select - non printable input char ignored: " + repr(c))
+                logging.info("loop select - non printable input char ignored: " + repr(c))
             # normal search charx
             elif type(c) is str:
                 # remove special chars such as 'new line' and 'return carriage'
@@ -501,7 +506,7 @@ class Picker(object):
                 logging.error("loop select - input not handled: " + repr(c))
 
     def _start(self, screen):
-        self.drawer = Drawer(screen)
+        self.drawer = Drawer(screen, self.theme)
         self.page_selector = PageSelector(self.drawer)
 
         return self.run_loop_select

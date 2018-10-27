@@ -1,38 +1,66 @@
 from console import colors
-
-LOG_ERROR = colors.Red + "ERROR" + colors.Color_Off
-LOG_INFO = colors.White + "INFO " + colors.Color_Off
-LOG_DEBUG = colors.Blue + "DEBUG" + colors.Color_Off
-LOG_SH_INFO = colors.Blue + "fastHistory" + colors.Color_Off
-LOG_SH_ERROR = colors.Red + "fastHistory" + colors.Color_Off
+from config.configReader import ConfigReader
 
 
-def log_on_console_info(msg):
-	"""
-	print an info message directly in the console
-	the message will show the 'fastHistory' string color in blue
-	:param msg:
-	:return:
-	"""
-	print("[" + LOG_SH_INFO + "] " + str(msg))
+class LoggerBash:
 
+	tag_colored = None
+	desc_colored = None
+	log_fh_info = None
+	log_fh_error = None
+	log_debug = None
+	log_info = None
+	log_error = None
 
-def log_on_console_error(msg):
-	"""
-	print an error message directly in the console
-	the message will show the 'fastHistory' string color in red
+	def __init__(self):
+		"""
+		initialize colored variable with default theme (AZURE)
+		"""
+		self.tag_colored = colors.Blue + "#" + colors.Color_Off
+		self.desc_colored = colors.Blue + "@" + colors.Color_Off
+		self.log_fh_info = colors.Blue + "fastHistory" + colors.Color_Off
+		self.log_debug = colors.Blue + "DEBUG" + colors.Color_Off
 
-	:param msg:
-	:return:
-	"""
-	print("[" + LOG_SH_ERROR + "] " + str(msg))
+		self.log_error = colors.Red + "ERROR" + colors.Color_Off
+		self.log_info = colors.White + "INFO " + colors.Color_Off
+		self.log_fh_error = colors.Red + "fastHistory" + colors.Color_Off
 
+	def set_theme(self, theme):
+		"""
+		change the color based on the configured theme
 
-def log_on_console(msg):
-	"""
-	print an message directly in the console
+		:return:
+		"""
+		if theme == ConfigReader.THEME_GREEN:
+			self.tag_colored = colors.Green + "#" + colors.Color_Off
+			self.desc_colored = colors.Green + "@" + colors.Color_Off
+			self.log_fh_info = colors.Green + "fastHistory" + colors.Color_Off
+			self.log_debug = colors.Green + "DEBUG" + colors.Color_Off
 
-	:param msg:
-	:return:
-	"""
-	print(str(msg))
+	def log_on_console_info(self, msg):
+		"""
+		print an info message directly in the console
+		the message will show the 'fastHistory' string color in blue
+		:param msg:
+		:return:
+		"""
+		print("[" + self.log_fh_info + "] " + str(msg))
+
+	def log_on_console_error(self, msg):
+		"""
+		print an error message directly in the console
+		the message will show the 'fastHistory' string color in red
+
+		:param msg:
+		:return:
+		"""
+		print("[" + self.log_fh_error + "] " + str(msg))
+
+	def log_on_console(self, msg):
+		"""
+		print an message directly in the console
+
+		:param msg:
+		:return:
+		"""
+		print(str(msg))

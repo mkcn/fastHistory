@@ -55,7 +55,7 @@ class BashParser(object):
                         self.get_flags_from_bash_node(bash_node.parts[i], result, cmd_main=cmd_main, first_cmd=False)
             # check if node is a word
             elif bash_node.kind == self.CMD_NODE_TYPE_WORD:
-                self.logger.info("bash_node.word word: " + bash_node.word)
+                self.logger.debug("bash_node.word word: " + bash_node.word)
                 if first_cmd:
                     found = False
                     for item in result:
@@ -86,10 +86,9 @@ class BashParser(object):
                 for i in bash_node.parts:
                     self.get_flags_from_bash_node(i, result)
             else:
-                self.logger.debug("Other kind: " + bash_node.kind + "\n")
-
+                self.logger.debug("other kind: " + bash_node.kind + "\n")
         else:
-            self.logger.debug("Unknown obj: " + str(bash_node) + "\n")
+            self.logger.debug("unknown obj: " + str(bash_node) + "\n")
 
     def get_flags(self, bash_node, result, cmd_main=None, first_cmd=False):
 
@@ -105,7 +104,7 @@ class BashParser(object):
                 for i in bash_node.list:
                     self.get_flags(i, result)
             elif bash_node.kind == self.CMD_NODE_TYPE_PIPELINE:
-                self.logger.debug("PIPELINE: " + str(bash_node))
+                self.logger.debug("pipeline: " + str(bash_node))
                 for i in bash_node.parts:
                     self.get_flags(i, result)
             elif bash_node.kind == self.CMD_NODE_TYPE_CMD:
@@ -150,8 +149,8 @@ class BashParser(object):
             elif bash_node.kind in self.CMD_NODE_TYPE_PIPE:
                 self.logger.debug("PIPE: " + str(bash_node.pipe))
             else:
-                print("BHO: " + bash_node.kind + "\n")
-                self.logger.debug("BHO: " + bash_node.kind + "\n")
+                print("unknown: " + bash_node.kind + "\n")
+                self.logger.debug("unknown: " + bash_node.kind + "\n")
 
     @staticmethod
     def decompose_possible_concatenated_flags(flag_string):
@@ -189,7 +188,6 @@ class BashParser(object):
         :param cmd_text:    the bash cmd string
         :return:            a structured list with info for each cmd and flags
         """
-
         # here the man search and parse
         parser = BashParser()
         # create a result var to fill
