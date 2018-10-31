@@ -70,7 +70,7 @@ class ManParser(object):
                 timeout=1).decode('utf-8')
             return True
         except subprocess.CalledProcessError as e:
-            logging.error("load_man_page - process error: " + str(cmd))
+            logging.info("load_man_page - man page not found for: " + str(cmd))
             self.man_page = None
             return False
         except subprocess.TimeoutExpired as e:

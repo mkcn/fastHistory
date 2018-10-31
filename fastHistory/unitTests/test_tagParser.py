@@ -8,15 +8,19 @@ from parser.tagParser import TagParser
 
 class TestTagParser(TestCase):
 
-    log_file_name = "data/test_tagParser.log"
+    TEST_FOLDER = "../../data_test/"
+    TEST_LOG_FILENAME = "test_tagParser.log"
 
     def setUp(self):
         """
         setup absolute log path and log level
         :return:
         """
-        current_path = os.path.dirname(os.path.realpath(__file__)) + "/../"
-        self.log_path = current_path + self.log_file_name
+        output_test_path = os.path.dirname(os.path.realpath(__file__)) + "/" + self.TEST_FOLDER
+        if not os.path.exists(output_test_path):
+            os.makedirs(output_test_path)
+
+        self.log_path = output_test_path + self.TEST_LOG_FILENAME
 
         logging.basicConfig(filename=self.log_path, level=logging.DEBUG)
 

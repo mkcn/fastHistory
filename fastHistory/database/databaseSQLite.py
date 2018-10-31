@@ -1,6 +1,7 @@
 import sqlite3
 import logging
 import os
+import time
 
 
 class DatabaseSQLite(object):
@@ -14,32 +15,114 @@ class DatabaseSQLite(object):
     CHAR_DESCRIPTION = "@"
     EMPTY_STRING = ""
 
-    def __init__(self, db_path, delete_old_db=False):
+    _DATABASE_TABLE_NAME = "history"
+    _DATABASE_STRUCTURE = """
+    command  TEXT,
+    description TEXT,
+    tags TEXT,
+    counter INTEGER,
+    date INTEGER,
+    synced TINYINT
+    """
+
+    def __init__(self, project_path, db_relative_path, old_db_relative_paths, delete_all_data_from_db=False):
         """
         check if database file exit, connect to it and initialize it
 
-        :param db_path:         the current path of the project (used to store the db file)
-        :param delete_old_db:   if true the old db file is delete (ONLY for test purposes)
+        :param project_path:            the current path of the project
+        :param db_relative_path:        the relative path of the database file
+        :param old_db_relative_paths:    the array of relative paths of (possible) database files to migrate
+        :param delete_all_data_from_db:   if true the db file is delete (ONLY for test purposes)
         """
-        self.db_path = db_path
-        if delete_old_db:
+        self.project_path = project_path
+        self.db_relative_path = db_relative_path
+        if delete_all_data_from_db:
             self.reset_entire_db()
-        self._connect_db()
+        self._connect_db(old_db_relative_paths)
 
-    def _connect_db(self):
+    def _connect_db(self, old_db_relative_paths):
         """
         connect to db and create it if it does not exit
 
         :return:
         """
-        init = not os.path.isfile(self.db_path)
-        self.conn = sqlite3.connect(self.db_path)
+        init = not os.path.isfile(self.project_path + self.db_relative_path)
+
+        self.conn = sqlite3.connect(self.project_path + self.db_relative_path)
         self.cursor = self.conn.cursor()
         if init:
-            # TODO check if old db file exists and move data from old to new db
-            # after import is completed remove or rename old db
             self._create_db()
             self.save_changes()
+
+            if old_db_relative_paths is not None:
+                # this will loop from the newest to the oldest db
+                for old_db in old_db_relative_paths:
+                    if self._automatic_db_migration(old_db[0], old_db[1]) is True:
+                        logging.info("successfully migrated data from old database (%s) to new one (%s)" %
+                                     (self.project_path + old_db[1], self.project_path + self.db_relative_path))
+                        # delete old db
+                        try:
+                            os.remove(self.project_path + old_db[1])
+                            logging.info("old database file deleted")
+                        except:
+                            logging.error("file delete fail. please manually delete the old database file: %s" %
+                                          self.project_path + old_db[1])
+
+    def _automatic_db_migration(self, old_db_type, old_db_relative_path):
+        """
+        check if old db file exists and move data from old to new db with no user interaction
+        this is needed when the database file position or structure changed (between project versions)
+
+        for each future change of the database a new type of database will be added to this function
+        to be able to migrate data from any version to any version
+
+        :param old_db_type:             type of the old database, this value is used like a version identification
+        :param old_db_relative_path:    relative path of old database file
+        :return:                        true if an the old database was found and correctly migrated, false otherwise
+        """
+        if old_db_type == 0:
+            """"
+            db structure of db type 0
+            
+            TABLE history 
+            (
+                command  TEXT,
+                counter BIGINT,
+                description TEXT,
+                tags TEXT
+            )
+            """
+            if os.path.isfile(self.project_path + old_db_relative_path):
+                migration_success = True
+                # connect to old db
+                tmp_conn_old = sqlite3.connect(self.project_path + old_db_relative_path)
+                tmp_cursor_old = tmp_conn_old.cursor()
+
+                # get all value from old db
+                tmp_cursor_old.execute("SELECT command, counter, description, tags FROM history")
+                old_db_data = tmp_cursor_old.fetchall()
+                for item in old_db_data:
+                    old_cmd = item[0]
+                    old_counter = item[1]
+                    old_desc = item[2]
+                    old_tags = self._tags_string_to_array(item[3])
+                    old_date = 0  # the date was not available therefore we select the oldest date possible
+
+                    if not self.add_element(old_cmd,
+                                            description=old_desc,
+                                            tags=old_tags,
+                                            counter=old_counter,
+                                            date=old_date):
+                        migration_success = False
+
+                tmp_conn_old.close()
+                return migration_success
+            else:
+                logging.debug("database migration - database type %d not found" % old_db_type)
+                return False
+        else:
+            logging.error("database migration - unknown old database: %s" % old_db_relative_path)
+            return False
 
     def save_changes(self):
         """
@@ -55,8 +138,8 @@ class DatabaseSQLite(object):
 
         :return:
         """
-        if os.path.exists(self.db_path):
-            os.remove(self.db_path)
+        if os.path.exists(self.project_path + self.db_relative_path):
+            os.remove(self.project_path + self.db_relative_path)
 
     def close(self):
         """
@@ -83,18 +166,12 @@ class DatabaseSQLite(object):
 
         :return:
         """
-        logging.info("create database")
-        self.cursor.execute("""
-        CREATE TABLE history 
-        (
-            command  TEXT,
-            counter BIGINT,
-            description TEXT,
-            tags TEXT
-        )
-        """)
+        logging.info("database - create database")
+        self.cursor.execute("CREATE TABLE %s ( %s )" % (self._DATABASE_TABLE_NAME, self._DATABASE_STRUCTURE))
+
         # note: sqlite automatically adds a column called "rowID"
         # the "rowID" value is a 64-bit signed integers
+        # REAL is used because it has the longest time range
 
     def get_all_data(self, filter=None):
         self.cursor.execute("SELECT * FROM history ")
@@ -201,7 +278,7 @@ class DatabaseSQLite(object):
 
         return self.cursor.fetchall()
 
-    def add_element(self, cmd, description=None, tags=None):
+    def add_element(self, cmd, description=None, tags=None, counter=0, date=None, synced=0):
         """
         insert a new element in the database,
         if it already in the db just increase the counter
@@ -211,87 +288,123 @@ class DatabaseSQLite(object):
         :param cmd:             bash command
         :param description:     description
         :param tags:            array of tag
+        :param counter:         usage counter
+        :param date:            date of last change (UTC time in Epoch timestamp)
+        :param synced:          boolean for future usage
+
         :return:                true if the command has been store successfully
         """
-        # remove whitespaces on the left and right
-        cmd = cmd.strip()
 
-        # check if description and tags contains an illegal char (@ or #)
-        if description is not None and (self.CHAR_TAG in description or self.CHAR_DESCRIPTION in description):
-            logging.error("description contains illegal char " + self.CHAR_DESCRIPTION + ": " + description)
-            return False
-        if tags is not None and type(tags) == list:
-            for tag in tags:
-                if self.CHAR_TAG in tag or self.CHAR_DESCRIPTION in tag:
-                    logging.error("tags contains illegal char " + self.CHAR_DESCRIPTION + ": " + tag)
-                    return False
+        try:
+            # remove whitespaces on the left and right
+            cmd = cmd.strip()
 
-        logging.debug("database - add command: " + str(cmd))
-        logging.debug("database - description: " + str(description))
-        logging.debug("database - tags: " + str(tags))
-        self.cursor.execute("SELECT rowid, counter, description, tags FROM history WHERE command=?", (cmd,))
-        matches = self.cursor.fetchall()
-        matches_number = len(matches)
-        if matches_number == 0:
-            if description is None:
-                description = ""
-            tags_str = self._tag_array_to_string(tags)
-            self.cursor.execute("INSERT INTO history values (?, ?, ?, ?)", (cmd, 0, description, tags_str,))
-            logging.debug("database - added NEW command")
-        elif matches_number == 1:
-            match = matches[0]
-            # get old values
-            match_id = match[0]
-            match_counter = int(match[1])
-            match_desc = match[2]
-            match_tags_str = match[3]
+            if date is None:
+                # https://www.epochconverter.com/
+                date = int(time.time())
 
-            # set new counter
-            new_counter = match_counter + 1
-            # set new description
-            if description is not None and description is not "" and description != match_desc:
-                # TODO possible improvement: keep (or ask to keep) also the previous description
-                new_description = description
-            else:
-                new_description = match_desc
-            # set new tags list
-            if tags is not None and type(tags) == list and len(tags) > 0:
-                update_tags = False
-                match_tags = self._tags_string_to_array(match_tags_str)
+            # check if description and tags contains an illegal char (@ or #)
+            if description is not None and (self.CHAR_TAG in description or self.CHAR_DESCRIPTION in description):
+                logging.error("database:add element - description contains illegal char " +
+                              self.CHAR_DESCRIPTION + ": " + description)
+                return False
+            if tags is not None and type(tags) == list:
                 for tag in tags:
-                    if tag not in match_tags and tag != "":
-                        # new tag
-                        match_tags.append(tag)
-                        update_tags = True
-                if update_tags:
-                    new_tags_str = self._tag_array_to_string(match_tags)
+                    if self.CHAR_TAG in tag or self.CHAR_DESCRIPTION in tag:
+                        logging.error("database:add element - tags contains illegal char " +
+                                      self.CHAR_DESCRIPTION + ": " + tag)
+                        return False
+
+            logging.debug("database:add element - add command: " + str(cmd))
+            logging.debug("database:add element - tags: " + str(tags))
+            logging.debug("database:add element - description: " + str(description))
+            logging.debug("database:add element - counter: " + str(counter))
+            logging.debug("database:add element - date: " + str(date))
+            logging.debug("database:add element - synced: " + str(synced))
+
+            self.cursor.execute("SELECT rowid, description, tags, counter FROM history WHERE command=?", (cmd,))
+            matches = self.cursor.fetchall()
+            matches_number = len(matches)
+            if matches_number == 0:
+                if description is None:
+                    description = ""
+                if tags is None:
+                    tags_str = ""
+                else:
+                    tags_str = self._tag_array_to_string(tags)
+                self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)",
+                                       (cmd,
+                                        description,
+                                        tags_str,
+                                        counter,
+                                        date,
+                                        synced
+                                        ))
+                logging.debug("database:add element - added NEW")
+            elif matches_number == 1:
+                match = matches[0]
+                # get old values
+                match_id = match[0]
+                match_desc = match[1]
+                match_tags_str = match[2]
+                match_counter = int(match[3])
+                # match_date = int(match[4])
+
+                # set new counter
+                new_counter = match_counter + 1
+                # set new description
+                if description is not None and description is not "" and description != match_desc:
+                    if match_desc is "":
+                        new_description = description
+                    else:
+                        # concatenate old and new description
+                        new_description = description + ". " + match_desc
+                else:
+                    new_description = match_desc
+                # set new tags list
+                if tags is not None and type(tags) == list and len(tags) > 0:
+                    update_tags = False
+                    match_tags = self._tags_string_to_array(match_tags_str)
+                    for tag in tags:
+                        if tag not in match_tags and tag != "":
+                            # new tag
+                            match_tags.append(tag)
+                            update_tags = True
+                    if update_tags:
+                        new_tags_str = self._tag_array_to_string(match_tags)
+                    else:
+                        new_tags_str = match_tags_str
                 else:
                     new_tags_str = match_tags_str
+
+                # delete old row
+                self.cursor.execute("DELETE FROM history WHERE rowid=?", (match_id,))
+
+                logging.debug("database:add element - new_tags_str: " + str(new_tags_str))
+                # create new row which will have the highest rowID (last used command)
+
+                self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)", (
+                    (cmd,
+                     new_description,
+                     new_tags_str,
+                     new_counter,
+                     date,
+                     synced
+                     )))
+                logging.debug("database:add element - command updated: " + cmd)
             else:
-                new_tags_str = match_tags_str
+                logging.error("database:add element - command entry is not unique: " + cmd)
+                return False
 
-            # delete old row
-            self.cursor.execute("DELETE FROM history WHERE rowid=?", (match_id,))
-
-            logging.debug("new_tags_str: " + str(new_tags_str))
-            # create new row which will have the highest rowID (last used command)
-            self.cursor.execute("INSERT INTO history values (?, ?, ?, ?)", (
-                cmd,
-                new_counter,
-                new_description,
-                new_tags_str,))
-            logging.debug("database - command updated: " + cmd)
-
-        else:
-            logging.error("database - command entry is not unique: " + cmd)
+            self.save_changes()
+            return True
+        except Exception as e:
+            logging.error("database:add element - thrown an error: %s" % str(e))
             return False
-
-        self.save_changes()
-        return True
 
     def update_position_element(self, cmd):
         logging.debug("database - update_position_element: " + str(cmd))
-        self.cursor.execute("SELECT  rowid, counter, description, tags FROM history WHERE command=?", (cmd,))
+        self.cursor.execute("SELECT  rowid, description, tags, counter, date, synced FROM history WHERE command=?", (cmd,))
         matches = self.cursor.fetchall()
         matches_number = len(matches)
         if matches_number == 1:
@@ -300,11 +413,13 @@ class DatabaseSQLite(object):
             # delete old row
             self.cursor.execute("DELETE FROM history WHERE rowid=?", (matched_id,))
             # create new row which will have the highest rowID (last used command)
-            self.cursor.execute("INSERT INTO history values (?, ?, ?, ?)", (
+            self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)", (
                 cmd,
                 match[1],
                 match[2],
-                match[3],))
+                int(match[3]) + 1,
+                match[4],
+                match[5]))
             self.save_changes()
         else:
             logging.error("database - update entry fail because of no matched command")

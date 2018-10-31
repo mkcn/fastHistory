@@ -6,7 +6,7 @@ A python tool connected to your terminal to store important commands and search 
 
 ### Why you need it?
 
-How often do you need to reuse a command but you cannot remember it (or all the needed flags)?
+How often do you need to reuse a command but you cannot remember it (or all the needed options/flags)?
 
 ```sh
 # example of an 'intuitive' and 'obvious' bash command from my bash history
@@ -54,7 +54,7 @@ or **both**
 $ srm -lrvz f1 f2 d1/ #secure #remove #file #directory @delete file and overwrite it 2 times
 ```
 
-Finally, to search your saved commands, all you need is the **f** of fastHistory
+Finally, to search your saved commands, all you need is **f**
 
 ```sh
 $ f secure
@@ -63,6 +63,12 @@ $ f secure
 **fastHistory** will then inject the selected command in your terminal input
 
 ![Search sample](images/sample.gif)
+
+
+Furthermore, for each saved command you can get a fast summary from the man page with details of the used options/flags
+**Warning**: this feature currently does not cover the syntax of all commands
+
+![Info ls sample](images/show.info.ls.png)
 
 
 # How to install
@@ -77,7 +83,7 @@ git clone https://github.com/mkcn/fastHistory.git
 
 2) enable **fastHistory** in your terminal
 ```sh
-echo 'source "$HOME/fastHistory/fastHistory.sh"' >> .bashrc
+echo 'source "$HOME/fastHistory/bash/f.sh"' >> .bashrc
 ```
 
 done!
@@ -85,7 +91,7 @@ done!
 
 # Commands and syntax
 
-#### Silent adding
+#### Simple adding
 
 ```
 command_to_save [#[tag [#tag ...]][@description]]

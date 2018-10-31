@@ -24,15 +24,12 @@ class DataManager(object):
 
 	DUMMY_SEARCH_FILTERS = ["", "", [""], False]
 
-	def __init__(self, db_path, mode=DATABASE_MODE_SQLITE):
+	def __init__(self, project_path, db_relative_path, old_db_relative_paths, mode=DATABASE_MODE_SQLITE):
 		self.last_search = None
 		self.filtered_data = None
 		if mode == self.DATABASE_MODE_SQLITE:
 			from database.databaseSQLite import DatabaseSQLite
-			self.database = DatabaseSQLite(db_path)
-		elif mode == self.DATABASE_MODE_MYSQL:
-			from database.databaseMYSQL import DatabaseMYSQL
-			self.database = DatabaseMYSQL(db_path)
+			self.database = DatabaseSQLite(project_path, db_relative_path, old_db_relative_paths)
 		else:
 			logging.error("database mode not selected")
 		# set dummy as default

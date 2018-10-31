@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # absolute path of the project folder
-_fast_history_project_directory="${BASH_SOURCE[0]%/*}"
+_fast_history_project_directory="${BASH_SOURCE[0]%/*}/../"
 
 # if true the return code of the executed command is check before to store it
 # by default this feature is disable
@@ -15,7 +15,7 @@ _fast_history_short_cmd=false
 fsearch() {
     # trick to capture all input (otherwise the comments are removed)
     arguments=${_fast_history_hooked_cmd:${#FUNCNAME[0]} + 1}
-    python3 "$_fast_history_project_directory"/fastHistory/fastHistory.py "search" "$arguments";
+    python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "search" "$arguments";
     unset _fast_history_hooked_cmd;
     }
 
@@ -23,7 +23,7 @@ fsearch() {
 f() {
     # trick to capture all input (otherwise the comments are removed)
     arguments=${_fast_history_hooked_cmd:${#FUNCNAME[0]} + 1}
-    python3 "$_fast_history_project_directory"/fastHistory/fastHistory.py "search" "$arguments";
+    python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "search" "$arguments";
     unset _fast_history_hooked_cmd;
 }
 
@@ -31,13 +31,13 @@ f() {
 fadd() {
     # trick to capture all input (otherwise the comments are removed)
     arguments=${_fast_history_hooked_cmd:${#FUNCNAME[0]} + 1}
-    python3 "$_fast_history_project_directory"/fastHistory/fastHistory.py "add-explicit" "$arguments";
+    python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "add-explicit" "$arguments";
     unset _fast_history_hooked_cmd;
     }
 
 # load bash hook functions
 # more info: https://github.com/rcaloras/bash-preexec/
-source "$_fast_history_project_directory"/bash-preexec.sh
+source "$_fast_history_project_directory"bash/bash-preexec.sh
 
 # "preexec" is executed just after a command has been read and is about to be executed
 # we store the hooked command in a bash variable
@@ -54,7 +54,7 @@ precmd() {
 		    	# this is just a preliminary check, in the python module a strict regex will be used
 		    	# this is only done to avoid to load the python module for each command
 		    	if [[ "$_fast_history_hooked_cmd" = *"#"* ]]; then
-				python3 "$_fast_history_project_directory"/fastHistory/fastHistory.py "add" "$_fast_history_hooked_cmd"
+				python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "add" "$_fast_history_hooked_cmd"
 				# clean the cmd, this is needed because precmd can be trigged without preexec (example ctrl+c)
 				unset _fast_history_hooked_cmd;
 			else

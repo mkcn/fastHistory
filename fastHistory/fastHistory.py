@@ -8,9 +8,10 @@ from database.dataManager import DataManager
 from console import loggerBash
 
 
-PATH_LOG_FILE = "data/history.log"
-PATH_DATABASE_FILE = "data/history.db"
-PATH_CONFIGURATION_FILE = "config/config.ini"
+PATH_LOG_FILE = "../data/fh.log"
+PATH_DATABASE_FILE = "../data/fh_v1.db"
+PATH_DATABASE_FILES_OLD = [[0, "data/history.db"]]
+PATH_CONFIGURATION_FILE = "../fastHistory.conf"
 
 DATABASE_MODE = DataManager.DATABASE_MODE_SQLITE
 
@@ -21,7 +22,6 @@ def handle_search_request(input_cmd_str, project_directory, theme, last_column_s
 
 	:param project_directory: 	path of the project
 	:param input_cmd_str:		input cmd
-	:param logger_console:			logger for terminal console
 	:param theme:				theme (colors)
 	:param last_column_size:	size of last column (percentage)
 	:return:
@@ -34,7 +34,7 @@ def handle_search_request(input_cmd_str, project_directory, theme, last_column_s
 	# set SIGINT handler
 	ConsoleUtils.handle_close_signal()
 	# create data manger obj
-	data_manager = DataManager(project_directory + PATH_DATABASE_FILE, DATABASE_MODE)
+	data_manager = DataManager(project_directory, PATH_DATABASE_FILE, PATH_DATABASE_FILES_OLD, DATABASE_MODE)
 
 	# open picker to select from history
 	picker = Picker(data_manager, theme=theme, last_column_size=last_column_size, search_text=input_cmd_str)
@@ -58,7 +58,6 @@ def handle_add_request(input_cmd_str, project_directory, error_feedback=False):
 
 	:param project_directory: 	path of the project
 	:param input_cmd_str:		input cmd
-	:param logger_console:			logger for terminal console
 	:param error_feedback:		if true print error messages in the console, otherwise hide them
 	:return:
 	"""
@@ -81,7 +80,7 @@ def handle_add_request(input_cmd_str, project_directory, error_feedback=False):
 		description = parser_res[TagParser.INDEX_DESC]
 		tags = parser_res[TagParser.INDEX_TAGS]
 
-		data_manager = DataManager(project_directory + PATH_DATABASE_FILE, DATABASE_MODE)
+		data_manager = DataManager(project_directory, PATH_DATABASE_FILE, PATH_DATABASE_FILES_OLD, DATABASE_MODE)
 		stored = data_manager.add_new_element(cmd, description, tags)
 		if stored:
 			logging.info("command added")
@@ -133,7 +132,7 @@ if __name__ == "__main__":
 				elif mode == "add-explicit" and len(input_cmd) > 0:
 					handle_add_request(input_cmd, project_dir, error_feedback=True)
 				else:
-					logger_console.log_on_console_error("'mode' parameter unknown")
+					logger_console.log_on_console_error("'mode' parameter unknown. check your '.bashrc' file and reload bash")
 			else:
 				logger_console.log_on_console_error("error in config file: %s" % project_dir + PATH_CONFIGURATION_FILE)
 				logger_console.log_on_console_error("error details: %s" % configReader.get_error_msg())
