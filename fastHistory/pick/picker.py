@@ -13,7 +13,7 @@ KEYS_ENTER = (curses.KEY_ENTER, '\n', '\r')
 KEY_SELECT = None  # TODO decide
 KEY_UP = curses.KEY_UP
 KEY_DOWN = curses.KEY_DOWN
-KEY_DELETE = curses.KEY_BACKSPACE
+KEYS_DELETE = (curses.KEY_BACKSPACE, '\b', '\x7f')
 KEY_CANC = curses.KEY_DC
 KEY_SHIFT_TAB = curses.KEY_BTAB
 KEY_RIGHT = curses.KEY_RIGHT
@@ -449,7 +449,7 @@ class Picker(object):
                     # do nothing, the cursor is already on the position 0
                     pass
             # delete a char of the search
-            elif c == KEY_DELETE:
+            elif c in KEYS_DELETE:
                 # the delete is allowed if the search text is not empty and if
                 if len(self.search_text) > 0 and self.search_text_index > 0:
                     # delete char at the position of the cursor inside the search text field
