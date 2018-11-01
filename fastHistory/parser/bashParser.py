@@ -156,12 +156,15 @@ class BashParser(object):
     def decompose_possible_concatenated_flags(flag_string):
         """
         Given a possible concatenated flag string it return an array with all the flags decomposed
+        NOTE: flags like "--help" must not be decomposed
+
         :param flag_string:     example: -lsv
         :return:                example: ['-l','-s','-v']
         """
         flags = []
         flag_dash = '-'
-        if flag_string.startswith(flag_dash):
+        # "-" ok , "--" not
+        if len(flag_string) >= 2 and flag_string[0] == flag_dash and flag_string[1] != flag_dash:
             flag_string = flag_string[1:]
             flag_len = len(flag_string)
             if flag_len == 1:
@@ -170,7 +173,8 @@ class BashParser(object):
             elif flag_len > 1:
                 # combined flags (example: -lsv)
                 for c in flag_string:
-                    flags.append(flag_dash + c)
+                    if str(flag_dash + c) not in flags:
+                        flags.append(flag_dash + c)
             else:
                 # '-' case
                 pass

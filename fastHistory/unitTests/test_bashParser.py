@@ -39,9 +39,19 @@ class TestBashParser(TestCase):
         res = bashParser.BashParser.decompose_possible_concatenated_flags("-lsv")
         self.assertEqual(res, ['-l', '-s', '-v'])
 
+        # single flag
         res = bashParser.BashParser.decompose_possible_concatenated_flags("-l")
         self.assertEqual(res, ['-l'])
 
+        # double flags
+        res = bashParser.BashParser.decompose_possible_concatenated_flags("-ll")
+        self.assertEqual(res, ['-l'])
+
+        # flag that should not be decomposed
+        res = bashParser.BashParser.decompose_possible_concatenated_flags("--help")
+        self.assertEqual(res, [])
+
+        # not a flag
         res = bashParser.BashParser.decompose_possible_concatenated_flags("notAFlag")
         self.assertEqual(res, [])
 

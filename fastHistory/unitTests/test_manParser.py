@@ -76,6 +76,11 @@ class TestManParser(TestCase):
             logging.info(meaning)
 
     def test_get_flag_meaning(self):
+        """
+        to run this test check if all commands are available in your system
+
+        :return:
+        """
         self._set_text_logger()
         parser = ManParser()
 
@@ -85,14 +90,21 @@ class TestManParser(TestCase):
             ["netstat", "-a"],
             ["netstat", "-n"],
             ["lsof", "-i"],
-            ["wget", "--quiet"]
+            ["wget", "--quiet"],
+            ["git", "--help"],
+            ["git", "--version"]
         ]
         for t in test_string:
             logging.info("test: " + str(t))
-            self.assertTrue(parser.load_man_page(t[0]))
-            flag_meaning = parser.get_flag_meaning(t[1])
-            self.assertTrue(flag_meaning)
-            logging.info("flag meaning: " + str(flag_meaning))
+            if parser.load_man_page(t[0]):
+                flag_meaning = parser.get_flag_meaning(t[1])
+                self.assertTrue(flag_meaning)
+                logging.info("flag meaning: " + str(flag_meaning))
+                #print(t[0] + " " + t[1])
+                #print("result: '" + str(flag_meaning) + "'")
+            else:
+                print("warning! program not found in your system:" + t[0])
+                logging.warning("warning! program not found in your system:" + t[0])
 
     def _set_text_logger(self):
         """

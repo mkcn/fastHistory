@@ -24,6 +24,7 @@ class ManParser(object):
                   "[-—]" \
                   "(.*\n( +.*\n)*)$"
     # regex notes
+    #   - (?:OPTIONS)?    means that the previous line can be empty or with the 'OPTIONS' string
     #   - "%s" is a dynamic field of the regex and it is replaced with the flag to search
     #   - the flag can be at the beginning or as secondary item ("-a" or "--all, -a" or "-a\n     --all")
     #       - each item must start with "-"
@@ -33,16 +34,17 @@ class ManParser(object):
     #                       - bracket   -a[=WHEN]
     # - the flag is always preceded by a new line ("\n       -a")
     # Examples:
+    #       "OPTIONS\n       -o outputfile\n               Specify where the output is to be written.
     #       "\n      -a, --all\n        do not ignore entries starting with ."
     #       "\n      -q\n--quiet     Turn off Wget's output."
 
-    _regexp_flag = r"^(\n {2,7}-.+)?" \
+    _regexp_flag = r"^(?:OPTIONS)?((\n {2,7}-.+)?" \
                    r"\n {2,7}(-.+, )*" \
                    r"%s" \
                    r"((\[)?[,=].+(\])?)?" \
                    r"( .*)?" \
                    r"\n" \
-                   r"( +.*\n)*$"
+                   r"( +.*\n)*)$"
     _regex_name_no_group = "^ {7}ls - .*"
 
     INDEX_IS_FIRST_LINE = 0
@@ -105,7 +107,8 @@ class ManParser(object):
             try:
                 result = re.search(self._regexp_flag % flag, self.man_page, re.MULTILINE)
                 if result is not None:
-                    result = result.group(0)
+                    # get group (1) and not the all string
+                    result = result.group(1)
                 else:
                     logging.debug("get_flag_meaning: regex does not match")
                     return None
