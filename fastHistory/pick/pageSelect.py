@@ -56,7 +56,7 @@ class PageSelector(object):
                     # print until the end of the cmd option
                     index_cmd_end = index_cmd + len(filters[DataManager.INDEX_OPTION_CMD])
                     self.drawer.draw_row(search_text[0:index_cmd])
-                    self.drawer.draw_row(search_text[index_cmd:index_cmd_end], color=self.drawer.color_search)
+                    self.drawer.draw_row(search_text[index_cmd:index_cmd_end])
                     # cut string with unprinted section
                     search_text = search_text[index_cmd_end:]
                 else:
@@ -68,8 +68,8 @@ class PageSelector(object):
                 if index_tag != -1:
                     # print until the end of the cmd option
                     index_tag_end = index_tag + len(tag)
-                    self.drawer.draw_row(search_text[0:index_tag])
-                    self.drawer.draw_row(search_text[index_tag:index_tag_end], color=self.drawer.color_search)
+                    self.drawer.draw_row(search_text[0:index_tag], color=self.drawer.color_hash_tag)
+                    self.drawer.draw_row(search_text[index_tag:index_tag_end])
                     # cut string with unprinted section
                     search_text = search_text[index_tag_end:]
                 else:
@@ -81,17 +81,18 @@ class PageSelector(object):
                 if index_desc != -1:
                     # print until the end of the cmd option
                     index_desc_end = index_desc + len(filters[DataManager.INDEX_OPTION_DESC])
-                    self.drawer.draw_row(search_text[0:index_desc])
-                    self.drawer.draw_row(search_text[index_desc:index_desc_end], color=self.drawer.color_search)
+                    self.drawer.draw_row(search_text[0:index_desc], color=self.drawer.color_hash_tag)
+                    self.drawer.draw_row(search_text[index_desc:index_desc_end])
                     # cut string with unprinted section
                     search_text = search_text[index_desc_end:]
                 else:
                     logging.error("option tag string not found in search field: " + filters[DataManager.INDEX_OPTION_DESC])
 
             # print the rest of the unprinted text
-            self.drawer.draw_row(search_text)
+            # NOTE: this is printed with color and it can contain "#" and "@"
+            self.drawer.draw_row(search_text, color=self.drawer.color_hash_tag)
         else:
-            self.drawer.draw_row(search_text, color=self.drawer.color_search)
+            self.drawer.draw_row(search_text, color=self.drawer.color_search_input)
 
         # columns titles
         index_tab_column = int(self.drawer.get_max_x() * last_column_size / 100)
@@ -164,7 +165,6 @@ class PageSelector(object):
             self.drawer.draw_row(" " * msg_space)
             self.drawer.draw_row(msg_help)
 
-
     def draw_option(self, cmd, tags, desc, filter_cmd, filter_desc, filter_tags, last_column_size=0, selected=False):
         """
         draw option line
@@ -217,7 +217,11 @@ class PageSelector(object):
                         index_tag = tag.lower().find(filter_tag)
                         if index_tag != -1:
                             self.drawer.draw_row(" ", color=background_color)
-                            self.drawer.draw_row("#", color=self.drawer.color_hash_tag)
+                            if selected:
+                                self.drawer.draw_row("#", color=self.drawer.color_hash_tag_selected)
+                            else:
+                                self.drawer.draw_row("#", color=self.drawer.color_hash_tag)
+
                             self.draw_marked_string(tag,
                                                     filter_tag,
                                                     index_sub_str=index_tag,
@@ -243,7 +247,10 @@ class PageSelector(object):
 
                     # @ + word + space
                     self.drawer.draw_row(" ", color=background_color)
-                    self.drawer.draw_row("@", color=self.drawer.color_hash_tag)
+                    if selected:
+                        self.drawer.draw_row("@", color=self.drawer.color_hash_tag_selected)
+                    else:
+                        self.drawer.draw_row("@", color=self.drawer.color_hash_tag)
                     # print the start of the matched work
                     self.drawer.draw_row(start, color=background_color)
                     # print the search string
@@ -255,13 +262,19 @@ class PageSelector(object):
             # print not matched tags
             for tag in unmatched_tags:
                 self.drawer.draw_row(" ", color=background_color)
-                self.drawer.draw_row("#", color=self.drawer.color_hash_tag)
+                if selected:
+                    self.drawer.draw_row("#", color=self.drawer.color_hash_tag_selected)
+                else:
+                    self.drawer.draw_row("#", color=self.drawer.color_hash_tag)
                 self.drawer.draw_row(tag, color=background_color)
 
             # print not matching description
             if unmatched_description:
                 self.drawer.draw_row(" ", color=background_color)
-                self.drawer.draw_row("@", color=self.drawer.color_hash_tag)
+                if selected:
+                    self.drawer.draw_row("@", color=self.drawer.color_hash_tag_selected)
+                else:
+                    self.drawer.draw_row("@", color=self.drawer.color_hash_tag)
                 self.drawer.draw_row(desc, color=background_color)
 
     def draw_marked_string(self, text, sub_str, index_sub_str=None, color_default=1, color_marked=None,

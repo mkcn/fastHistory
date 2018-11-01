@@ -100,7 +100,7 @@ class PageInfo(object):
                     index_tag = tag.lower().find(filter_tag)
                     if index_tag != -1:
                         found = True
-                        self.draw_marked_string(tag, filter_tag)
+                        self.draw_marked_string(tag, filter_tag, color_marked=self.drawer.color_search)
                         break
                 if not found:
                     self.drawer.draw_row(tag)
@@ -119,7 +119,7 @@ class PageInfo(object):
         self.drawer.draw_row(" " * indent)
         if desc is not None and len(desc) > 0:
             self.drawer.draw_row("@", color=self.drawer.color_hash_tag)
-            self.draw_marked_string(desc, filter_desc)
+            self.draw_marked_string(desc, filter_desc, color_marked=self.drawer.color_search)
         else:
             self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
             self.drawer.draw_row(no_desc_message)
