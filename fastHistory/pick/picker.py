@@ -8,9 +8,10 @@ from database.dataManager import DataManager
 from parser.tagParser import TagParser
 from pick.drawer import Drawer
 from pick.pageSelect import PageSelector
+from pick.textManager import TextManager, ContextShifter
 
 KEYS_ENTER = (curses.KEY_ENTER, '\n', '\r')
-KEY_SELECT = None  # TODO decide
+KEY_SELECT = None  # used for future feature (multi select)
 KEY_UP = curses.KEY_UP
 KEY_DOWN = curses.KEY_DOWN
 KEYS_DELETE = (curses.KEY_BACKSPACE, '\b', '\x7f')
@@ -35,6 +36,8 @@ class Picker(object):
     """
 
     DESCRIPTION_CONTEXT_LENGTH = 5
+    EDIT_FIELD_MARGIN = 4
+    SEARCH_FIELD_MARGIN = 23
 
     DEBUG_MODE = True
 
@@ -46,9 +49,8 @@ class Picker(object):
         :param multi_select:        (optional) if true its possible to select multiple values by hitting SPACE, defaults to False
         """
 
-        self.search_text = search_text
-        self.search_text_lower = search_text.lower()
-        self.search_text_index = len(search_text)
+        self.context_shift = ContextShifter()
+        self.search_t = TextManager(search_text, use_lower=True)
 
         self.data_manager = data_manager
         self.theme = theme
@@ -56,7 +58,6 @@ class Picker(object):
         self.all_selected = []
 
         self.drawer = None
-        self.data_from_man_page = None
 
         self.is_multi_select = multi_select
 
@@ -73,90 +74,21 @@ class Picker(object):
 
         self.current_selected_option = None
 
-    def has_minimum_size(self):
+    def start(self):
         """
-        # draw screen if screen has minimum size
-        :return:    true if the console has at least the minimum size
-        """
-        return self.drawer.get_max_y() < 4 or self.drawer.get_max_x() < 40
-
-    def draw_edit_description(self):
-        """
-        controller of description page drawer
+        starting point
         :return:
         """
-        if self.has_minimum_size():
-            return
-        self.drawer.clear()
-        self.drawer.reset()
+        return curses.wrapper(self._start)
 
-        # import this locally to improve performance when the program is loaded
-        from pick.pageEditDescription import PageEditDescription
-        page_desc = PageEditDescription(self.drawer, self.page_selector)
-        page_desc.draw_description_page(option=self.current_selected_option,
-                                        filters=self.data_manager.get_search_filters())
+    def _start(self, screen):
+        self.drawer = Drawer(screen, self.theme)
+        self.page_selector = PageSelector(self.drawer)
 
-        # refresh screen
-        self.drawer.refresh()
+        # set screen context
+        self.search_t.set_max_x(self.drawer.get_max_x() - self.SEARCH_FIELD_MARGIN)
 
-    def draw_edit_tags(self):
-        """
-        controller of tags page drawer
-        :return:
-        """
-        if self.has_minimum_size():
-            return
-        self.drawer.clear()
-        self.drawer.reset()
-
-        # import this locally to improve performance when the program is loaded
-        from pick.pageEditTags import PageEditTags
-        page_tags = PageEditTags(self.drawer, self.page_selector)
-        page_tags.draw_tags_page(option=self.current_selected_option, filters=self.data_manager.get_search_filters())
-
-        # refresh screen
-        self.drawer.refresh()
-
-    def draw_info(self):
-        """
-        controller of info page drawer
-        :return:
-        """
-        if self.has_minimum_size():
-            return
-        self.drawer.clear()
-        self.drawer.reset()
-
-        # import this locally to improve performance when the program is loaded
-        from pick.pageInfo import PageInfo
-        page_info = PageInfo(self.drawer, self.page_selector)
-        page_info.draw_page_info(option=self.current_selected_option,
-                                 filters=self.data_manager.get_search_filters(),
-                                 data_from_man_page=self.data_from_man_page)
-
-        # refresh screen
-        self.drawer.refresh()
-
-    def draw_select(self):
-        """
-        controller of select page drawer
-        :return:
-        """
-        if self.has_minimum_size():
-            return
-        self.drawer.clear()
-        self.drawer.reset()
-
-        options = self.get_options()
-        self.page_selector.draw_page_select(
-            filters=self.data_manager.get_search_filters(),
-            search_text=self.search_text,
-            search_text_index=self.search_text_index,
-            options=options,
-            last_column_size=self.last_column_size)
-
-        # refresh screen
-        self.drawer.refresh()
+        return self.run_loop_select
 
     def move_up(self):
         """
@@ -283,55 +215,174 @@ class Picker(object):
                 options.append([False, option])
         return options
 
-    def run_loop_edit_description(self):
+    def run_loop_edit_description(self, data_from_man_page):
         """
         Loop to capture user input keys to interact with the "add description" page
 
         :return:
         """
+        # import this locally to improve performance when the program is loaded
+        from pick.pageEditDescription import PageEditDescription
+        page_desc = PageEditDescription(self.drawer,
+                                        option=self.current_selected_option,
+                                        filters=self.data_manager.get_search_filters(),
+                                        context_shift=self.context_shift,
+                                        data_from_man_page=data_from_man_page)
+
+        current_command = self.current_selected_option[DataManager.INDEX_OPTION_CMD]
+        description_t = TextManager(TagParser.DESCRIPTION_SIGN +
+                                    self.current_selected_option[DataManager.INDEX_OPTION_DESC],
+                                    max_x=self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
+
         while True:
-            self.draw_edit_description()
+            if page_desc.has_minimum_size():
+                page_desc.clean_page()
+                page_desc.draw_page_edit(description_text=description_t.get_text_to_print(),
+                                         description_cursor_index=description_t.get_cursor_index_to_print())
+                page_desc.refresh_page()
+
             # wait for char
             c = self.drawer.wait_next_char()
 
             # save and exit
             if c in KEYS_ENTER:
-                return
+                new_description = TagParser.parse_description(description_t.get_text())
+                if new_description is not None:
+                    if self.data_manager.update_description(current_command, new_description):
+                        return True
+                    else:
+                        logging.error("database error during saving, please try again")
+                        # TODO show error and details in GUI
+                else:
+                    logging.error("new description text not allowed: %s" % str(description_t.get_text()))
+                    # TODO show error and details in GUI
+
             # exit without saving
-            elif c == KEY_AT or c == KEY_ESC:
-                return None
+            elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
+                return False
             # -> command
             elif c == KEY_RIGHT:
-                self.drawer.move_shift_right()
-            # <- command
+                if description_t.is_cursor_at_the_end():
+                    self.context_shift.shift_context_right()
+                else:
+                    description_t.move_cursor_right()
+                # <- command
             elif c == KEY_LEFT:
-                self.drawer.move_shift_left()
+                if not self.context_shift.is_context_index_zero():
+                    self.context_shift.shift_context_left()
+                elif not description_t.is_cursor_at_the_beginning():
+                    description_t.move_cursor_left()
+                else:
+                    # do nothing, the cursor is already on the position 0
+                    pass
+            # delete a char of the search
+            elif c in KEYS_DELETE:
+                description_t.delete_char()
+            # move cursor to the beginning
+            elif c == KEY_START or c == KEY_CTRL_A:
+                description_t.move_cursor_to_start()
+                self.context_shift.reset_context_shifted()
+            # move cursor to the end
+            elif c == KEY_END or c == KEY_CTRL_E:
+                description_t.move_cursor_to_end()
+            elif c == KEY_RESIZE:
+                # this occurs when the console size changes
+                self.drawer.reset()
+                description_t.set_max_x(self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
+            elif type(c) is str:
+                # TODO check input max len
+                description_t.add_string(c)
+            elif type(c) is int:
+                logging.debug("loop edit description - integer input not handled: " + repr(c))
             else:
                 logging.error("loop edit description - input not handled: " + repr(c))
 
-    def run_loop_edit_tags(self):
+    def run_loop_edit_tags(self, data_from_man_page):
         """
         Loop to capture user input keys to interact with the "add tag" page
 
         :return:
         """
+        # import this locally to improve performance when the program is loaded
+        from pick.pageEditTags import PageEditTags
+        page_tags = PageEditTags(self.drawer,
+                                 option=self.current_selected_option,
+                                 filters=self.data_manager.get_search_filters(),
+                                 context_shift=self.context_shift,
+                                 data_from_man_page=data_from_man_page)
+
+        current_command = self.current_selected_option[DataManager.INDEX_OPTION_CMD]
+        new_tags = self.current_selected_option[DataManager.INDEX_OPTION_TAGS]
+        new_tags_str = ""
+        for tag in new_tags:
+            if len(tag) > 0:
+                new_tags_str += TagParser.TAG_SIGN + tag + " "
+
+        new_tags_t = TextManager(new_tags_str, max_x=self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
+        new_tags_t.add_string(TagParser.TAG_SIGN)
+
         while True:
-            self.draw_edit_tags()
+            if page_tags.has_minimum_size():
+                page_tags.clean_page()
+                page_tags.draw_page_edit(tags_text=new_tags_t.get_text_to_print(),
+                                         tags_cursor_index=new_tags_t.get_cursor_index_to_print())
+                page_tags.refresh_page()
+
             # wait for char
             c = self.drawer.wait_next_char()
 
             # save and exit
             if c in KEYS_ENTER:
-                return
+                new_tags_array = TagParser.parse_tags_str(new_tags_t.get_text())
+                if new_tags_str != None:
+                    if self.data_manager.update_tags(current_command, new_tags_array):
+                        return True
+                    else:
+                        logging.error("database error during saving, please try again")
+                        # TODO show error and details
+                else:
+                    logging.error("new tags text not allowed: %s" % str(new_tags_t.get_text()))
+                    # TODO show error and details
             # exit without saving
-            elif c == KEY_TAG or c == KEY_ESC:
-                return None
+            # TODO fix return if "alt+char" is pressed
+            elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
+                return False
             # -> command
             elif c == KEY_RIGHT:
-                self.drawer.move_shift_right()
-            # <- command
+                if new_tags_t.is_cursor_at_the_end():
+                    self.context_shift.shift_context_right()
+                else:
+                    # move the search cursor one position right (->)
+                    new_tags_t.move_cursor_right()
+                # <- command
             elif c == KEY_LEFT:
-                self.drawer.move_shift_left()
+                if not self.context_shift.is_context_index_zero():
+                    self.context_shift.shift_context_left()
+                elif not new_tags_t.is_cursor_at_the_beginning():
+                    new_tags_t.move_cursor_left()
+                else:
+                    # do nothing, the cursor is already on the position 0
+                    pass
+                    # delete a char of the search
+            elif c in KEYS_DELETE:
+                # the delete is allowed if the search text is not empty and if
+                if new_tags_t.delete_char():
+                    self.context_shift.reset_context_shifted()
+            # move cursor to the beginning
+            elif c == KEY_START or c == KEY_CTRL_A:
+                new_tags_t.move_cursor_to_start()
+                self.context_shift.reset_context_shifted()
+            # move cursor to the end
+            elif c == KEY_END or c == KEY_CTRL_E:
+                new_tags_t.move_cursor_to_end()
+            elif c == KEY_RESIZE:
+                # this occurs when the console size changes
+                self.drawer.reset()
+                new_tags_t.set_max_x(self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
+            elif type(c) is str:
+                new_tags_t.add_string(c)
+            elif type(c) is int:
+                logging.debug("loop edit tag - integer input not handled: " + repr(c))
             else:
                 logging.error("loop edit tag - input not handled: " + repr(c))
 
@@ -341,11 +392,23 @@ class Picker(object):
 
         :return:
         """
-        self.data_from_man_page = BashParser.load_data_for_info_from_man_page(
+        # import this locally to improve performance when the program is loaded
+        from pick.pageInfo import PageInfo
+
+        data_from_man_page = BashParser.load_data_for_info_from_man_page(
             cmd_text=self.current_selected_option[DataManager.INDEX_OPTION_CMD])
+        page_info = PageInfo(self.drawer,
+                             option=self.current_selected_option,
+                             filters=self.data_manager.get_search_filters(),
+                             context_shift=self.context_shift,
+                             data_from_man_page=data_from_man_page)
 
         while True:
-            self.draw_info()
+            if page_info.has_minimum_size():
+                page_info.clean_page()
+                page_info.draw_page()
+                self.page_selector.refresh_page()
+
             # wait for char
             c = self.drawer.wait_next_char()
 
@@ -355,7 +418,7 @@ class Picker(object):
             # delete current selected option
             elif c == KEY_CANC:
                 self.data_manager.delete_element(self.current_selected_option[DataManager.INDEX_OPTION_CMD])
-                self.options = self.data_manager.filter(self.search_text_lower,
+                self.options = self.data_manager.filter(self.search_t.get_text_lower(),
                                                         self.index + self.get_number_options_to_draw())
                 self.update_options_to_draw()
                 return None
@@ -364,31 +427,43 @@ class Picker(object):
                 return None
             # open man page
             elif c == 109:  # char 'm'
+                # TODO fix and show description in help line
                 from console import consoleUtils
-                cmd = self.data_from_man_page[0][BashParser.INDEX_CMD][BashParser.INDEX_VALUE]
+                cmd = data_from_man_page[0][BashParser.INDEX_CMD][BashParser.INDEX_VALUE]
                 consoleUtils.ConsoleUtils.open_interactive_man_page(cmd)
                 return ""
             # -> command
             elif c == KEY_RIGHT:
-                self.drawer.move_shift_right()
+                self.context_shift.shift_context_right()
             # <- command
             elif c == KEY_LEFT:
-                self.drawer.move_shift_left()
+                self.context_shift.shift_context_left()
             # normal search char
             elif c == KEY_TAG:  # "#"
-                self.run_loop_edit_tags()
+                if self.run_loop_edit_tags(data_from_man_page):
+                    # reload options from db
+                    self.options = self.data_manager.filter(self.search_t.get_text_lower(),
+                                                            self.get_number_options_to_draw())
+                    self.update_options_to_draw()
+                    # update current selected option
+                    self.get_options()
+                    # update option to show
+                    page_info.update_option_value(self.current_selected_option)
             # delete a char of the search
             elif c == KEY_AT:  # "@"
-                self.run_loop_edit_description()
+                if self.run_loop_edit_description(data_from_man_page):
+                    # reload options from db
+                    self.options = self.data_manager.filter(self.search_t.get_text_lower(),
+                                                            self.get_number_options_to_draw())
+                    self.update_options_to_draw()
+                    # update current selected option
+                    self.get_options()
+                    # update option to show
+                    page_info.update_option_value(self.current_selected_option)
             elif c == KEY_RESIZE:
                 # this occurs when the console size changes
                 self.drawer.reset()
-                # TODO make this more efficient
-                # update list option
-                self.options = self.data_manager.filter(self.search_text_lower,
-                                                        self.index + self.get_number_options_to_draw())
-                # update the options to show
-                self.update_options_to_draw()
+                self.search_t.set_max_x(self.drawer.get_max_x())
             else:
                 logging.error("loop info - input not handled: " + repr(c))
 
@@ -399,11 +474,20 @@ class Picker(object):
 
         """
         # get filtered starting options
-        self.options = self.data_manager.filter(self.search_text_lower, self.get_number_options_to_draw())
+        self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.get_number_options_to_draw())
         self.initialize_options_to_draw()
 
         while True:
-            self.draw_select()
+            if self.page_selector.has_minimum_size():
+                self.page_selector.clean_page()
+                self.page_selector.draw_page(
+                    filters=self.data_manager.get_search_filters(),
+                    options=self.get_options(),
+                    search_t=self.search_t,
+                    context_shift=self.context_shift,
+                    last_column_size=self.last_column_size)
+                self.page_selector.refresh_page()
+
             # wait for char
             c = self.drawer.wait_next_char()
 
@@ -415,7 +499,7 @@ class Picker(object):
                 # retrieve more data from db when user want to view more
                 if self.index % (self.get_number_options_to_draw() - 1) == 0:
                     self.options = self.data_manager.filter(
-                        self.search_text_lower,
+                        self.search_t.get_text_lower(),
                         self.index + self.get_number_options_to_draw())
             elif c in KEYS_ENTER:
                 return self.get_selected()
@@ -425,7 +509,7 @@ class Picker(object):
             # tab command
             elif c == KEY_TAB:
                 # reset index of search text (to avoid confusion when the scroll is done on the info page)
-                self.search_text_index = len(self.search_text)
+                self.search_t.move_cursor_to_end()
                 # call the loop for the info page
                 res = self.run_loop_info()
                 if res is not None:
@@ -433,84 +517,59 @@ class Picker(object):
                     return res
             # -> command
             elif c == KEY_RIGHT:
-                if self.search_text_index == len(self.search_text):
-                    self.drawer.move_shift_right()
+                if self.search_t.is_cursor_at_the_end():
+                    if self.options != []:
+                        # move all options list to right
+                        self.context_shift.shift_context_right()
                 else:
-                    # move the search cursor one position right (->)
-                    self.search_text_index += 1
+                    self.search_t.move_cursor_right()
             # <- command
             elif c == KEY_LEFT:
-                if self.drawer.get_shifted() > 0:
-                    self.drawer.move_shift_left()
-                elif self.search_text_index > 0:
-                    # move the search cursor one position left (<-)
-                    self.search_text_index -= 1
+                if not self.context_shift.is_context_index_zero():
+                    self.context_shift.shift_context_left()
+                elif not self.search_t.is_cursor_at_the_beginning():
+                    self.search_t.move_cursor_left()
                 else:
                     # do nothing, the cursor is already on the position 0
                     pass
             # delete a char of the search
             elif c in KEYS_DELETE:
-                # the delete is allowed if the search text is not empty and if
-                if len(self.search_text) > 0 and self.search_text_index > 0:
-                    # delete char at the position of the cursor inside the search text field
-                    self.search_text = self.search_text[0:self.search_text_index - 1] +\
-                                   self.search_text[self.search_text_index:len(self.search_text)]
-                    self.search_text_lower = self.search_text.lower()
-                    self.search_text_index -= 1
+                if self.search_t.delete_char():
                     # reset shift value
-                    self.drawer.reset_shifted()
-                    self.options = self.data_manager.filter(self.search_text_lower, self.get_number_options_to_draw())
+                    self.context_shift.reset_context_shifted()
+                    self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.get_number_options_to_draw())
                     # update the options to show
                     self.update_options_to_draw(initialize_index=True)
             # delete current selected option
             elif c == KEY_CANC:
                 self.data_manager.delete_element(self.current_selected_option[DataManager.INDEX_OPTION_CMD])
-                self.options = self.data_manager.filter(self.search_text_lower, self.index + self.get_number_options_to_draw())
+                self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.index + self.get_number_options_to_draw())
                 self.update_options_to_draw()
             elif c == KEY_RESIZE:
                 # this occurs when the console size changes
                 self.drawer.reset()
+                self.search_t.set_max_x(self.drawer.get_max_x() - self.SEARCH_FIELD_MARGIN)
                 # TODO make this more efficient
                 # update list option
-                self.options = self.data_manager.filter(self.search_text_lower, self.index + self.get_number_options_to_draw())
+                self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.index + self.get_number_options_to_draw())
                 # update the options to show
                 self.update_options_to_draw()
             # move cursor to the beginning
             elif c == KEY_START or c == KEY_CTRL_A:
-                self.search_text_index = 0
+                self.search_t.move_cursor_to_start()
+                self.context_shift.reset_context_shifted()
             # move cursor to the end
             elif c == KEY_END or c == KEY_CTRL_E:
-                self.search_text_index = len(self.search_text)
-            # check if it is a non printable character
-            elif "\\x" in repr(c) or "\\u" in repr(c):
-                # if python3 is not able to print the string then it will be shown as "\xNN" or "\uNNNN"
-                logging.info("loop select - non printable input char ignored: " + repr(c))
-            # normal search charx
+                self.search_t.move_cursor_to_end()
+            # normal search char
             elif type(c) is str:
-                # remove special chars such as 'new line' and 'return carriage'
-                c = c.replace('\n', '')
-                c = c.replace('\r', '')
-                # add char at the position of the cursor inside the search_text field
-                self.search_text = self.search_text[0:self.search_text_index] + \
-                                   c + \
-                                   self.search_text[self.search_text_index:len(self.search_text)]
-                self.search_text_lower = self.search_text.lower()
-                self.search_text_index += len(c)
-                self.option_to_draw = None
-                self.options = self.data_manager.filter(self.search_text_lower, self.get_number_options_to_draw())
-                # update the options to show
-                self.update_options_to_draw(initialize_index=True)
+                if self.search_t.add_string(c):
+                    self.option_to_draw = None
+                    self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.get_number_options_to_draw())
+                    # update the options to show
+                    self.update_options_to_draw(initialize_index=True)
             elif type(c) is int:
                 logging.debug("loop select - integer input not handled: " + repr(c))
             else:
                 logging.error("loop select - input not handled: " + repr(c))
-
-    def _start(self, screen):
-        self.drawer = Drawer(screen, self.theme)
-        self.page_selector = PageSelector(self.drawer)
-
-        return self.run_loop_select
-
-    def start(self):
-        return curses.wrapper(self._start)
 

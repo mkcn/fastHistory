@@ -1,59 +1,80 @@
 from database.dataManager import DataManager
+from pick.pageInfo import PageInfo
 
 
-class PageEditTags(object):
+class PageEditTags(PageInfo):
     """
     Class to draw the tags page
-    whit this page the user can edit the tags list
+    whit this page the user can edit the tags list of the current selected command
     """
 
-    def __init__(self, drawer, page_selector):
-        self.drawer = drawer
-        self.page_selector = page_selector
+    def __init__(self, drawer, option, filters, context_shift, data_from_man_page):
+        """
+        initialize page edit tags
 
-    def draw_tags_page(self, option, filters):
+        :param drawer:              drawer obj
+        :param option:              selected option
+        :param filters:             strings used to highlight filtered strings (in default search there are the same)
+        :param context_shift:       context shift obj
+        :param data_from_man_page:  obj with man info
+        """
+        PageInfo.__init__(self, drawer, option, filters, context_shift, data_from_man_page)
+
+    def draw_page_edit(self, tags_text, tags_cursor_index):
         """
         draw page to edit tags of the current selected option
 
-        :param option:            selected option
-        :param filters:           strings used to highlight filtered strings (in default search there are the same)
+        :param tags_text:              tags string
+        :param tags_cursor_index:      position of the cursor
         :return:
         """
         # draw colored title
-        self.drawer.draw_row(" " * (self.drawer.get_max_x()), color=self.drawer.color_columns_title)
+        self.drawer.draw_row(self.CHAR_SPACE * (self.drawer.get_max_x()), color=self.drawer.color_columns_title)
         self.drawer.draw_row("# Tags edit", x=2, color=self.drawer.color_columns_title)
 
-        # options
-        value_option = option
-
         # draw option row
-        self.page_selector.draw_option(cmd=value_option[DataManager.INDEX_OPTION_CMD],
-                                       tags=value_option[DataManager.INDEX_OPTION_TAGS],
-                                       desc=value_option[DataManager.INDEX_OPTION_DESC],
-                                       filter_cmd=filters[DataManager.INDEX_OPTION_CMD],
-                                       filter_desc=filters[DataManager.INDEX_OPTION_DESC],
-                                       filter_tags=filters[DataManager.INDEX_OPTION_TAGS],
-                                       selected=True,
-                                       last_column_size=0)
-        self.drawer.new_line()
+        self.draw_option(cmd=self.option[DataManager.INDEX_OPTION_CMD],
+                         tags=self.option[DataManager.INDEX_OPTION_TAGS],
+                         desc=self.option[DataManager.INDEX_OPTION_DESC],
+                         filter_cmd=self.filters[DataManager.INDEX_OPTION_CMD],
+                         filter_desc=self.filters[DataManager.INDEX_OPTION_DESC],
+                         filter_tags=self.filters[DataManager.INDEX_OPTION_TAGS],
+                         selected=True,
+                         context_shift=self.context_shift,
+                         last_column_size=0)
         self.drawer.new_line()
 
-        index = 2
-
-        self.drawer.draw_row(" " * index)
-        self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
-        self.drawer.draw_row("this feature is not implemented yet")
-        self.drawer.draw_row("]", color=self.drawer.color_hash_tag)
+        self._draw_edit_tag_field(tags_text)
+        self.draw_info_description(desc=self.option[DataManager.INDEX_OPTION_DESC],
+                                   filter_desc=self.filters[DataManager.INDEX_OPTION_DESC])
+        self.draw_info_man_page(data_from_man_page=self.data_from_man_page)
 
         # help line in the last line
         self._draw_help_line_info()
 
         # cursor set position
-        self.drawer.hide_cursor()
+        self.drawer.show_cursor()
+        self.drawer.move_cursor(self.INDENT + tags_cursor_index, 4)
+
+    def _draw_edit_tag_field(self, new_tags_str):
+        """
+        draw input tags field
+
+        :param new_tags_str:   current tags string
+        :return:
+        """
+        self.drawer.new_line()
+        # note: to highlight we use the same color of the selected row
+        self.drawer.draw_row(self.CHAR_SPACE * self.SUB_TITLE_LEN, x=self.INDENT, color=self.drawer.color_selected_row)
+        self.drawer.draw_row("Tags", x=self.INDENT + 1, color=self.drawer.color_selected_row)
+        self.drawer.new_line()
+        self.drawer.draw_row(self.CHAR_SPACE * self.INDENT)
+        self.draw_marked_string(new_tags_str, self.CHAR_TAG, color_marked=self.drawer.color_hash_tag)
+        self.drawer.new_line()
 
     def _draw_help_line_info(self):
         """
-        Draw info at the end of the console
+        draw info at the end of the console
         :return:
         """
         self.drawer.set_y(self.drawer.get_max_y() - 1)
@@ -63,5 +84,5 @@ class PageEditTags(object):
         self.drawer.draw_row("<-|->", x_indent=2, color=self.drawer.color_columns_title)
         self.drawer.draw_row("Scroll", x_indent=1)
 
-        self.drawer.draw_row("#", x_indent=2, color=self.drawer.color_columns_title)
+        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title)
         self.drawer.draw_row("Go back without saving", x_indent=1)

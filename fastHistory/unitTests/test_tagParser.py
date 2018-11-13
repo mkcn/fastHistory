@@ -100,3 +100,49 @@ class TestTagParser(TestCase):
         for test in test_cases:
             res = TagParser.parse_cmd(test[0], is_search_cmd=True)
             self.assertEqual(test[1], res)
+
+    def test_input_validation_edit_tags(self):
+        """
+        test tags input validation parser
+
+        :return:
+        """
+        # [test, result]
+        test_cases = [
+            ["", []],
+            ["#", [""]],
+            ["#tag1", ["tag1"]],
+            [" # tag1 ", ["tag1"]],
+            ["#tag1 #tag2", ["tag1", "tag2"]],
+            ["#tag1 #tag2 #tag2", ["tag1", "tag2", "tag2"]],  # TODO improve
+            ["#tag1  #tag2      #tag2", ["tag1", "tag2", "tag2"]],
+            ["#some_special-char_is_allowed", ["some_special-char_is_allowed"]],
+            ["#spaces are also   allowed", ["spaces are also   allowed"]],
+            ["##", ["", ""]],  # TODO improve
+            ["#hello?%", None],
+            ["#@", None]
+        ]
+
+        for test in test_cases:
+            res = TagParser.parse_tags_str(test[0])
+            self.assertEqual(test[1], res)
+
+    def test_input_validation_edit_description(self):
+        """
+        test description input validation parser
+
+        :return:
+        """
+        # [test, result]
+        test_cases = [
+            ["", ""],
+            ["@", ""],
+            ["@description", "description"],
+            ["@-_.,!?\t :;%+()", "-_.,!?\t :;%+()"],
+            ["@#notvalid", None],
+            [" @to-trim ", "to-trim"]
+        ]
+
+        for test in test_cases:
+            res = TagParser.parse_description(test[0])
+            self.assertEqual(test[1], res)

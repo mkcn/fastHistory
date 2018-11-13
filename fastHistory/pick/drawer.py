@@ -15,7 +15,6 @@ class Drawer(object):
         self.max_y, self.max_x = self.terminal_screen.getmaxyx()
         self.x = 0
         self.y = 0
-        self.shifted = 0
 
         # define colors
         self.color_search_input = None
@@ -142,41 +141,12 @@ class Drawer(object):
             y = self.max_y - 1
         self.terminal_screen.move(y, x)
 
-    def move_shift_right(self):
-        if self.shifted < 1000:
-            self.shifted += 1
-
-    def move_shift_left(self):
-        if self.shifted > 0:
-            self.shifted -= 1
-
-    def shift_string(self, text, max_x=None):
-        """
-        to support string too long, the text can be shifted
-        this function shifts and cuts the string to show only a part of this
-        :param max_x:
-        :param text:
-        :return:
-        """
-        if max_x is None:
-            max_x = self.max_x
-
-        text = text[self.shifted:]
-        text_len = len(text)
-        if text_len <= max_x:
-            return text
-        else:
-            return text[:max_x - 2] + self._TEXT_TO_LONG
-
     def set_x(self, x):
         self.x = x
 
     def set_y(self, y, x=0):
         self.x = x
         self.y = y
-        
-    def reset_shifted(self):
-        self.shifted = 0
 
     def new_line(self, x=0):
         self.y += 1
@@ -187,9 +157,6 @@ class Drawer(object):
 
     def get_max_y(self):
         return self.max_y
-
-    def get_shifted(self):
-        return self.shifted
 
     def draw_row(self, text, x=None, x_indent=0, color=1):
         """

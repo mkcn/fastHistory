@@ -120,14 +120,37 @@ class DataManager(object):
 		"""
 		return self.database.add_element(cmd, description, tags)
 
+	def update_tags(self, cmd, tags):
+		"""
+		update tag list of a command
+		:param cmd:		command to update
+		:param tags:	new tag array
+		:return:		True is the database was successfully changed, False otherwise
+		"""
+		return self.database.update_tags_field(cmd, tags)
+
+	def update_description(self, cmd, description):
+		"""
+		update description of a command
+		:param cmd:			command to update
+		:param description: new description
+		:return:			True is the database was successfully changed, False otherwise
+		"""
+		return self.database.update_description_field(cmd, description)
+
 	def update_element_order(self, cmd):
+		"""
+		after a command was selected update the order
+		:param cmd:		command to update
+		:return:		True is the database was successfully changed, False otherwise
+		"""
 		return self.database.update_position_element(cmd)
 
 	def delete_element(self, cmd):
 		"""
 		delete a command from db
 		:param cmd:		cmd to delete
-		:return:
+		:return:		True is the database was successfully changed, False otherwise
 		"""
 		return self.database.remove_element(cmd)
 

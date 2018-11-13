@@ -64,7 +64,7 @@ class DatabaseSQLite(object):
                         try:
                             os.remove(self.project_path + old_db[1])
                             logging.info("old database file deleted")
-                        except:
+                        except OSError or ValueError:
                             logging.error("file delete fail. please manually delete the old database file: %s" %
                                           self.project_path + old_db[1])
 
@@ -80,48 +80,52 @@ class DatabaseSQLite(object):
         :param old_db_relative_path:    relative path of old database file
         :return:                        true if an the old database was found and correctly migrated, false otherwise
         """
-        if old_db_type == 0:
-            """"
-            db structure of db type 0
-            
-            TABLE history 
-            (
-                command  TEXT,
-                counter BIGINT,
-                description TEXT,
-                tags TEXT
-            )
-            """
-            if os.path.isfile(self.project_path + old_db_relative_path):
-                migration_success = True
-                # connect to old db
-                tmp_conn_old = sqlite3.connect(self.project_path + old_db_relative_path)
-                tmp_cursor_old = tmp_conn_old.cursor()
+        try:
+            if old_db_type == 0:
+                """"
+                db structure of db type 0
+                
+                TABLE history 
+                (
+                    command  TEXT,
+                    counter BIGINT,
+                    description TEXT,
+                    tags TEXT
+                )
+                """
+                if os.path.isfile(self.project_path + old_db_relative_path):
+                    migration_success = True
+                    # connect to old db
+                    tmp_conn_old = sqlite3.connect(self.project_path + old_db_relative_path)
+                    tmp_cursor_old = tmp_conn_old.cursor()
 
-                # get all value from old db
-                tmp_cursor_old.execute("SELECT command, counter, description, tags FROM history")
-                old_db_data = tmp_cursor_old.fetchall()
-                for item in old_db_data:
-                    old_cmd = item[0]
-                    old_counter = item[1]
-                    old_desc = item[2]
-                    old_tags = self._tags_string_to_array(item[3])
-                    old_date = 0  # the date was not available therefore we select the oldest date possible
+                    # get all value from old db
+                    tmp_cursor_old.execute("SELECT command, counter, description, tags FROM history")
+                    old_db_data = tmp_cursor_old.fetchall()
+                    for item in old_db_data:
+                        old_cmd = item[0]
+                        old_counter = item[1]
+                        old_desc = item[2]
+                        old_tags = self._tags_string_to_array(item[3])
+                        old_date = 0  # the date was not available therefore we select the oldest date possible
 
-                    if not self.add_element(old_cmd,
-                                            description=old_desc,
-                                            tags=old_tags,
-                                            counter=old_counter,
-                                            date=old_date):
-                        migration_success = False
+                        if not self.add_element(old_cmd,
+                                                description=old_desc,
+                                                tags=old_tags,
+                                                counter=old_counter,
+                                                date=old_date):
+                            migration_success = False
 
-                tmp_conn_old.close()
-                return migration_success
+                    tmp_conn_old.close()
+                    return migration_success
+                else:
+                    logging.debug("database migration - database type %d not found" % old_db_type)
+                    return False
             else:
-                logging.debug("database migration - database type %d not found" % old_db_type)
+                logging.error("database migration - unknown old database: %s" % old_db_relative_path)
                 return False
-        else:
-            logging.error("database migration - unknown old database: %s" % old_db_relative_path)
+        except Exception as e:
+            logging.error("database migration - error: %s" % str(e))
             return False
 
     def save_changes(self):
@@ -300,8 +304,7 @@ class DatabaseSQLite(object):
             cmd = cmd.strip()
 
             if date is None:
-                # https://www.epochconverter.com/
-                date = int(time.time())
+                date = self._get_time_now()
 
             # check if description and tags contains an illegal char (@ or #)
             if description is not None and (self.CHAR_TAG in description or self.CHAR_DESCRIPTION in description):
@@ -402,27 +405,127 @@ class DatabaseSQLite(object):
             logging.error("database:add element - thrown an error: %s" % str(e))
             return False
 
+    def update_tags_field(self, cmd, tags):
+        """
+        update tags field
+        first get the row id and then update the tag list (and date!) of the found command
+
+        :param cmd:             command to update
+        :param tags:            new tags array
+        :return:                True is the database was successfully changed, False otherwise
+        """
+        try:
+            if tags is None:
+                logging.error("database - update_tags_field: tags is null")
+                return False
+
+            logging.debug("database - update_tags_field: " + str(cmd) + " with " + str(tags))
+            self.cursor.execute("SELECT  rowid, tags, date FROM history WHERE command=?", (cmd,))
+            matches = self.cursor.fetchall()
+            matches_number = len(matches)
+            if matches_number == 1:
+                match = matches[0]
+                item_row_id = match[0]
+                item_tags_str = match[1]
+                item_date = match[2]
+
+                new_tags_str = self._tag_array_to_string(tags)
+                new_date = self._get_time_now()
+                if item_tags_str != new_tags_str:
+                    # update tags
+                    self.cursor.execute("UPDATE history SET tags=?, date=? WHERE rowid=?", (
+                        new_tags_str,
+                        new_date,
+                        item_row_id))
+                    self.save_changes()
+                    return True
+                else:
+                    logging.debug("database - update_tags_field - no changed")
+                    return True
+            else:
+                logging.error("database - update_tags_field - fail because of no matched command")
+                return False
+        except Exception as e:
+            logging.error("database - update_tags_field error: %s" % str(e))
+            return False
+
+    def update_description_field(self, cmd, description):
+        """
+        update description field
+        first get the row id and then update the description (and date!) of the found command
+
+        :param cmd:             command to update
+        :param description:     new description
+        :return:                True is the database was successfully changed, False otherwise
+        """
+        try:
+            if description is None:
+                return False
+
+            logging.debug("database - update_description_field: " + str(cmd) + " with " + str(description))
+            self.cursor.execute("SELECT  rowid, description, date FROM history WHERE command=?", (cmd,))
+            matches = self.cursor.fetchall()
+            matches_number = len(matches)
+            if matches_number == 1:
+                match = matches[0]
+                item_row_id = match[0]
+                item_desc_str = match[1]
+                item_date = match[2]
+
+                new_date = self._get_time_now()
+                if item_desc_str != description:
+                    # update tags
+                    self.cursor.execute("UPDATE history SET description=?, date=? WHERE rowid=?", (
+                        description,
+                        new_date,
+                        item_row_id))
+                    self.save_changes()
+                    return True
+                else:
+                    return True
+            else:
+                logging.error("database - update_description_field - fail because of no matched command")
+                return False
+        except Exception as e:
+            logging.error("database - update_description_field error: %s" % str(e))
+            return False
+
     def update_position_element(self, cmd):
-        logging.debug("database - update_position_element: " + str(cmd))
-        self.cursor.execute("SELECT  rowid, description, tags, counter, date, synced FROM history WHERE command=?", (cmd,))
-        matches = self.cursor.fetchall()
-        matches_number = len(matches)
-        if matches_number == 1:
-            match = matches[0]
-            matched_id = match[0]
-            # delete old row
-            self.cursor.execute("DELETE FROM history WHERE rowid=?", (matched_id,))
-            # create new row which will have the highest rowID (last used command)
-            self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)", (
-                cmd,
-                match[1],
-                match[2],
-                int(match[3]) + 1,
-                match[4],
-                match[5]))
-            self.save_changes()
-        else:
-            logging.error("database - update entry fail because of no matched command")
+        """
+        when a command is selected two changes are made:
+            - counter increased (+1)
+            - the row id is update with a new one. this is done to move the selected cmd on the top (or botton,
+              it depends on the point of view) and to have a faster search the next time
+
+        :param cmd:     command to update
+        :return:        True is the database was successfully changed, False otherwise
+        """
+        try:
+            logging.debug("database - update_position_element: " + str(cmd))
+            self.cursor.execute("SELECT  rowid, description, tags, counter, date, synced FROM history WHERE command=?", (cmd,))
+            matches = self.cursor.fetchall()
+            matches_number = len(matches)
+            if matches_number == 1:
+                match = matches[0]
+                matched_id = match[0]
+                # delete old row
+                self.cursor.execute("DELETE FROM history WHERE rowid=?", (matched_id,))
+                # create new row which will have the highest rowID (last used command)
+                self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)", (
+                    cmd,
+                    match[1],
+                    match[2],
+                    int(match[3]) + 1,
+                    match[4],
+                    match[5]))
+                self.save_changes()
+                return True
+            else:
+                logging.error("database - update_position_element - fail because of no matched command")
+                return False
+        except Exception as e:
+            logging.error("database - update_position_element error: %s" % str(e))
+            return False
 
     def remove_element(self, cmd):
         """
@@ -431,21 +534,25 @@ class DatabaseSQLite(object):
         :param cmd:     cmd to delete
         :return:        true is successfully deleted, false otherwise
         """
-        logging.info("delete command: " + str(cmd))
-        if cmd is None:
-            logging.error("remove_element: " + "cmd is None")
-            return False
-        # remove whitespaces on the left and right
-        cmd = cmd.strip()
-        if len(cmd) == 0:
-            logging.error("remove_element: " + "cmd is empty")
-            return False
+        try:
+            logging.info("delete command: " + str(cmd))
+            if cmd is None:
+                logging.error("remove_element: " + "cmd is None")
+                return False
+            # remove whitespaces on the left and right
+            cmd = cmd.strip()
+            if len(cmd) == 0:
+                logging.error("remove_element: " + "cmd is empty")
+                return False
 
-        # delete item
-        self.cursor.execute("DELETE FROM history WHERE  command=?", (cmd,))
-        self.save_changes()
-        logging.info("delete completed")
-        return True
+            # delete item
+            self.cursor.execute("DELETE FROM history WHERE  command=?", (cmd,))
+            self.save_changes()
+            logging.debug("delete completed")
+            return True
+        except Exception as e:
+            logging.error("database - remove_element error: %s" % str(e))
+            return False
 
     def _tags_string_to_array(self, tags_string):
         """
@@ -455,6 +562,9 @@ class DatabaseSQLite(object):
         :param tags_string:     #tag1#tag2#tag3
         :return:                ["tag1","tag2","tag3"]
         """
+        if type(tags_string) is not str:
+            logging.error("database - _tags_string_to_array - wrong type")
+            return None
         if tags_string == "":
             return []
         tags = tags_string.split(self.CHAR_TAG)
@@ -473,8 +583,20 @@ class DatabaseSQLite(object):
         :param tags:
         :return:
         """
+        if type(tags) is not list:
+            logging.error("database - _tag_array_to_string - wrong type")
+            return None
+
         tags_string = ""
         for tag in tags:
             if len(tag) > 0:
                 tags_string += self.CHAR_TAG + tag
         return tags_string
+
+    def _get_time_now(self):
+        """
+        https://www.epochconverter.com/
+
+        :return: unix epoch time
+        """
+        return int(time.time())
