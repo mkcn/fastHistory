@@ -379,6 +379,7 @@ class Picker(object):
                 # the delete is allowed if the search text is not empty and if
                 if new_tags_t.delete_char():
                     self.context_shift.reset_context_shifted()
+                input_error_msg = None
             # move cursor to the beginning
             elif c == KEY_START or c == KEY_CTRL_A:
                 new_tags_t.move_cursor_to_start()
@@ -392,6 +393,7 @@ class Picker(object):
                 new_tags_t.set_max_x(self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
             elif type(c) is str:
                 new_tags_t.add_string(c)
+                input_error_msg = None
             elif type(c) is int:
                 logging.debug("loop edit tag - integer input not handled: " + repr(c))
             else:
