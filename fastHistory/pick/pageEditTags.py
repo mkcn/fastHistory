@@ -20,12 +20,13 @@ class PageEditTags(PageInfo):
         """
         PageInfo.__init__(self, drawer, option, filters, context_shift, data_from_man_page)
 
-    def draw_page_edit(self, tags_text, tags_cursor_index):
+    def draw_page_edit(self, tags_text, tags_cursor_index, input_error_msg):
         """
         draw page to edit tags of the current selected option
 
         :param tags_text:              tags string
         :param tags_cursor_index:      position of the cursor
+        :param input_error_msg:        string error to show, None is there is no error to show
         :return:
         """
         # draw colored title
@@ -48,6 +49,8 @@ class PageEditTags(PageInfo):
         self.draw_info_description(desc=self.option[DataManager.INDEX_OPTION_DESC],
                                    filter_desc=self.filters[DataManager.INDEX_OPTION_DESC])
         self.draw_info_man_page(data_from_man_page=self.data_from_man_page)
+
+        self.draw_input_error_msg(input_error_msg, 3)
 
         # help line in the last line
         self._draw_help_line_info()
@@ -78,11 +81,11 @@ class PageEditTags(PageInfo):
         :return:
         """
         self.drawer.set_y(self.drawer.get_max_y() - 1)
-        self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Save", x_indent=1)
+        self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Save", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("<-|->", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Scroll", x_indent=1)
+        self.drawer.draw_row("<-|->", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Scroll", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Go back without saving", x_indent=1)
+        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Go back without saving", x_indent=1, allow_last_row=True)

@@ -1,17 +1,12 @@
 import logging
 
-from parser.tagParser import TagParser
+from parser.inputParser import InputParser
 
 
 class DataManager(object):
 	"""
 	Class use to manage data and interact with the database
 	"""
-
-	# TODO find a common place where to retrieve these chars
-	CHAR_TAG = "#"
-	CHAR_DESCRIPTION = "@"
-
 	MIN_LENGTH_SEARCH_FOR_DESC = 3
 
 	INDEX_OPTION_CMD = 0
@@ -57,7 +52,7 @@ class DataManager(object):
 		# basic searches do not contains '@' or '#' (usually)
 		# in case of a string such as "echo ' #'" the advance search is called but
 		# it will correctly parse it as cmd (without tag or description) because the regex is able to handle such cases
-		if self.CHAR_TAG in search or self.CHAR_DESCRIPTION in search:
+		if InputParser.TAG_SIGN in search or InputParser.DESCRIPTION_SIGN in search:
 			filtered_data = self._advanced_search(search, n)
 		else:
 			filtered_data = self._simple_search(search, n)
@@ -66,7 +61,6 @@ class DataManager(object):
 			return []
 
 		new_filtered_data = []
-		# TODO use _tags_string_to_array in the db function to return the correct type
 		# tmp solution, change the type here
 		for i in range(len(filtered_data)):
 			tags_str = filtered_data[i][2]
@@ -87,18 +81,18 @@ class DataManager(object):
 
 	def _advanced_search(self, search, n):
 
-		sections = TagParser.parse_cmd(search, is_search_cmd=True)
+		sections = InputParser.parse_cmd(search, is_search_cmd=True)
 
 		logging.debug("advance search: " + str(sections))
 
 		if sections:
 			filtered_data = self.database.get_last_n_elements_with_advanced_search(
-				cmd_filter=sections[TagParser.INDEX_CMD],
-				description_filter=sections[TagParser.INDEX_DESC],
-				tags_filter=sections[TagParser.INDEX_TAGS],
+				cmd_filter=sections[InputParser.INDEX_CMD],
+				description_filter=sections[InputParser.INDEX_DESC],
+				tags_filter=sections[InputParser.INDEX_TAGS],
 				n=n)
 			#  the bool to indicate if it is an "advance search result"
-			if sections[TagParser.INDEX_DESC] is None and sections[TagParser.INDEX_TAGS] == []:
+			if sections[InputParser.INDEX_DESC] is None and sections[InputParser.INDEX_TAGS] == []:
 				# if no description and no tags then the result must be consider a simple research
 				self.search_filters = sections + [False]
 			else:

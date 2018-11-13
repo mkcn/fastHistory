@@ -2,10 +2,9 @@ import re
 import logging
 
 
-class TagParser(object):
+class InputParser(object):
     """
     Class used to parse input commands
-    # TODO rename into "InputParser"
     """
 
     INDEX_CMD = 0
@@ -51,7 +50,7 @@ class TagParser(object):
 
     @staticmethod
     def is_privacy_mode_enable(cmd):
-        if cmd.endswith(TagParser.PRIVACY_SIGN):
+        if cmd.endswith(InputParser.PRIVACY_SIGN):
             return True
         return False
 
@@ -65,7 +64,7 @@ class TagParser(object):
         :return:            if the input is valid -> array of tags (e.g. ['tag1','tag2','tag3','tag4-0')
                             otherwise None
         """
-        match = re.search(TagParser.INPUT_TAGS_REGEXP, tags_str, flags=re.UNICODE)
+        match = re.search(InputParser.INPUT_TAGS_REGEXP, tags_str, flags=re.UNICODE)
         if match:
             logging.debug("tag parser: regex matches")
             tags_str = match.group(1)
@@ -75,12 +74,12 @@ class TagParser(object):
 
         tags = []
 
-        if tags_str is TagParser.EMTPY_STRING:
+        if tags_str is InputParser.EMTPY_STRING:
             return []
 
         if tags_str is not None:
             logging.debug("tags_str: " + str(tags_str))
-            tags_tmp = tags_str.split(TagParser.TAG_SIGN)
+            tags_tmp = tags_str.split(InputParser.TAG_SIGN)
             if len(tags_tmp) >= 2:
                 tags_tmp = tags_tmp[1:]
                 for i in range(len(tags_tmp)):
@@ -106,10 +105,10 @@ class TagParser(object):
         :return:            if the input is valid -> the description text (e.g. "description for a command")
                             otherwise None
         """
-        if description is TagParser.EMTPY_STRING:
-            return TagParser.EMTPY_STRING
+        if description is InputParser.EMTPY_STRING:
+            return InputParser.EMTPY_STRING
 
-        match = re.search(TagParser.INPUT_DESCRIPTION_REGEXP, description, flags=re.UNICODE)
+        match = re.search(InputParser.INPUT_DESCRIPTION_REGEXP, description, flags=re.UNICODE)
         if match:
             logging.debug("description parser: regex matches")
             desc_str = match.group(1)
@@ -120,7 +119,7 @@ class TagParser(object):
         # remove @ and spaces from description
         if desc_str is not None:
             logging.debug("description parser - desc_str: " + desc_str)
-            if desc_str[0] == TagParser.DESCRIPTION_SIGN:
+            if desc_str[0] == InputParser.DESCRIPTION_SIGN:
                 desc = desc_str[1:].strip()
             else:
                 logging.error("description parser - description does not start with @")
@@ -154,9 +153,9 @@ class TagParser(object):
         """
 
         if is_search_cmd:
-            match = re.search(TagParser.TAGS_REGEXP_SEARCH_CMD, cmd, flags=re.UNICODE)
+            match = re.search(InputParser.TAGS_REGEXP_SEARCH_CMD, cmd, flags=re.UNICODE)
         else:
-            match = re.search(TagParser.TAGS_REGEXP_INSERT_CMD, cmd, flags=re.UNICODE)
+            match = re.search(InputParser.TAGS_REGEXP_INSERT_CMD, cmd, flags=re.UNICODE)
 
         if match:
             logging.debug("tag parser: regex matches")
@@ -178,9 +177,9 @@ class TagParser(object):
 
         # tags
         tags = []
-        if tags_str is not None and tags_str is not TagParser.EMTPY_STRING:
+        if tags_str is not None and tags_str is not InputParser.EMTPY_STRING:
             logging.debug("tags_str: " + str(tags_str))
-            tags_tmp = tags_str.split(TagParser.TAG_SIGN)
+            tags_tmp = tags_str.split(InputParser.TAG_SIGN)
             if len(tags_tmp) >= 2:
                 tags_tmp = tags_tmp[1:]
                 for i in range(len(tags_tmp)):
@@ -196,9 +195,9 @@ class TagParser(object):
         # remove @ and spaces from description
         if desc_str is not None:
             logging.debug("desc_str: " + desc_str)
-            if desc_str[0] == TagParser.DESCRIPTION_SIGN:
+            if desc_str[0] == InputParser.DESCRIPTION_SIGN:
                 desc = desc_str[1:].strip()
-            else:  # desc_str[1] == TagParser.DESCRIPTION_SIGN:
+            else:  # desc_str[1] == InputParser.DESCRIPTION_SIGN:
                 desc = desc_str[2:].strip()
         else:
             desc = None

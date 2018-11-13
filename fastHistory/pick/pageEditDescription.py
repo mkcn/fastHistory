@@ -20,12 +20,13 @@ class PageEditDescription(PageInfo):
         """
         PageInfo.__init__(self, drawer, option, filters, context_shift, data_from_man_page)
 
-    def draw_page_edit(self, description_text, description_cursor_index):
+    def draw_page_edit(self, description_text, description_cursor_index, input_error_msg):
         """
         draw page to edit the description of the current selected option
 
         :param description_text:            description string
         :param description_cursor_index:    position of the cursor
+        :param input_error_msg:             string error to show, None is there is no error to show
         :return:
         """
         # draw colored title
@@ -49,6 +50,8 @@ class PageEditDescription(PageInfo):
         self._draw_edit_description_field(description_text)
         self.draw_info_man_page(data_from_man_page=self.data_from_man_page)
 
+        self.draw_input_error_msg(input_error_msg, 6)
+
         # help line in the last line
         self._draw_help_line_info()
 
@@ -69,7 +72,7 @@ class PageEditDescription(PageInfo):
         self.drawer.draw_row("Description", x=self.INDENT + 1, color=self.drawer.color_selected_row)
         self.drawer.new_line()
         self.drawer.draw_row(self.CHAR_SPACE * self.INDENT)
-        self.draw_marked_string(new_description_str, self.CHAR_TAG, color_marked=self.drawer.color_hash_tag)
+        self.draw_marked_string(new_description_str, self.CHAR_DESCRIPTION, color_marked=self.drawer.color_hash_tag)
         self.drawer.new_line()
 
     def _draw_help_line_info(self):
@@ -78,11 +81,13 @@ class PageEditDescription(PageInfo):
         :return:
         """
         self.drawer.set_y(self.drawer.get_max_y() - 1)
-        self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Save", x_indent=1)
+        self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Save", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("<-|->", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Scroll", x_indent=1)
+        self.drawer.draw_row("<-|->", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Scroll", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Go back without saving", x_indent=1)
+        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Go back without saving", x_indent=1, allow_last_row=True)
+
+

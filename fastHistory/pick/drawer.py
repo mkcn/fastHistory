@@ -158,13 +158,14 @@ class Drawer(object):
     def get_max_y(self):
         return self.max_y
 
-    def draw_row(self, text, x=None, x_indent=0, color=1):
+    def draw_row(self, text, x=None, x_indent=0, color=1, allow_last_row=False):
         """
         draw data to console and take care to not exceed borders
         :param text:
         :param x:
         :param x_indent:
         :param color:
+        :param allow_last_row:
         :return:
         """
         # if x is defined use it as absolute x
@@ -173,8 +174,13 @@ class Drawer(object):
         else:
             self.x = x
 
+        if allow_last_row:
+            margin_bottom = 0
+        else:
+            margin_bottom = 1
+
         # check if we can print this line
-        if self.y < self.max_y:
+        if self.y < self.max_y - margin_bottom:
             # check if text to print is too long
             text_len = len(text)
             # if empty text

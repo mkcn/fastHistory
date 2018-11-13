@@ -5,7 +5,7 @@ import logging
 
 from parser.bashParser import BashParser
 from database.dataManager import DataManager
-from parser.tagParser import TagParser
+from parser.inputParser import InputParser
 from pick.drawer import Drawer
 from pick.pageSelect import PageSelector
 from pick.textManager import TextManager, ContextShifter
@@ -197,7 +197,7 @@ class Picker(object):
             option_count = len(self.options)
             if option_count == 0 or self.index >= option_count or self.index < 0:
                 return ""
-            selected_cmd = self.options[self.index][TagParser.INDEX_CMD]
+            selected_cmd = self.options[self.index][InputParser.INDEX_CMD]
             # update order of the selected cmd
             self.data_manager.update_element_order(selected_cmd)
             return selected_cmd
@@ -230,15 +230,17 @@ class Picker(object):
                                         data_from_man_page=data_from_man_page)
 
         current_command = self.current_selected_option[DataManager.INDEX_OPTION_CMD]
-        description_t = TextManager(TagParser.DESCRIPTION_SIGN +
+        description_t = TextManager(InputParser.DESCRIPTION_SIGN +
                                     self.current_selected_option[DataManager.INDEX_OPTION_DESC],
                                     max_x=self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
+        input_error_msg = None
 
         while True:
             if page_desc.has_minimum_size():
                 page_desc.clean_page()
                 page_desc.draw_page_edit(description_text=description_t.get_text_to_print(),
-                                         description_cursor_index=description_t.get_cursor_index_to_print())
+                                         description_cursor_index=description_t.get_cursor_index_to_print(),
+                                         input_error_msg=input_error_msg)
                 page_desc.refresh_page()
 
             # wait for char
@@ -246,16 +248,18 @@ class Picker(object):
 
             # save and exit
             if c in KEYS_ENTER:
-                new_description = TagParser.parse_description(description_t.get_text())
+                new_description = InputParser.parse_description(description_t.get_text())
                 if new_description is not None:
                     if self.data_manager.update_description(current_command, new_description):
                         return True
                     else:
-                        logging.error("database error during saving, please try again")
-                        # TODO show error and details in GUI
+                        msg = "database error during saving, please try again"
+                        logging.error(msg)
+                        input_error_msg = msg
                 else:
-                    logging.error("new description text not allowed: %s" % str(description_t.get_text()))
-                    # TODO show error and details in GUI
+                    msg = "new description text not allowed"
+                    logging.error(msg + ": " + str(description_t.get_text()))
+                    input_error_msg = msg
 
             # exit without saving
             elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
@@ -278,6 +282,7 @@ class Picker(object):
             # delete a char of the search
             elif c in KEYS_DELETE:
                 description_t.delete_char()
+                input_error_msg = None
             # move cursor to the beginning
             elif c == KEY_START or c == KEY_CTRL_A:
                 description_t.move_cursor_to_start()
@@ -292,6 +297,7 @@ class Picker(object):
             elif type(c) is str:
                 # TODO check input max len
                 description_t.add_string(c)
+                input_error_msg = None
             elif type(c) is int:
                 logging.debug("loop edit description - integer input not handled: " + repr(c))
             else:
@@ -316,16 +322,19 @@ class Picker(object):
         new_tags_str = ""
         for tag in new_tags:
             if len(tag) > 0:
-                new_tags_str += TagParser.TAG_SIGN + tag + " "
+                new_tags_str += InputParser.TAG_SIGN + tag + " "
 
         new_tags_t = TextManager(new_tags_str, max_x=self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
-        new_tags_t.add_string(TagParser.TAG_SIGN)
+        new_tags_t.add_string(InputParser.TAG_SIGN)
+
+        input_error_msg = None
 
         while True:
             if page_tags.has_minimum_size():
                 page_tags.clean_page()
                 page_tags.draw_page_edit(tags_text=new_tags_t.get_text_to_print(),
-                                         tags_cursor_index=new_tags_t.get_cursor_index_to_print())
+                                         tags_cursor_index=new_tags_t.get_cursor_index_to_print(),
+                                         input_error_msg=input_error_msg)
                 page_tags.refresh_page()
 
             # wait for char
@@ -333,16 +342,18 @@ class Picker(object):
 
             # save and exit
             if c in KEYS_ENTER:
-                new_tags_array = TagParser.parse_tags_str(new_tags_t.get_text())
-                if new_tags_str != None:
+                new_tags_array = InputParser.parse_tags_str(new_tags_t.get_text())
+                if new_tags_array is not None:
                     if self.data_manager.update_tags(current_command, new_tags_array):
                         return True
                     else:
-                        logging.error("database error during saving, please try again")
-                        # TODO show error and details
+                        msg = "database error during saving, please try again"
+                        logging.error(msg)
+                        input_error_msg = msg
                 else:
-                    logging.error("new tags text not allowed: %s" % str(new_tags_t.get_text()))
-                    # TODO show error and details
+                    msg = "new tags text is not allowed"
+                    logging.error(msg + ": " + str(new_tags_t.get_text()))
+                    input_error_msg = msg
             # exit without saving
             # TODO fix return if "alt+char" is pressed
             elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:

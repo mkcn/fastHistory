@@ -168,14 +168,14 @@ class PageSelector(PageGeneric):
 
     def _draw_help_line_selector(self):
         self.drawer.set_y(self.drawer.get_max_y() - 1)
-        self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Select", x_indent=1)
+        self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Select", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("<-|->", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Scroll", x_indent=1)
+        self.drawer.draw_row("<-|->", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Scroll", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("More", x_indent=1)
+        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("More", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("Canc", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Delete", x_indent=1)
+        self.drawer.draw_row("Canc", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Delete", x_indent=1, allow_last_row=True)

@@ -21,7 +21,7 @@ class ManParser(object):
     #       "NAME\n   grep, egrep, fgrep - print lines matching a pattern" > group(0) = "print lines matching a pattern"
     _regex_name = "^NAME\n {2,7}" \
                   ".*" \
-                  "[-—]" \
+                  " (?:-|—|--) " \
                   "(.*\n( +.*\n)*)$"
     # regex notes
     #   - (?:OPTIONS)?    means that the previous line can be empty or with the 'OPTIONS' string

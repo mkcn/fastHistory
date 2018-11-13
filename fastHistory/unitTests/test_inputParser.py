@@ -3,13 +3,13 @@ from unittest import TestCase
 
 import os
 
-from parser.tagParser import TagParser
+from parser.inputParser import InputParser
 
 
-class TestTagParser(TestCase):
+class TestInputParser(TestCase):
 
     TEST_FOLDER = "../../data_test/"
-    TEST_LOG_FILENAME = "test_tagParser.log"
+    TEST_LOG_FILENAME = "test_inputParser.log"
 
     def setUp(self):
         """
@@ -53,7 +53,7 @@ class TestTagParser(TestCase):
         ]
 
         for test in test_cases:
-            res = TagParser.parse_cmd(test[0])
+            res = InputParser.parse_cmd(test[0])
             self.assertEqual(test[1], res)
 
     def test_parse_cmd_search(self):
@@ -98,7 +98,7 @@ class TestTagParser(TestCase):
         ]
 
         for test in test_cases:
-            res = TagParser.parse_cmd(test[0], is_search_cmd=True)
+            res = InputParser.parse_cmd(test[0], is_search_cmd=True)
             self.assertEqual(test[1], res)
 
     def test_input_validation_edit_tags(self):
@@ -124,7 +124,7 @@ class TestTagParser(TestCase):
         ]
 
         for test in test_cases:
-            res = TagParser.parse_tags_str(test[0])
+            res = InputParser.parse_tags_str(test[0])
             self.assertEqual(test[1], res)
 
     def test_input_validation_edit_description(self):
@@ -144,5 +144,5 @@ class TestTagParser(TestCase):
         ]
 
         for test in test_cases:
-            res = TagParser.parse_description(test[0])
+            res = InputParser.parse_description(test[0])
             self.assertEqual(test[1], res)

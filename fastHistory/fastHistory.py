@@ -62,13 +62,13 @@ def handle_add_request(input_cmd_str, project_directory, error_feedback=False):
 	:return:
 	"""
 	# local import to load this module only in case of an 'add' commands
-	from parser.tagParser import TagParser
+	from parser.inputParser import InputParser
 
 	# define log class
 	logging.debug("add request: '" + input_cmd_str + "'")
 
 	# parse tags and store the cmd
-	parser_res = TagParser.parse_cmd(input_cmd_str)
+	parser_res = InputParser.parse_cmd(input_cmd_str)
 
 	if parser_res is None:
 		if error_feedback:
@@ -76,9 +76,9 @@ def handle_add_request(input_cmd_str, project_directory, error_feedback=False):
 			logger_console.log_on_console_info("Syntax : command [#[tag [#tag ...]][@description]]")
 			logger_console.log_on_console_info("Example: ls -la #tag1 #tag2 #tag2 @a long description")
 	else:
-		cmd = parser_res[TagParser.INDEX_CMD]
-		description = parser_res[TagParser.INDEX_DESC]
-		tags = parser_res[TagParser.INDEX_TAGS]
+		cmd = parser_res[InputParser.INDEX_CMD]
+		description = parser_res[InputParser.INDEX_DESC]
+		tags = parser_res[InputParser.INDEX_TAGS]
 
 		data_manager = DataManager(project_directory, PATH_DATABASE_FILE, PATH_DATABASE_FILES_OLD, DATABASE_MODE)
 		stored = data_manager.add_new_element(cmd, description, tags)

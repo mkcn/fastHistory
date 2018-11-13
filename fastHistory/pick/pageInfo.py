@@ -79,23 +79,23 @@ class PageInfo(PageGeneric):
         :return:
         """
         self.drawer.set_y(self.drawer.get_max_y() - 1)
-        self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Select", x_indent=1)
+        self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Select", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("<-|->", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Scroll", x_indent=1)
+        self.drawer.draw_row("<-|->", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Scroll", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Go back", x_indent=1)
+        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Go back", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("Canc", x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Delete", x_indent=1)
+        self.drawer.draw_row("Canc", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Delete", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row(self.CHAR_TAG, x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Tag", x_indent=1)
+        self.drawer.draw_row(self.CHAR_TAG, x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Tag", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row(self.CHAR_DESCRIPTION, x_indent=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Description", x_indent=1)
+        self.drawer.draw_row(self.CHAR_DESCRIPTION, x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Description", x_indent=1, allow_last_row=True)
 
     def draw_info_tags(self, tags, filter_tags):
         """
@@ -218,3 +218,16 @@ class PageInfo(PageGeneric):
                 self.drawer.draw_row(self.CHAR_SPACE * indent_more)
                 self.drawer.draw_row(row[ManParser.INDEX_MEANING_VALUE])
             self.drawer.new_line()
+
+    def draw_input_error_msg(self, input_error_msg, row):
+        """
+        draw label with error message to show about the input
+
+        :param input_error_msg:             string error to show or None
+        :param row:                         row number where to show the error message
+        :return:
+        """
+        if input_error_msg is not None:
+            self.drawer.set_y(row)
+            self.drawer.draw_row(self.CHAR_SPACE + "Invalid input ", x_indent=2, color=self.drawer.color_search)
+            self.drawer.draw_row(self.CHAR_SPACE + input_error_msg + self.CHAR_SPACE, color=self.drawer.color_selected_row)
