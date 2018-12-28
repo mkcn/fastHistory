@@ -70,6 +70,9 @@ class ManParser(object):
                 ["man", cmd],
                 stderr=subprocess.DEVNULL,
                 timeout=1).decode('utf-8')
+            # man command uses "Backspace" characters to show words bold
+            # in macOS this special char is still present in the subprocess output and must be removed
+            self.man_page = re.sub(r'.\x08', '', self.man_page)
             return True
         except subprocess.CalledProcessError as e:
             logging.info("load_man_page - man page not found for: " + str(cmd))
