@@ -4,6 +4,7 @@ import os
 import inspect
 from database.databaseSQLite import DatabaseSQLite
 import sqlite3
+from datetime import datetime
 
 
 class TestDatabaseSQLite(unittest.TestCase):
@@ -38,11 +39,38 @@ class TestDatabaseSQLite(unittest.TestCase):
         for i in range(25):
             self.assertTrue(db.add_element("ls " + str(i), "test " + str(i), ["sec" + str(i)]))
 
-        res = db.get_last_n_elements_with_advanced_search(cmd_filter="ls",
-                                                          tags_filter="",
-                                                          description_filter="",
-                                                          n=20)
+        res = db.get_last_n_filtered_elements(generic_filters=["ls"],
+                                              description_filters=["test"],
+                                              tags_filters=["sec"],
+                                              n=20)
         self.assertEqual(len(res), 20)
+
+        db.close()
+
+    def test_wrong_matches(self):
+        """
+        test searches with special set of chars
+        :return:
+        """
+        self._set_text_logger()
+        db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
+        self.assertTrue(db.add_element("1234", "1234", ["1234", "1234"]))
+
+        # test if "34" + "12" matches something
+        res = db.get_last_n_filtered_elements(generic_filters=["3412"], n=20)
+        self.assertEqual(len(res), 0)
+        res = db.get_last_n_filtered_elements(generic_filters=[], tags_filters=["3412"], n=20)
+        self.assertEqual(len(res), 0)
+        res = db.get_last_n_filtered_elements(generic_filters=[], description_filters=["3412"], n=20)
+        self.assertEqual(len(res), 0)
+
+        # test if "34" + "#" + "12"
+        res = db.get_last_n_filtered_elements(generic_filters=["34#12"], n=20)  # TODO find solution
+        self.assertEqual(len(res), 0)
+        res = db.get_last_n_filtered_elements(generic_filters=[], tags_filters=["34#12"], n=20)
+        self.assertEqual(len(res), 0)
+        res = db.get_last_n_filtered_elements(generic_filters=[], description_filters=["34#12"], n=20)
+        self.assertEqual(len(res), 0)
 
         db.close()
 
@@ -58,9 +86,33 @@ class TestDatabaseSQLite(unittest.TestCase):
             self.assertTrue(db.add_element("ls " + str(i), "test " + str(i), ["sec" + str(i)]))
         db.save_changes()
         # try to retrieve 200 entries
-        res = db.get_last_n_elements_with_simple_search(n=tot_line*2)
+        res = db.get_last_n_filtered_elements(n=tot_line * 2)
         self.assertEqual(len(res), tot_line)
 
+        db.close()
+
+    def test_input_regex_attack(self):
+        """
+        check if a Regular expression Denial of Service (ReDoS) works
+        the test is successful if the result is returned within 2 seconds
+        :return:
+        """
+        self._set_text_logger()
+        db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
+
+        element = "a" * 40
+        attack = ["a", "a", "a", "a", "a", "a", "a", "a", "a", "b"]
+        logging.debug("filter: " + str(attack))
+
+        self.assertTrue(db.add_element(element, "", []))
+        db.save_changes()
+
+        tick = datetime.now()
+        res = db.get_last_n_filtered_elements(generic_filters=attack)
+        tock = datetime.now()
+        diff = tock - tick
+        self.assertEqual(len(res), 0)
+        self.assertGreater(2, diff.seconds)  # TODO find solution
         db.close()
 
     def test_search_by_tag_and_by_description(self):
@@ -71,30 +123,44 @@ class TestDatabaseSQLite(unittest.TestCase):
         self._set_text_logger()
         db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
         # insert case 1
-        self.assertTrue(db.add_element("ls -ls", "test1", ["security"]))
-        self.assertTrue(db.add_element("ls -ls", "test2", None))
-        self.assertTrue(db.add_element("ls -ls", "test3", ["sec", "security", "supersecure"]))
+        self.assertTrue(db.add_element("ls -la", "test1", ["security"]))
+        self.assertTrue(db.add_element("ls -la", "test2", None))
+        self.assertTrue(db.add_element("ls -la", "test3", ["sec", "security", "supersecure"]))
         # insert case 2
         self.assertTrue(db.add_element("srm", "", tags=None))
         self.assertTrue(db.add_element("srm", "description command", ["tag-1"]))
 
         # test case 1
-        res = db.get_last_n_elements_with_simple_search(filter="supersecure")
+        res = db.get_last_n_filtered_elements(generic_filters=["supersecure"])
         # check number of matches
         self.assertEqual(len(res), 1)
         # check if tags are saved correctly
-        self.assertEqual(res[0][2], "#security#sec#supersecure")
+        self.assertEqual(res[0][2], ["security", "sec", "supersecure"])  # note order!
         # check if description is updated
         self.assertEqual(res[0][1], "test3. test2. test1")
 
         # test case 2 (search for description)
-        res = db.get_last_n_elements_with_simple_search(filter="description")
+        res = db.get_last_n_filtered_elements(generic_filters=["description"])
         # check number of matches
         self.assertEqual(len(res), 1)
         # check if tags are saved correctly
-        self.assertEqual(res[0][2], "#tag-1")
+        self.assertEqual(res[0][2], ["tag-1"])
         # check if description is updated
         self.assertEqual(res[0][1], "description command")
+
+        # test case 3 (multi words generic search)
+        # input: "la ls security"
+        res = db.get_last_n_filtered_elements(generic_filters=["la", "ls", "security"])  # note the order
+        self.assertEqual(len(res), 1)
+        self.assertTrue(res[0][0], "ls -la")
+
+        # test case 4 (multi words specific search)
+        # input "la ls security #supersecure #sec @test3 test2"
+        res = db.get_last_n_filtered_elements(generic_filters=["la", "ls", "security"],
+                                              description_filters=["test3", "test2"],
+                                              tags_filters=["supersecure", "sec"])
+        self.assertEqual(len(res), 1)
+        self.assertTrue(res[0][0], "ls -la")
 
         db.close()
 
@@ -185,13 +251,13 @@ class TestDatabaseSQLite(unittest.TestCase):
         # check if the number of element matches
         self.assertEqual(len(data), 3)
         # test search for command
-        res = db.get_last_n_elements_with_simple_search(filter="test1")
+        res = db.get_last_n_filtered_elements(generic_filters=["test1"])
         self.assertEqual(len(res), 1)
         # test search for tag
-        res = db.get_last_n_elements_with_simple_search(filter="only-tags")
+        res = db.get_last_n_filtered_elements(generic_filters=["only-tags"])
         self.assertEqual(len(res), 1)
         # test search for description
-        res = db.get_last_n_elements_with_simple_search(filter="only description")
+        res = db.get_last_n_filtered_elements(generic_filters=["only description"])
         self.assertEqual(len(res), 1)
 
         # check if migration is successful (true if old file does not exist anymore)

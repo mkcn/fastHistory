@@ -3,6 +3,7 @@ from unittest import TestCase
 
 import os
 
+from database.dataManager import DataManager
 from parser.inputParser import InputParser
 
 
@@ -53,8 +54,14 @@ class TestInputParser(TestCase):
         ]
 
         for test in test_cases:
-            res = InputParser.parse_cmd(test[0])
-            self.assertEqual(test[1], res)
+            res = InputParser.parse_input(test[0], is_search_cmd=False)
+            if test[1] is None:
+                self.assertEqual(res, None)
+            else:
+                self.assertEqual(res[DataManager.INPUT.INDEX_MAIN], test[1][0])
+                if res[DataManager.INPUT.INDEX_IS_ADVANCED]:
+                    self.assertEqual(res[DataManager.INPUT.INDEX_DESC], test[1][1])
+                    self.assertEqual(res[DataManager.INPUT.INDEX_TAGS], test[1][2])
 
     def test_parse_cmd_search(self):
         """
@@ -64,6 +71,7 @@ class TestInputParser(TestCase):
         :return:
         """
         # [test, result]
+
         test_cases = [
             ["ls -la", ["ls -la", None, []]],
             ["ls -la #", ["ls -la", None, [""]]],
@@ -98,8 +106,11 @@ class TestInputParser(TestCase):
         ]
 
         for test in test_cases:
-            res = InputParser.parse_cmd(test[0], is_search_cmd=True)
-            self.assertEqual(test[1], res)
+            res = InputParser.parse_input(test[0], is_search_cmd=True)
+            self.assertEqual(res[DataManager.INPUT.INDEX_MAIN], test[1][0])
+            if res[DataManager.INPUT.INDEX_IS_ADVANCED]:
+                self.assertEqual(res[DataManager.INPUT.INDEX_DESC], test[1][1])
+                self.assertEqual(res[DataManager.INPUT.INDEX_TAGS], test[1][2])
 
     def test_input_validation_edit_tags(self):
         """
@@ -114,7 +125,7 @@ class TestInputParser(TestCase):
             ["#tag1", ["tag1"]],
             [" # tag1 ", ["tag1"]],
             ["#tag1 #tag2", ["tag1", "tag2"]],
-            ["#tag1 #tag2 #tag2", ["tag1", "tag2", "tag2"]],  # TODO improve
+            ["#tag1 #tag2 #tag2", ["tag1", "tag2", "tag2"]],
             ["#tag1  #tag2      #tag2", ["tag1", "tag2", "tag2"]],
             ["#some_special-char_is_allowed", ["some_special-char_is_allowed"]],
             ["#spaces are also   allowed", ["spaces are also   allowed"]],

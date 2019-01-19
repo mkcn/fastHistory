@@ -17,19 +17,19 @@ class PageInfo(PageGeneric):
     MESSAGE_NO_DESC = "To add a description press "
     MESSAGE_NO_MAN_PAGE_AVAILABLE = "No info available"
 
-    def __init__(self, drawer, option, filters, context_shift, data_from_man_page):
+    def __init__(self, drawer, option, search_filters, context_shift, data_from_man_page):
         """
         initialize page info drawer
 
         :param drawer:                  drawer obj
         :param option:                  selected option
-        :param filters:                 strings used to filter description (in default search there are the same)
+        :param search_filters:          array of strings used to filter options
         :param context_shift:           context shift obj
         :param data_from_man_page:      data retrieved from the man page
         """
         PageGeneric.__init__(self, drawer)
         self.option = option
-        self.filters = filters
+        self.search_filters = search_filters
         self.context_shift = context_shift
         self.data_from_man_page = data_from_man_page
 
@@ -53,20 +53,24 @@ class PageInfo(PageGeneric):
         self.drawer.draw_row("Info selected command", x=2, color=self.drawer.color_columns_title)
 
         # draw option row
-        self.draw_option(cmd=self.option[DataManager.INDEX_OPTION_CMD],
-                         tags=self.option[DataManager.INDEX_OPTION_TAGS],
-                         desc=self.option[DataManager.INDEX_OPTION_DESC],
-                         filter_cmd=self.filters[DataManager.INDEX_OPTION_CMD],
-                         filter_desc=self.filters[DataManager.INDEX_OPTION_DESC],
-                         filter_tags=self.filters[DataManager.INDEX_OPTION_TAGS],
+        self.draw_option(option=self.option,
+                         search_filters=self.search_filters,
                          selected=True,
                          context_shift=self.context_shift,
                          last_column_size=0)
         self.drawer.new_line()
-        self.draw_info_tags(tags=self.option[DataManager.INDEX_OPTION_TAGS],
-                            filter_tags=self.filters[DataManager.INDEX_OPTION_TAGS])
-        self.draw_info_description(desc=self.option[DataManager.INDEX_OPTION_DESC],
-                                   filter_desc=self.filters[DataManager.INDEX_OPTION_DESC])
+
+        if self.search_filters[DataManager.INPUT.INDEX_IS_ADVANCED]:
+            self.draw_info_tags(tags=self.option[DataManager.OPTION.INDEX_TAGS],
+                                filter_tags=self.search_filters[DataManager.INPUT.INDEX_TAGS])
+            self.draw_info_description(desc=self.option[DataManager.OPTION.INDEX_DESC],
+                                       filter_desc=self.search_filters[DataManager.INPUT.INDEX_DESC_WORDS])
+        else:
+            self.draw_info_tags(tags=self.option[DataManager.OPTION.INDEX_TAGS],
+                                filter_tags=self.search_filters[DataManager.INPUT.INDEX_MAIN_WORDS])
+            self.draw_info_description(desc=self.option[DataManager.OPTION.INDEX_DESC],
+                                       filter_desc=self.search_filters[DataManager.INPUT.INDEX_MAIN_WORDS])
+
         self.draw_info_man_page(data_from_man_page=self.data_from_man_page)
         # help line in the last line
         self._draw_help_line_info()
@@ -100,6 +104,7 @@ class PageInfo(PageGeneric):
     def draw_info_tags(self, tags, filter_tags):
         """
         draw tags section
+
         :param tags:            array of tags
         :param filter_tags:     tag filters
         :return:
@@ -114,6 +119,7 @@ class PageInfo(PageGeneric):
                 self.drawer.draw_row(self.CHAR_TAG, color=self.drawer.color_hash_tag)
                 found = False
                 for filter_tag in filter_tags:
+                    # TODO make more efficient (use the index tag value)
                     index_tag = tag.lower().find(filter_tag)
                     if index_tag != -1:
                         found = True
@@ -181,7 +187,7 @@ class PageInfo(PageGeneric):
                 for flag in cmd_flags:
                     # if flag found in the man page
                     if flag[BashParser.INDEX_MEANING]:
-                        self._draw_cmd_meaning(flag[BashParser.INDEX_VALUE], flag[BashParser.INDEX_MEANING],
+                        self._draw_cmd_meaning([flag[BashParser.INDEX_VALUE]], flag[BashParser.INDEX_MEANING],
                                                is_flag=True)
                 self.drawer.new_line()
         if not info_man_shown:

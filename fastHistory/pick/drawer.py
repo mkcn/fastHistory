@@ -6,15 +6,15 @@ class Drawer(object):
     """
     Class to handle the console drawer
     """
-    _TEXT_TO_LONG = ".."
 
     NULL_COLOR = 0
 
-    def __init__(self, screen, theme):
+    def __init__(self, screen, theme, text_too_long):
         self.terminal_screen = screen
         self.max_y, self.max_x = self.terminal_screen.getmaxyx()
         self.x = 0
         self.y = 0
+        self.text_too_long = text_too_long
 
         # define colors
         self.color_search_input = None
@@ -188,7 +188,7 @@ class Drawer(object):
                 return
             # if no space left
             elif self.max_x - self.x <= 0:
-                self.terminal_screen.addstr(self.y, self.max_x - len(self._TEXT_TO_LONG) - 1, self._TEXT_TO_LONG, color)
+                self.terminal_screen.addstr(self.y, self.max_x - len(self.text_too_long) - 1, self.text_too_long, color)
             # enough space for text
             elif self.max_x - self.x - text_len > 0:
                 self.terminal_screen.addstr(self.y, self.x, str(text), color)
@@ -210,7 +210,7 @@ class Drawer(object):
                 cut_text = text[:(self.max_x - self.x - 1)]
                 self.terminal_screen.addstr(self.y, self.x, str(cut_text), color)
                 self.x += len(cut_text)
-                self.terminal_screen.addstr(self.y, self.max_x - len(self._TEXT_TO_LONG) - 1, self._TEXT_TO_LONG, color)
-                self.x += len(self._TEXT_TO_LONG)
+                self.terminal_screen.addstr(self.y, self.max_x - len(self.text_too_long) - 1, self.text_too_long, color)
+                self.x += len(self.text_too_long)
 
 

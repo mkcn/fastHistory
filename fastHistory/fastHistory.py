@@ -16,7 +16,7 @@ PATH_CONFIGURATION_FILE = "../fastHistory.conf"
 DATABASE_MODE = DataManager.DATABASE_MODE_SQLITE
 
 
-def handle_search_request(input_cmd_str, project_directory, theme, last_column_size):
+def handle_search_request(input_cmd_str: str, project_directory, theme, last_column_size):
 	"""
 	take input and show the filtered list of command to select
 
@@ -68,7 +68,7 @@ def handle_add_request(input_cmd_str, project_directory, error_feedback=False):
 	logging.debug("add request: '" + input_cmd_str + "'")
 
 	# parse tags and store the cmd
-	parser_res = InputParser.parse_cmd(input_cmd_str)
+	parser_res = InputParser.parse_input(input_cmd_str)
 
 	if parser_res is None:
 		if error_feedback:
@@ -76,9 +76,9 @@ def handle_add_request(input_cmd_str, project_directory, error_feedback=False):
 			logger_console.log_on_console_info("Syntax : command [#[tag [#tag ...]][@description]]")
 			logger_console.log_on_console_info("Example: ls -la #tag1 #tag2 #tag2 @a long description")
 	else:
-		cmd = parser_res[InputParser.INDEX_CMD]
-		description = parser_res[InputParser.INDEX_DESC]
-		tags = parser_res[InputParser.INDEX_TAGS]
+		cmd = parser_res[DataManager.INPUT.INDEX_MAIN]
+		description = parser_res[DataManager.INPUT.INDEX_DESC]
+		tags = parser_res[DataManager.INPUT.INDEX_TAGS]
 
 		data_manager = DataManager(project_directory, PATH_DATABASE_FILE, PATH_DATABASE_FILES_OLD, DATABASE_MODE)
 		stored = data_manager.add_new_element(cmd, description, tags)
@@ -123,10 +123,7 @@ if __name__ == "__main__":
 				mode = str(sys.argv[1])
 				input_cmd = str(sys.argv[2])
 				if mode == "search":
-					handle_search_request(input_cmd,
-										  project_dir,
-										  configReader.get_theme(),
-										  configReader.get_last_column_size())
+					handle_search_request(input_cmd, project_dir, configReader.get_theme(), configReader.get_last_column_size())
 				elif mode == "add":
 					handle_add_request(input_cmd, project_dir)
 				elif mode == "add-explicit" and len(input_cmd) > 0:

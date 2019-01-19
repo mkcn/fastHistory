@@ -7,13 +7,10 @@ class InputParser(object):
     Class used to parse input commands
     """
 
-    INDEX_CMD = 0
-    INDEX_DESC = 1
-    INDEX_TAGS = 2
-
     TAG_SIGN = "#"
     DESCRIPTION_SIGN = "@"
     PRIVACY_SIGN = "##"
+    SPACE = " "
 
     EMTPY_STRING = ""
 
@@ -131,7 +128,7 @@ class InputParser(object):
         return desc
 
     @staticmethod
-    def parse_cmd(cmd, is_search_cmd=False):
+    def parse_input(cmd, is_search_cmd=False):
         """
         parse the input cmd and retrieve the cmd, tags and description
         accepted input:     cmd_string [#[tag[#tag...]][@description]]
@@ -151,6 +148,7 @@ class InputParser(object):
                             None in case a command without tags or description
                             None in case of generic errors
         """
+        is_advanced_search = False
 
         if is_search_cmd:
             match = re.search(InputParser.TAGS_REGEXP_SEARCH_CMD, cmd, flags=re.UNICODE)
@@ -185,8 +183,8 @@ class InputParser(object):
                 for i in range(len(tags_tmp)):
                     # remove spaces from each tag
                     tag = tags_tmp[i].strip()
-                    #if tag != "":
                     tags.append(tag)
+                is_advanced_search = True
             else:
                 tags = []
         else:
@@ -199,8 +197,30 @@ class InputParser(object):
                 desc = desc_str[1:].strip()
             else:  # desc_str[1] == InputParser.DESCRIPTION_SIGN:
                 desc = desc_str[2:].strip()
+            is_advanced_search = True
         else:
             desc = None
 
-        return [cmd, desc, tags]
+        if is_advanced_search:
+            generic_word_filters = InputParser.get_list_words(cmd)
+            description_word_filters = InputParser.get_list_words(desc)
+            return [True,
+                    cmd,
+                    generic_word_filters,
+                    desc,
+                    description_word_filters,
+                    tags]
+        else:
+            return [False, cmd, InputParser.get_list_words(cmd)]
 
+    @staticmethod
+    def get_list_words(string):
+        if string is None:
+            return []
+        elif string is "":
+            return ['']
+        else:
+            # split string
+            arr_words = string.split(InputParser.SPACE)
+            # removed empty strings
+            return [x for x in arr_words if x]

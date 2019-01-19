@@ -3,6 +3,8 @@ import logging
 import os
 import time
 
+from database.databaseCommon import DatabaseCommon
+
 
 class DatabaseSQLite(object):
 
@@ -13,7 +15,11 @@ class DatabaseSQLite(object):
 
     CHAR_TAG = "#"
     CHAR_DESCRIPTION = "@"
+    CHAR_DIVIDER = " "
     EMPTY_STRING = ""
+    EMPTY_STRING_TUPLE = ('', )
+
+    MAX_NUMBER_OF_WORDS_TO_COMBINE = 4
 
     _DATABASE_TABLE_NAME = "history"
     _DATABASE_STRUCTURE = """
@@ -177,88 +183,87 @@ class DatabaseSQLite(object):
         # the "rowID" value is a 64-bit signed integers
         # REAL is used because it has the longest time range
 
-    def get_all_data(self, filter=None):
+    def get_all_data(self):
         self.cursor.execute("SELECT * FROM history ")
         return self.cursor.fetchall()
 
-    def get_last_n_elements_with_simple_search(self, filter=None, n=50):
+    def get_last_n_filtered_elements(self, generic_filters=None, description_filters=None, tags_filters=None, n=50):
         """
-        get data from db
-        by default if a simple search is done, the string is searched in all values: cmd, tags and description
+        get filtered data from db
 
-        :param filter:  string which must match part of the command or description or tag
-        :param n:       max number of rows returned
-        :return:       filtered data (array of array [command, description, tags])
+        :param generic_filters:        array of words used to filter cmd, descriptions and tags
+        :param description_filters:    array of words used to filter descriptions
+        :param tags_filters:           array of words used to filter tags
+        :param n:                      max number of rows returned
+        :return:                       filtered data (array of array [command, description, tags])
         """
 
-        if filter is None or filter == DatabaseSQLite.EMPTY_STRING:
-            query = "SELECT command, description, tags " \
-                                "FROM history " \
-                                "ORDER BY rowid DESC LIMIT ?"
-            parameters = (n,)
+        if generic_filters is not None and len(generic_filters) > self.MAX_NUMBER_OF_WORDS_TO_COMBINE:
+            # TODO show feedback to user when this kind of search is done
+            combinations_generic_filters = [tuple(generic_filters)]
         else:
-            query = "SELECT command, description, tags " \
-                     "FROM history " \
-                     "WHERE " \
-                     "command LIKE ? OR " \
-                     "description LIKE ? OR " \
-                     "tags LIKE ? " \
-                     "ORDER BY rowid DESC LIMIT ?"
-            parameters = ("%" + filter + "%",  "%" + filter + "%", "%" + filter + "%", n,)
+            combinations_generic_filters = DatabaseCommon.get_all_unique_combinations(generic_filters)
 
-        # execute query
-        self.cursor.execute(query, parameters)
+        if description_filters is not None and len(description_filters) > self.MAX_NUMBER_OF_WORDS_TO_COMBINE:
+            combinations_description_filters = [tuple(description_filters)]
+        else:
+            combinations_description_filters = DatabaseCommon.get_all_unique_combinations(description_filters)
 
-        # logging.debug("simple search query: " + query + " - " + str(parameters))
-
-        return self.cursor.fetchall()
-
-    def get_last_n_elements_with_advanced_search(self, cmd_filter=None, description_filter=None, tags_filter=None, n=50):
-        """
-        get data from db
-        this is a more specific and advanced search
-        the there are 6 different combination of searching:
-            - cmd
-            - description
-            - tag (single or multiple)
-            - cmd + description
-            - cmd + tag(s)
-            - desc + tag(s)
-        all filters are combined dynamically with "AND" logic
-
-        note: when tag or description are empty, we search for any "not" empty" line (search for # -> all cmd with tags are shown)
-
-        :param cmd_filter:          string to filter cmd
-        :param description_filter:  string to filter documentation
-        :param tags_filter:         array of string to filter
-        :param n:                   max number of rows returned
-        :return:                    filtered data (array of array [command, description, tags])
-        """
         parameters = ()
-        and_needed = False
+        where_needed = True
 
-        # select
-        query = "SELECT command, description, tags FROM history WHERE "
+        query = "SELECT command, description, tags " \
+                "FROM history "
 
-        if cmd_filter is not None and len(cmd_filter) > 0:
-            query += "command LIKE ? "
-            parameters += ("%" + cmd_filter + "%", )
-            and_needed = True
+        if combinations_generic_filters is not None and len(combinations_generic_filters) > 0:
+            if where_needed:
+                query += " WHERE ("
+                where_needed = False
 
-        if description_filter is not None:
-            if and_needed:
-                query += "AND "
+            or_needed = False
+            for combination in combinations_generic_filters:
+                if or_needed:
+                    query += " OR "
+                else:
+                    or_needed = True
+
+                pattern = '%' + '%'.join(combination) + '%'
+                # a divider is used to avoid the corner case where a word matches only
+                # because of the concatenation of different columns
+                query += "(command || ? || description || ? || tags LIKE ? ) "
+                parameters += (self.CHAR_DIVIDER, self.CHAR_DIVIDER, pattern, )
+            query += ") "
+
+        if combinations_description_filters is not None and len(combinations_description_filters) > 0:
+            if where_needed:
+                query += " WHERE ("
+                where_needed = False
             else:
-                and_needed = True
-            if description_filter == DatabaseSQLite.EMPTY_STRING:
-                query += "description <> '' "
-                parameters += ()
-            else:
-                query += "description LIKE ? "
-                parameters += ("%" + description_filter + "%", )
+                query += " AND ("
 
-        if tags_filter is not None:
-            for tag_filter in tags_filter:
+            or_needed = False
+            for desc_combination in combinations_description_filters:
+                if or_needed:
+                    query += " OR "
+                else:
+                    or_needed = True
+                if desc_combination == DatabaseSQLite.EMPTY_STRING_TUPLE:
+                    query += "description <> '' "
+                    parameters += ()
+                else:
+                    desc_pattern = '%' + '%'.join(desc_combination) + '%'
+                    query += "description LIKE ? "
+                    parameters += (desc_pattern, )
+            query += ") "
+
+        if tags_filters is not None and len(tags_filters) > 0:
+            if where_needed:
+                query += " WHERE ("
+            else:
+                query += " AND ("
+
+            and_needed = False
+            for tag_filter in tags_filters:
                 if and_needed:
                     query += "AND "
                 else:
@@ -268,19 +273,21 @@ class DatabaseSQLite(object):
                     query += "tags <> '' "
                     parameters += ()
                 else:
+                    pattern = "%" + tag_filter + "%"
                     query += "tags LIKE ? "
-                    parameters += ("%%" + tag_filter + "%", )
+                    parameters += (pattern, )
+            query += ") "
 
-        # sort
         query += "ORDER BY rowid DESC LIMIT ?"
-        parameters += (n, )
+        parameters += (n,)
 
         # execute query
         self.cursor.execute(query, parameters)
 
-        logging.debug("advance search query: " + query + " - " + str(parameters))
+        logging.debug("database:search - query: " + query)
+        logging.debug("database:search - parameters: " + str(parameters))
 
-        return self.cursor.fetchall()
+        return DatabaseCommon.cast_return_type(self.cursor.fetchall())
 
     def add_element(self, cmd, description=None, tags=None, counter=0, date=None, synced=0):
         """
@@ -336,13 +343,13 @@ class DatabaseSQLite(object):
                 else:
                     tags_str = self._tag_array_to_string(tags)
                 self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)",
-                                       (cmd,
-                                        description,
-                                        tags_str,
-                                        counter,
-                                        date,
-                                        synced
-                                        ))
+                                    (cmd,
+                                     description,
+                                     tags_str,
+                                     counter,
+                                     date,
+                                     synced
+                                     ))
                 logging.debug("database:add element - added NEW")
             elif matches_number == 1:
                 match = matches[0]

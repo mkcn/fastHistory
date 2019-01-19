@@ -82,7 +82,7 @@ class Picker(object):
         return curses.wrapper(self._start)
 
     def _start(self, screen):
-        self.drawer = Drawer(screen, self.theme)
+        self.drawer = Drawer(screen, self.theme, TextManager.TEXT_TOO_LONG)
         self.page_selector = PageSelector(self.drawer)
 
         # set screen context
@@ -197,7 +197,7 @@ class Picker(object):
             option_count = len(self.options)
             if option_count == 0 or self.index >= option_count or self.index < 0:
                 return ""
-            selected_cmd = self.options[self.index][InputParser.INDEX_CMD]
+            selected_cmd = self.options[self.index][DataManager.OPTION.INDEX_CMD]
             # update order of the selected cmd
             self.data_manager.update_element_order(selected_cmd)
             return selected_cmd
@@ -225,13 +225,13 @@ class Picker(object):
         from pick.pageEditDescription import PageEditDescription
         page_desc = PageEditDescription(self.drawer,
                                         option=self.current_selected_option,
-                                        filters=self.data_manager.get_search_filters(),
+                                        search_filters=self.data_manager.get_search_filters(),
                                         context_shift=self.context_shift,
                                         data_from_man_page=data_from_man_page)
 
-        current_command = self.current_selected_option[DataManager.INDEX_OPTION_CMD]
+        current_command = self.current_selected_option[DataManager.OPTION.INDEX_CMD]
         description_t = TextManager(InputParser.DESCRIPTION_SIGN +
-                                    self.current_selected_option[DataManager.INDEX_OPTION_DESC],
+                                    self.current_selected_option[DataManager.OPTION.INDEX_DESC],
                                     max_x=self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
         input_error_msg = None
 
@@ -313,12 +313,12 @@ class Picker(object):
         from pick.pageEditTags import PageEditTags
         page_tags = PageEditTags(self.drawer,
                                  option=self.current_selected_option,
-                                 filters=self.data_manager.get_search_filters(),
+                                 search_filters=self.data_manager.get_search_filters(),
                                  context_shift=self.context_shift,
                                  data_from_man_page=data_from_man_page)
 
-        current_command = self.current_selected_option[DataManager.INDEX_OPTION_CMD]
-        new_tags = self.current_selected_option[DataManager.INDEX_OPTION_TAGS]
+        current_command = self.current_selected_option[DataManager.OPTION.INDEX_CMD]
+        new_tags = self.current_selected_option[DataManager.OPTION.INDEX_TAGS]
         new_tags_str = ""
         for tag in new_tags:
             if len(tag) > 0:
@@ -409,10 +409,10 @@ class Picker(object):
         from pick.pageInfo import PageInfo
 
         data_from_man_page = BashParser.load_data_for_info_from_man_page(
-            cmd_text=self.current_selected_option[DataManager.INDEX_OPTION_CMD])
+            cmd_text=self.current_selected_option[DataManager.OPTION.INDEX_CMD])
         page_info = PageInfo(self.drawer,
                              option=self.current_selected_option,
-                             filters=self.data_manager.get_search_filters(),
+                             search_filters=self.data_manager.get_search_filters(),
                              context_shift=self.context_shift,
                              data_from_man_page=data_from_man_page)
 
@@ -430,7 +430,7 @@ class Picker(object):
                 return self.get_selected()
             # delete current selected option
             elif c == KEY_CANC:
-                self.data_manager.delete_element(self.current_selected_option[DataManager.INDEX_OPTION_CMD])
+                self.data_manager.delete_element(self.current_selected_option[DataManager.OPTION.INDEX_CMD])
                 self.options = self.data_manager.filter(self.search_t.get_text_lower(),
                                                         self.index + self.get_number_options_to_draw())
                 self.update_options_to_draw()
@@ -494,7 +494,7 @@ class Picker(object):
             if self.page_selector.has_minimum_size():
                 self.page_selector.clean_page()
                 self.page_selector.draw_page(
-                    filters=self.data_manager.get_search_filters(),
+                    search_filters=self.data_manager.get_search_filters(),
                     options=self.get_options(),
                     search_t=self.search_t,
                     context_shift=self.context_shift,
@@ -555,7 +555,7 @@ class Picker(object):
                     self.update_options_to_draw(initialize_index=True)
             # delete current selected option
             elif c == KEY_CANC:
-                self.data_manager.delete_element(self.current_selected_option[DataManager.INDEX_OPTION_CMD])
+                self.data_manager.delete_element(self.current_selected_option[DataManager.OPTION.INDEX_CMD])
                 self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.index + self.get_number_options_to_draw())
                 self.update_options_to_draw()
             elif c == KEY_RESIZE:
