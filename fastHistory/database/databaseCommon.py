@@ -33,20 +33,3 @@ class DatabaseCommon:
                 remaining_elements.remove(first_element)
                 for sub_permutation in DatabaseCommon._unique_permutations(remaining_elements):
                     yield (first_element,) + sub_permutation
-
-    @staticmethod
-    def cast_return_type(data):
-        """
-        change the tags return type from string to array
-        :param data:
-        :return:
-        """
-        new_data = []
-        for i in range(len(data)):
-            tags_str = data[i][2]
-            tags = tags_str.split("#")
-            # remove first empty item
-            if len(tags) > 0 and tags[0] == "":
-                tags = tags[1:]
-            new_data.append([data[i][0], data[i][1], tags])
-        return new_data

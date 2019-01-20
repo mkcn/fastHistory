@@ -65,11 +65,19 @@ class TestDatabaseSQLite(unittest.TestCase):
         self.assertEqual(len(res), 0)
 
         # test if "34" + "#" + "12"
-        res = db.get_last_n_filtered_elements(generic_filters=["34#12"], n=20)  # TODO find solution
+        res = db.get_last_n_filtered_elements(generic_filters=["34#12"], n=20)
         self.assertEqual(len(res), 0)
         res = db.get_last_n_filtered_elements(generic_filters=[], tags_filters=["34#12"], n=20)
         self.assertEqual(len(res), 0)
         res = db.get_last_n_filtered_elements(generic_filters=[], description_filters=["34#12"], n=20)
+        self.assertEqual(len(res), 0)
+
+        # test if "34" + "@" + "12"
+        res = db.get_last_n_filtered_elements(generic_filters=["34@12"], n=20)
+        self.assertEqual(len(res), 0)
+        res = db.get_last_n_filtered_elements(generic_filters=[], tags_filters=["34@12"], n=20)
+        self.assertEqual(len(res), 0)
+        res = db.get_last_n_filtered_elements(generic_filters=[], description_filters=["34@12"], n=20)
         self.assertEqual(len(res), 0)
 
         db.close()
@@ -116,7 +124,7 @@ class TestDatabaseSQLite(unittest.TestCase):
         db.close()
 
     def test_search_by_tag_and_by_description(self):
-        """"
+        """
         store same command multiple times with different description and tags
         try then to retrieve it
         """
@@ -165,7 +173,7 @@ class TestDatabaseSQLite(unittest.TestCase):
         db.close()
 
     def test_fill_db_with_wrong_entries(self):
-        """"
+        """
         store same command multiple times with different description and tags
         try then to retrieve it
         """

@@ -296,7 +296,7 @@ class Picker(object):
                 description_t.set_max_x(self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
             elif type(c) is str:
                 # TODO check input max len
-                description_t.add_string(c)
+                description_t.add_string(c, self.data_manager.get_forbidden_chars())
                 input_error_msg = None
             elif type(c) is int:
                 logging.debug("loop edit description - integer input not handled: " + repr(c))
@@ -325,7 +325,7 @@ class Picker(object):
                 new_tags_str += InputParser.TAG_SIGN + tag + " "
 
         new_tags_t = TextManager(new_tags_str, max_x=self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
-        new_tags_t.add_string(InputParser.TAG_SIGN)
+        new_tags_t.add_string(InputParser.TAG_SIGN, self.data_manager.get_forbidden_chars())
 
         input_error_msg = None
 
@@ -392,7 +392,7 @@ class Picker(object):
                 self.drawer.reset()
                 new_tags_t.set_max_x(self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
             elif type(c) is str:
-                new_tags_t.add_string(c)
+                new_tags_t.add_string(c, self.data_manager.get_forbidden_chars())
                 input_error_msg = None
             elif type(c) is int:
                 logging.debug("loop edit tag - integer input not handled: " + repr(c))
@@ -576,7 +576,7 @@ class Picker(object):
                 self.search_t.move_cursor_to_end()
             # normal search char
             elif type(c) is str:
-                if self.search_t.add_string(c):
+                if self.search_t.add_string(c, self.data_manager.get_forbidden_chars()):
                     self.option_to_draw = None
                     self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.get_number_options_to_draw())
                     # update the options to show

@@ -15,9 +15,10 @@ class DatabaseSQLite(object):
 
     CHAR_TAG = "#"
     CHAR_DESCRIPTION = "@"
-    CHAR_DIVIDER = " "
     EMPTY_STRING = ""
     EMPTY_STRING_TUPLE = ('', )
+
+    CHAR_DIVIDER = "ǁ"
 
     MAX_NUMBER_OF_WORDS_TO_COMBINE = 4
 
@@ -287,7 +288,7 @@ class DatabaseSQLite(object):
         logging.debug("database:search - query: " + query)
         logging.debug("database:search - parameters: " + str(parameters))
 
-        return DatabaseCommon.cast_return_type(self.cursor.fetchall())
+        return self._cast_return_type(self.cursor.fetchall())
 
     def add_element(self, cmd, description=None, tags=None, counter=0, date=None, synced=0):
         """
@@ -561,12 +562,25 @@ class DatabaseSQLite(object):
             logging.error("database - remove_element error: %s" % str(e))
             return False
 
+    def _cast_return_type(self, data):
+        """
+        change the tags return type from string to array
+        :param data:
+        :return:
+        """
+        new_data = []
+        for i in range(len(data)):
+            tags_str = data[i][2]
+            tags = self._tags_string_to_array(tags_str)
+            new_data.append([data[i][0], data[i][1], tags])
+        return new_data
+
     def _tags_string_to_array(self, tags_string):
         """
         given the string of tags form the db it split the tags word and put it into an array
         if the string is empty and empty array is returned
 
-        :param tags_string:     #tag1#tag2#tag3
+        :param tags_string:     ǁtag1ǁtag2ǁtag3
         :return:                ["tag1","tag2","tag3"]
         """
         if type(tags_string) is not str:
@@ -574,7 +588,11 @@ class DatabaseSQLite(object):
             return None
         if tags_string == "":
             return []
-        tags = tags_string.split(self.CHAR_TAG)
+        if tags_string[0] == self.CHAR_DIVIDER:
+            tags = tags_string.split(self.CHAR_DIVIDER)
+        else:
+            # old version of fastHistory uses the # as tags divider
+            tags = tags_string.split(self.CHAR_TAG)
         if len(tags) >= 2:
             # remove first always empty value
             tags = tags[1:]
@@ -597,7 +615,7 @@ class DatabaseSQLite(object):
         tags_string = ""
         for tag in tags:
             if len(tag) > 0:
-                tags_string += self.CHAR_TAG + tag
+                tags_string += self.CHAR_DIVIDER + tag
         return tags_string
 
     def _get_time_now(self):

@@ -41,16 +41,17 @@ class TextManager(object):
             return True
         return False
 
-    def add_string(self, string):
+    def add_string(self, string, forbidden_chars):
         """
         add char at the position of the cursor inside the text
 
         :param string: string to add, usually only a char but it could be a string or a unicode char
-        :return:
+        :param forbidden_chars: array of chars not allowed
+        :return:    true if successful, false otherwise
         """
         # remove special chars such as 'new line' and 'return carriage'
-        string = string.replace('\n', '')
-        string = string.replace('\r', '')
+        for char in forbidden_chars:
+            string = string.replace(char, '')
         # if python3 is not able to print the string then it will be shown as "\xNN" or "\uNNNN"
         if "\\x" in repr(string) or "\\u" in repr(string):
             return False

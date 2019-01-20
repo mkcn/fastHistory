@@ -22,8 +22,6 @@ class DataManager(object):
 		INDEX_DESC_WORDS = 4
 		INDEX_TAGS = 5
 
-	CHAR_DIVIDER = "¦"
-
 	DATABASE_MODE_SQLITE = 0
 	DATABASE_MODE_MYSQL = 1
 
@@ -39,6 +37,8 @@ class DataManager(object):
 			logging.error("database mode not selected")
 		# set dummy as default
 		self.search_filters = self.DUMMY_SEARCH_FILTERS
+		# define special chars based on the chosen database
+		self.forbidden_chars = ['\n', '\r', self.database.CHAR_DIVIDER]
 
 	def get_search_filters(self):
 		"""
@@ -47,6 +47,13 @@ class DataManager(object):
 		:return: [cmd_filter, description_filter, array_tag_filter]
 		"""
 		return self.search_filters
+
+	def get_forbidden_chars(self):
+		"""
+		the database uses a special chars and these cannot be use as input to avoid ambiguity
+		:return:	array of forbidden chars
+		"""
+		return self.forbidden_chars
 
 	def filter(self, search, n=100):
 		"""
