@@ -101,7 +101,14 @@ class Drawer(object):
         :return:
         """
         # this supports wide characters
-        c = self.terminal_screen.get_wch()
+        try:
+            c = self.terminal_screen.get_wch()
+        except curses.error:
+            # on macOS the resize key does not work as expected
+            # as a workaround we send the resize key when the get_wch throws an error
+            return curses.KEY_RESIZE
+        except ValueError:
+            return ""
         return c
 
     def clear(self):
