@@ -20,13 +20,13 @@ class PageEditTags(PageInfo):
         """
         PageInfo.__init__(self, drawer, option, search_filters, context_shift, data_from_man_page)
 
-    def draw_page_edit(self, tags_text, tags_cursor_index, input_error_msg):
+    def draw_page_edit(self, tags_text, tags_cursor_index, input_error_msg=None):
         """
         draw page to edit tags of the current selected option
 
         :param tags_text:              tags string
         :param tags_cursor_index:      position of the cursor
-        :param input_error_msg:        string error to show, None is there is no error to show
+        :param input_error_msg:        string error to show, None if there is no error to show
         :return:
         """
         # draw colored title
@@ -86,9 +86,6 @@ class PageEditTags(PageInfo):
         self.drawer.set_y(self.drawer.get_max_y() - 1)
         self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Save", x_indent=1, allow_last_row=True)
-
-        self.drawer.draw_row("<-|->", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Scroll", x_indent=1, allow_last_row=True)
 
         self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Go back without saving", x_indent=1, allow_last_row=True)

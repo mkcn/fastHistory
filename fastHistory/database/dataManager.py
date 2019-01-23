@@ -101,6 +101,15 @@ class DataManager(object):
 		"""
 		return self.database.add_element(cmd, description, tags)
 
+	def update_command(self, cmd, new_cmd):
+		"""
+		update command string of a command
+		:param cmd:
+		:param new_cmd:
+		:return:
+		"""
+		return self.database.update_command_field(cmd, new_cmd)
+
 	def update_tags(self, cmd, tags):
 		"""
 		update tag list of a command

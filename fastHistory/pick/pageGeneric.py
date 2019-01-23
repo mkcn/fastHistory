@@ -23,6 +23,7 @@ class PageGeneric(object):
     CHAR_DESCRIPTION = "@"
     CHAR_TAG = "#"
     CHAR_SPACE = " "
+    CHAR_EDIT = 'E'
 
     INDEX_SECTION_VALUE = 0
     INDEX_SECTION_IS_MARKED = 1

@@ -143,6 +143,14 @@ class DatabaseSQLite(object):
         """
         self.conn.commit()
 
+    def rollback_changes(self):
+        """
+        in case of exceptions this should be called to clean the local changes
+        :return:
+        """
+        logging.error("database error detected - rollback changes")
+        self.conn.rollback()
+
     def reset_entire_db(self):
         """
         for debug and test purposes delete the db file
@@ -311,9 +319,6 @@ class DatabaseSQLite(object):
             # remove whitespaces on the left and right
             cmd = cmd.strip()
 
-            if date is None:
-                date = self._get_time_now()
-
             # check if description and tags contains an illegal char (@ or #)
             if description is not None and (self.CHAR_TAG in description or self.CHAR_DESCRIPTION in description):
                 logging.error("database:add element - description contains illegal char " +
@@ -330,13 +335,15 @@ class DatabaseSQLite(object):
             logging.debug("database:add element - tags: " + str(tags))
             logging.debug("database:add element - description: " + str(description))
             logging.debug("database:add element - counter: " + str(counter))
-            logging.debug("database:add element - date: " + str(date))
             logging.debug("database:add element - synced: " + str(synced))
 
             self.cursor.execute("SELECT rowid, description, tags, counter FROM history WHERE command=?", (cmd,))
             matches = self.cursor.fetchall()
             matches_number = len(matches)
             if matches_number == 0:
+                if date is None:
+                    date = self._get_time_now()
+
                 if description is None:
                     description = ""
                 if tags is None:
@@ -353,56 +360,13 @@ class DatabaseSQLite(object):
                                      ))
                 logging.debug("database:add element - added NEW")
             elif matches_number == 1:
-                match = matches[0]
-                # get old values
-                match_id = match[0]
-                match_desc = match[1]
-                match_tags_str = match[2]
-                match_counter = int(match[3])
-                # match_date = int(match[4])
-
-                # set new counter
-                new_counter = match_counter + 1
-                # set new description
-                if description is not None and description is not "" and description != match_desc:
-                    if match_desc is "":
-                        new_description = description
-                    else:
-                        # concatenate old and new description
-                        new_description = description + ". " + match_desc
-                else:
-                    new_description = match_desc
-                # set new tags list
-                if tags is not None and type(tags) == list and len(tags) > 0:
-                    update_tags = False
-                    match_tags = self._tags_string_to_array(match_tags_str)
-                    for tag in tags:
-                        if tag not in match_tags and tag != "":
-                            # new tag
-                            match_tags.append(tag)
-                            update_tags = True
-                    if update_tags:
-                        new_tags_str = self._tag_array_to_string(match_tags)
-                    else:
-                        new_tags_str = match_tags_str
-                else:
-                    new_tags_str = match_tags_str
-
-                # delete old row
-                self.cursor.execute("DELETE FROM history WHERE rowid=?", (match_id,))
-
-                logging.debug("database:add element - new_tags_str: " + str(new_tags_str))
-                # create new row which will have the highest rowID (last used command)
-
-                self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)", (
-                    (cmd,
-                     new_description,
-                     new_tags_str,
-                     new_counter,
-                     date,
-                     synced
-                     )))
-                logging.debug("database:add element - command updated: " + cmd)
+                # note: in this case the given 'date' and 'sync' values are ignored
+                self._merge_elements(old_element=matches[0],
+                                     new_cmd=cmd,
+                                     new_description=description,
+                                     new_tags=tags,
+                                     new_counter=1,
+                                     update_id=True)
             else:
                 logging.error("database:add element - command entry is not unique: " + cmd)
                 return False
@@ -411,6 +375,150 @@ class DatabaseSQLite(object):
             return True
         except Exception as e:
             logging.error("database:add element - thrown an error: %s" % str(e))
+            self.rollback_changes()
+            return False
+
+    def _merge_elements(self, old_element, new_cmd, new_description, new_tags, new_counter, update_id=False):
+        """
+        given an old element and a new set of attributes, the old element is updated with the new values
+         merged with the old values
+
+        :param old_element:         old element from db query
+        :param new_cmd:             new command string
+        :param new_description:     new description string
+        :param new_tags:            new tags list
+        :param new_counter:         new counter int
+        :param update_id:           if true, the row id of the old element is updated
+        :return:
+        """
+        # get old values
+        old_id = old_element[0]
+        old_description = old_element[1]
+        old_tags_str = old_element[2]
+        old_counter = int(old_element[3])
+        # match_date = int(old_elements[4])
+
+        # set new counter
+        counter = old_counter + new_counter
+        # set new description
+        if new_description is not None and new_description is not "" and new_description != old_description:
+            if old_description is "":
+                description = new_description
+            else:
+                # concatenate old and new description
+                # TODO use new line TBD
+                description = old_description + ". " + new_description
+        else:
+            description = old_description
+
+        # set new tags list
+        if new_tags is not None and type(new_tags) == list and len(new_tags) > 0:
+            update_tags = False
+            match_tags = self._tags_string_to_array(old_tags_str)
+            for tag in new_tags:
+                if tag not in match_tags and tag != "":
+                    # new tag
+                    match_tags.append(tag)
+                    update_tags = True
+            if update_tags:
+                tags_str = self._tag_array_to_string(match_tags)
+            else:
+                tags_str = old_tags_str
+        else:
+            tags_str = old_tags_str
+
+        date = self._get_time_now()
+        synced = 0
+
+        # update = delete + create
+        if update_id:
+            # delete old row
+            self.cursor.execute("DELETE FROM history WHERE rowid=?", (old_id,))
+            # create new row which will have the highest rowID (last used command)
+            self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)",
+                                (new_cmd,
+                                 description,
+                                 tags_str,
+                                 counter,
+                                 date,
+                                 synced
+                                 ))
+        else:
+            self.cursor.execute("UPDATE history SET command=?, description=?, tags=?, counter=?, date=? WHERE rowid=?", (
+                new_cmd,
+                description,
+                tags_str,
+                counter,
+                date,
+                old_id))
+        self.save_changes()
+
+        logging.debug("database:merge element - command updated: " + new_cmd)
+
+    def update_command_field(self, old_cmd, new_cmd):
+        """
+        update item command
+        first find the item with the old_cmd
+        then find if an item with the new_cmd exist already
+        based on that make an update or a merge
+        :param old_cmd:     old command string
+        :param new_cmd:     new command string
+        :return:            True   if update is successful. False otherwise
+        """
+        try:
+            if new_cmd is None or new_cmd is "":
+                logging.error("database - update_command_field: new command is null")
+                return False
+            if old_cmd == new_cmd:
+                logging.debug("database - update_command_field: no change needed")
+                return False
+
+            logging.debug("database - update_command_field: replace " + str(old_cmd) + "  with " + str(new_cmd))
+            self.cursor.execute("SELECT rowid, description, tags, counter FROM history WHERE command=?", (old_cmd,))
+            old_matches = self.cursor.fetchall()
+            matches_number = len(old_matches)
+            if matches_number == 1:
+                old_match = old_matches[0]
+                old_row_id = old_match[0]
+                self.cursor.execute("SELECT rowid, description, tags, counter FROM history WHERE command=?", (new_cmd,))
+                new_matches = self.cursor.fetchall()
+                new_matches_number = len(new_matches)
+                # the new command does not exist already
+                if new_matches_number == 0:
+                    new_date = self._get_time_now()
+                    self.cursor.execute("UPDATE history SET command=?, date=? WHERE rowid=?", (
+                        new_cmd,
+                        new_date,
+                        old_row_id))
+                    self.save_changes()
+                    return True
+                # the new command already exists
+                elif new_matches_number == 1:
+                    new_match = new_matches[0]
+                    new_row_id = new_match[0]
+                    # merge value in old cmd
+                    self._merge_elements(old_element=old_match,
+                                         new_cmd=new_cmd,
+                                         new_description=new_match[1],
+                                         new_tags=self._tags_string_to_array(new_match[2]),
+                                         new_counter=new_match[3])
+                    # delete old command
+                    self.cursor.execute("DELETE FROM history WHERE rowid=?", (new_row_id,))
+                    self.save_changes()
+                    return True
+                else:
+                    logging.debug("database - update_command_field - command entry is not unique: " + new_cmd)
+                    return False
+            elif matches_number == 0:
+                logging.error("database - update_command_field - command entry is not unique: " + old_cmd)
+                return False
+            else:
+                logging.error("database - update_command_field - fail because of no matched command")
+                return False
+
+        except Exception as e:
+            logging.error("database: update_command_field - throw an error: %s" % str(e))
+            self.rollback_changes()
             return False
 
     def update_tags_field(self, cmd, tags):
@@ -455,6 +563,7 @@ class DatabaseSQLite(object):
                 return False
         except Exception as e:
             logging.error("database - update_tags_field error: %s" % str(e))
+            self.rollback_changes()
             return False
 
     def update_description_field(self, cmd, description):

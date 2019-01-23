@@ -26,6 +26,7 @@ KEY_CTRL_A = '\x01'
 KEY_CTRL_E = '\x05'
 KEY_START = curses.KEY_HOME
 KEY_END = curses.KEY_END
+KEYS_EDIT = ('e', 'E')
 KEY_TAG = '#'
 KEY_AT = '@'
 
@@ -145,6 +146,7 @@ class Picker(object):
             self.current_line_index = 0
         else:
             # check if the current selected line is too big set the last line as selected line
+            # this is needed for the console resize event
             if self.current_line_index >= number_option_to_draw:
                 self.index -= self.current_line_index - number_option_to_draw + 1
                 self.current_line_index = number_option_to_draw - 1
@@ -206,18 +208,118 @@ class Picker(object):
         """
         :return: list of options to show
         """
-        options = []
+        tmp_options = []
         for row_index, option in enumerate(self.option_to_draw):
             if row_index == self.current_line_index:
-                options.append([True, option])
+                tmp_options.append([True, option])
                 self.current_selected_option = option
             else:
-                options.append([False, option])
-        return options
+                tmp_options.append([False, option])
+        return tmp_options
+
+    def run_loop_edit_command(self, data_from_man_page):
+        """
+        loop to capture user input keys to interact with the "edit command" page
+
+        :return:
+        """
+        # import this locally to improve performance when the program is loaded
+        from pick.pageEditCommand import PageEditCommand
+        page_desc = PageEditCommand(self.drawer,
+                                    option=self.current_selected_option,
+                                    search_filters=self.data_manager.get_search_filters(),
+                                    context_shift=self.context_shift,
+                                    data_from_man_page=data_from_man_page)
+
+        current_command = self.current_selected_option[DataManager.OPTION.INDEX_CMD]
+        command_t = TextManager(self.current_selected_option[DataManager.OPTION.INDEX_CMD],
+                                max_x=self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
+        input_error_msg = None
+
+        while True:
+            if page_desc.has_minimum_size():
+                page_desc.clean_page()
+                page_desc.draw_page_edit(command_text=command_t.get_text_to_print(),
+                                         command_cursor_index=command_t.get_cursor_index_to_print(),
+                                         input_error_msg=input_error_msg)
+                page_desc.refresh_page()
+
+            # wait for char
+            c = self.drawer.wait_next_char()
+
+            # save and exit
+            if c in KEYS_ENTER:
+                if current_command == command_t.get_text():
+                    return False
+                else:
+                    is_valid_command = InputParser.is_cmd_str_valid(command_t.get_text())
+                    if is_valid_command:
+                        if self.data_manager.update_command(current_command, command_t.get_text()):
+                            # if an other item exists with the new command text, it is
+                            # deleted and merged with the old command item by the db function.
+                            # In this case the GUI index must be correctly adjusted (this is needed only if
+                            # the delete item was before the updated one in the options array)
+                            for option in self.options:
+                                if option[DataManager.OPTION.INDEX_CMD] == command_t.get_text():
+                                    self.move_up()
+                                    break
+                                if option[DataManager.OPTION.INDEX_CMD] == current_command:
+                                    break
+                            return True
+                        else:
+                            msg = "database error during saving, please try again"
+                            logging.error(msg)
+                            input_error_msg = msg
+                    else:
+                        msg = "no tags and description are allowed here"
+                        logging.error(msg + ": " + str(command_t.get_text()))
+                        input_error_msg = msg
+
+            # exit without saving
+            elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
+                return False
+            # -> command
+            elif c == KEY_RIGHT:
+                if command_t.is_cursor_at_the_end():
+                    self.context_shift.shift_context_right()
+                else:
+                    command_t.move_cursor_right()
+                # <- command
+            elif c == KEY_LEFT:
+                if not self.context_shift.is_context_index_zero():
+                    self.context_shift.shift_context_left()
+                elif not command_t.is_cursor_at_the_beginning():
+                    command_t.move_cursor_left()
+                else:
+                    # do nothing, the cursor is already on the position 0
+                    pass
+            # delete a char of the search
+            elif c in KEYS_DELETE:
+                command_t.delete_char()
+                input_error_msg = None
+            # move cursor to the beginning
+            elif c == KEY_START or c == KEY_CTRL_A:
+                command_t.move_cursor_to_start()
+                self.context_shift.reset_context_shifted()
+            # move cursor to the end
+            elif c == KEY_END or c == KEY_CTRL_E:
+                command_t.move_cursor_to_end()
+            elif c == KEY_RESIZE:
+                # this occurs when the console size changes
+                self.drawer.reset()
+                command_t.set_max_x(self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
+            elif type(c) is str:
+                # TODO check input max len
+                command_t.add_string(c, self.data_manager.get_forbidden_chars())
+                input_error_msg = None
+            elif type(c) is int:
+                logging.debug("loop edit command - integer input not handled: " + repr(c))
+            else:
+                logging.error("loop edit command - input not handled: " + repr(c))
 
     def run_loop_edit_description(self, data_from_man_page):
         """
-        Loop to capture user input keys to interact with the "add description" page
+        loop to capture user input keys to interact with the "add description" page
 
         :return:
         """
@@ -305,7 +407,7 @@ class Picker(object):
 
     def run_loop_edit_tags(self, data_from_man_page):
         """
-        Loop to capture user input keys to interact with the "add tag" page
+        loop to capture user input keys to interact with the "add tag" page
 
         :return:
         """
@@ -452,6 +554,16 @@ class Picker(object):
             elif c == KEY_LEFT:
                 self.context_shift.shift_context_left()
             # normal search char
+            elif c in KEYS_EDIT:
+                if self.run_loop_edit_command(data_from_man_page):
+                    # reload options from db
+                    self.options = self.data_manager.filter(self.search_t.get_text_lower(),
+                                                            self.get_number_options_to_draw())
+                    self.update_options_to_draw()
+                    # update current selected option (based on an index)
+                    self.get_options()  # TODO check if needed
+                    # update option to show
+                    page_info.update_option_value(self.current_selected_option)
             elif c == KEY_TAG:  # "#"
                 if self.run_loop_edit_tags(data_from_man_page):
                     # reload options from db

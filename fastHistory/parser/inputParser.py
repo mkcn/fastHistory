@@ -128,6 +128,31 @@ class InputParser(object):
         return desc
 
     @staticmethod
+    def is_cmd_str_valid(cmd_str):
+        """
+        parse cmd string with the 'insert cmd' regex to check if the end matches the tags or description structure
+        if yes, it is not a valid command because the command should not contains tags or descriptions
+        if not, then the string is valid
+        :param cmd_str: command string to evaluate
+        :return:        true if valid, false otherwise
+        """
+        match = re.search(InputParser.TAGS_REGEXP_INSERT_CMD, cmd_str, flags=re.UNICODE)
+
+        if match:
+            logging.debug("command parser: regex matches")
+            tags_str = match.group(1)
+            desc_str = match.group(2)
+
+            if tags_str is None and desc_str is None:
+                return True
+            else:
+                logging.debug("command contains tag and/or description")
+                return False
+        else:
+            logging.debug("command parser: regex does not match (correct)")
+            return True
+
+    @staticmethod
     def parse_input(cmd, is_search_cmd=False):
         """
         parse the input cmd and retrieve the cmd, tags and description
@@ -156,7 +181,7 @@ class InputParser(object):
             match = re.search(InputParser.TAGS_REGEXP_INSERT_CMD, cmd, flags=re.UNICODE)
 
         if match:
-            logging.debug("tag parser: regex matches")
+            logging.debug("input parser: regex matches")
             tags_str = match.group(1)
             desc_str = match.group(2)
 
@@ -170,7 +195,7 @@ class InputParser(object):
             if char_to_cut != 0:
                 cmd = cmd[:-char_to_cut]
         else:
-            logging.debug("tag parser: regex does NOT match")
+            logging.debug("input parser: regex does NOT match")
             return None
 
         # tags

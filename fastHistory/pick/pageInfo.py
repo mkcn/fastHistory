@@ -86,14 +86,14 @@ class PageInfo(PageGeneric):
         self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Select", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("<-|->", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Scroll", x_indent=1, allow_last_row=True)
-
         self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Go back", x_indent=1, allow_last_row=True)
 
         self.drawer.draw_row("Canc", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Delete", x_indent=1, allow_last_row=True)
+
+        self.drawer.draw_row(self.CHAR_EDIT, x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Edit", x_indent=1, allow_last_row=True)
 
         self.drawer.draw_row(self.CHAR_TAG, x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Tag", x_indent=1, allow_last_row=True)

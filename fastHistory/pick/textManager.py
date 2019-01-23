@@ -56,6 +56,7 @@ class TextManager(object):
         if "\\x" in repr(string) or "\\u" in repr(string):
             return False
 
+        # TODO add 'max' parameter and check input total len
         string_len = len(string)
         if string_len > 0:
             self.text = self.text[0:self.cursor_index] + \

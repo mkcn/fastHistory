@@ -47,6 +47,46 @@ class TestDatabaseSQLite(unittest.TestCase):
 
         db.close()
 
+    def test_command_update(self):
+        """
+        test command edit feature with merging conflicts
+        :return:
+        """
+        self._set_text_logger()
+        db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
+        self.assertTrue(db.add_element("t1", "test1", ["t1", "f1", "common"]))  # id 1
+        self.assertTrue(db.add_element("t2", "test2", ["t2", "f2", "common"]))  # id 2
+        self.assertTrue(db.add_element("t3", "test3", ["t3", "f3", "common"]))  # id 3
+        self.assertTrue(db.add_element("t4", "test4", ["t4", "f4", "common"]))  # id 4
+
+        # case 1 - simple renaming
+        self.assertTrue(db.update_command_field("t1", "t1_new"))
+        res = db.get_last_n_filtered_elements(generic_filters=["t1_new"],
+                                              tags_filters=["t1"],
+                                              description_filters=["test1"],
+                                              n=20)
+        self.assertEqual(len(res), 1)
+
+        # case 2 - renaming with conflict ( id(t2) < id(t3) )
+        self.assertTrue(db.update_command_field("t2", "t3"))
+        res = db.get_last_n_filtered_elements(generic_filters=["t3"], n=20)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0][1], "test2. test3")
+        self.assertEqual(res[0][2], ["t2", "f2", "common", "t3", "f3"])  # note order!
+
+        # case 3 - renaming with conflict ( id(t4) > id(t3) )
+        self.assertTrue(db.update_command_field("t4", "t3"))
+        res = db.get_last_n_filtered_elements(generic_filters=["t3"], n=20)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0][1], "test4. test2. test3")
+        self.assertEqual(res[0][2], ["t4", "f4", "common", "t2", "f2", "t3", "f3"])  # note order!
+
+        # only 2 items are left
+        res = db.get_last_n_filtered_elements(generic_filters=[""], n=20)
+        self.assertEqual(len(res), 2)
+
+        db.close()
+
     def test_wrong_matches(self):
         """
         test searches with special set of chars
@@ -143,9 +183,9 @@ class TestDatabaseSQLite(unittest.TestCase):
         # check number of matches
         self.assertEqual(len(res), 1)
         # check if tags are saved correctly
-        self.assertEqual(res[0][2], ["security", "sec", "supersecure"])  # note order!
+        self.assertEqual(res[0][2], ["security", "sec", "supersecure"])  # note order
         # check if description is updated
-        self.assertEqual(res[0][1], "test3. test2. test1")
+        self.assertEqual(res[0][1], "test1. test2. test3")  # note order
 
         # test case 2 (search for description)
         res = db.get_last_n_filtered_elements(generic_filters=["description"])
