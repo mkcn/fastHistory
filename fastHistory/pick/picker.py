@@ -206,6 +206,9 @@ class Picker(object):
 
     def get_options(self):
         """
+        TODO split this function into:
+            - get_options()
+            - update_current_selected_option()
         :return: list of options to show
         """
         tmp_options = []
@@ -553,12 +556,11 @@ class Picker(object):
             # <- command
             elif c == KEY_LEFT:
                 self.context_shift.shift_context_left()
-            # normal search char
             elif c in KEYS_EDIT:
                 if self.run_loop_edit_command(data_from_man_page):
                     # reload options from db
                     self.options = self.data_manager.filter(self.search_t.get_text_lower(),
-                                                            self.get_number_options_to_draw())
+                                                            self.index + self.get_number_options_to_draw())
                     self.update_options_to_draw()
                     # update current selected option (based on an index)
                     self.get_options()  # TODO check if needed
@@ -566,24 +568,17 @@ class Picker(object):
                     page_info.update_option_value(self.current_selected_option)
             elif c == KEY_TAG:  # "#"
                 if self.run_loop_edit_tags(data_from_man_page):
-                    # reload options from db
                     self.options = self.data_manager.filter(self.search_t.get_text_lower(),
-                                                            self.get_number_options_to_draw())
+                                                            self.index + self.get_number_options_to_draw())
                     self.update_options_to_draw()
-                    # update current selected option
                     self.get_options()
-                    # update option to show
                     page_info.update_option_value(self.current_selected_option)
-            # delete a char of the search
             elif c == KEY_AT:  # "@"
                 if self.run_loop_edit_description(data_from_man_page):
-                    # reload options from db
                     self.options = self.data_manager.filter(self.search_t.get_text_lower(),
-                                                            self.get_number_options_to_draw())
+                                                            self.index + self.get_number_options_to_draw())
                     self.update_options_to_draw()
-                    # update current selected option
                     self.get_options()
-                    # update option to show
                     page_info.update_option_value(self.current_selected_option)
             elif c == KEY_RESIZE:
                 # this occurs when the console size changes
