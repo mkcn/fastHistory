@@ -367,6 +367,7 @@ class DatabaseSQLite(object):
                                      new_tags=tags,
                                      new_counter=1,
                                      update_id=True)
+                self.save_changes()
             else:
                 logging.error("database:add element - command entry is not unique: " + cmd)
                 return False
@@ -451,7 +452,6 @@ class DatabaseSQLite(object):
                 counter,
                 date,
                 old_id))
-        self.save_changes()
 
         logging.debug("database:merge element - command updated: " + new_cmd)
 
@@ -605,6 +605,7 @@ class DatabaseSQLite(object):
                 return False
         except Exception as e:
             logging.error("database - update_description_field error: %s" % str(e))
+            self.rollback_changes()
             return False
 
     def update_position_element(self, cmd):
@@ -642,6 +643,7 @@ class DatabaseSQLite(object):
                 return False
         except Exception as e:
             logging.error("database - update_position_element error: %s" % str(e))
+            self.rollback_changes()
             return False
 
     def remove_element(self, cmd):
@@ -669,6 +671,7 @@ class DatabaseSQLite(object):
             return True
         except Exception as e:
             logging.error("database - remove_element error: %s" % str(e))
+            self.rollback_changes()
             return False
 
     def _cast_return_type(self, data):
