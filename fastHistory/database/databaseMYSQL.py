@@ -6,7 +6,7 @@ class DatabaseMYSQL(object):
     """
 
     def __init__(self, project_directory):
-        return NotImplementedError
+        pass
 
     def get_all_data(self, filter=None):
         return NotImplementedError

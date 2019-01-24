@@ -1,6 +1,4 @@
 
-_TEXT_TO_LONG = '…'
-
 
 class TextManager(object):
     """
@@ -8,6 +6,8 @@ class TextManager(object):
 
     this will take care of input text too long and it will shift it accordingly
     """
+    TEXT_TOO_LONG = '…'
+
     text = None
     text_lower = None
     text_len = 0
@@ -41,20 +41,22 @@ class TextManager(object):
             return True
         return False
 
-    def add_string(self, string):
+    def add_string(self, string, forbidden_chars):
         """
         add char at the position of the cursor inside the text
 
         :param string: string to add, usually only a char but it could be a string or a unicode char
-        :return:
+        :param forbidden_chars: array of chars not allowed
+        :return:    true if successful, false otherwise
         """
         # remove special chars such as 'new line' and 'return carriage'
-        string = string.replace('\n', '')
-        string = string.replace('\r', '')
+        for char in forbidden_chars:
+            string = string.replace(char, '')
         # if python3 is not able to print the string then it will be shown as "\xNN" or "\uNNNN"
         if "\\x" in repr(string) or "\\u" in repr(string):
             return False
 
+        # TODO add 'max' parameter and check input total len
         string_len = len(string)
         if string_len > 0:
             self.text = self.text[0:self.cursor_index] + \
@@ -105,22 +107,22 @@ class TextManager(object):
                 if return_cursor_index:
                     return self.cursor_index
                 else:
-                    return text[:max_x] + _TEXT_TO_LONG
+                    return text[:max_x] + self.TEXT_TOO_LONG
             # --|.---------x|
             elif self.cursor_index >= max_x and self.cursor_index == text_len:
                 if return_cursor_index:
                     return max_x
                 else:
-                    # +1 is to print the "TEXT_TO_LONG"
-                    return _TEXT_TO_LONG + text[self.cursor_index - max_x + len(_TEXT_TO_LONG):]
+                    # +1 is to print the "TEXT_TOO_LONG"
+                    return self.TEXT_TOO_LONG + text[self.cursor_index - max_x + len(self.TEXT_TOO_LONG):]
             # -|.---------x|.-
             else:
                 if return_cursor_index:
                     return max_x
                 else:
-                    # +1 is to print the "TEXT_TO_LONG"
-                    return _TEXT_TO_LONG + text[
-                                    self.cursor_index - max_x + len(_TEXT_TO_LONG):self.cursor_index] + _TEXT_TO_LONG
+                    # +1 is to print the "TEXT_TOO_LONG"
+                    return self.TEXT_TOO_LONG + text[
+                                    self.cursor_index - max_x + len(self.TEXT_TOO_LONG):self.cursor_index] + self.TEXT_TOO_LONG
 
     def get_text_to_print(self):
         return self._calculate_text_shifted(self.text, self.text_len, self.max_x)
@@ -173,10 +175,10 @@ class ContextShifter(object):
 
     def get_text_shifted(self, text, max_x):
         if self.context_shift > 0:
-            text = _TEXT_TO_LONG + text[self.context_shift+len(_TEXT_TO_LONG):]
+            text = TextManager.TEXT_TOO_LONG + text[self.context_shift + len(TextManager.TEXT_TOO_LONG):]
 
         text_len = len(text)
         if text_len <= max_x:
             return text
         else:
-            return text[:max_x-len(_TEXT_TO_LONG)] + _TEXT_TO_LONG
+            return text[:max_x-len(TextManager.TEXT_TOO_LONG)] + TextManager.TEXT_TOO_LONG

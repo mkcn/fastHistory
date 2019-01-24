@@ -3,6 +3,8 @@ import logging
 import os
 import time
 
+from database.databaseCommon import DatabaseCommon
+
 
 class DatabaseSQLite(object):
 
@@ -14,6 +16,11 @@ class DatabaseSQLite(object):
     CHAR_TAG = "#"
     CHAR_DESCRIPTION = "@"
     EMPTY_STRING = ""
+    EMPTY_STRING_TUPLE = ('', )
+
+    CHAR_DIVIDER = "ǁ"
+
+    MAX_NUMBER_OF_WORDS_TO_COMBINE = 4
 
     _DATABASE_TABLE_NAME = "history"
     _DATABASE_STRUCTURE = """
@@ -136,6 +143,14 @@ class DatabaseSQLite(object):
         """
         self.conn.commit()
 
+    def rollback_changes(self):
+        """
+        in case of exceptions this should be called to clean the local changes
+        :return:
+        """
+        logging.error("database error detected - rollback changes")
+        self.conn.rollback()
+
     def reset_entire_db(self):
         """
         for debug and test purposes delete the db file
@@ -177,88 +192,87 @@ class DatabaseSQLite(object):
         # the "rowID" value is a 64-bit signed integers
         # REAL is used because it has the longest time range
 
-    def get_all_data(self, filter=None):
+    def get_all_data(self):
         self.cursor.execute("SELECT * FROM history ")
         return self.cursor.fetchall()
 
-    def get_last_n_elements_with_simple_search(self, filter=None, n=50):
+    def get_last_n_filtered_elements(self, generic_filters=None, description_filters=None, tags_filters=None, n=50):
         """
-        get data from db
-        by default if a simple search is done, the string is searched in all values: cmd, tags and description
+        get filtered data from db
 
-        :param filter:  string which must match part of the command or description or tag
-        :param n:       max number of rows returned
-        :return:       filtered data (array of array [command, description, tags])
+        :param generic_filters:        array of words used to filter cmd, descriptions and tags
+        :param description_filters:    array of words used to filter descriptions
+        :param tags_filters:           array of words used to filter tags
+        :param n:                      max number of rows returned
+        :return:                       filtered data (array of array [command, description, tags])
         """
 
-        if filter is None or filter == DatabaseSQLite.EMPTY_STRING:
-            query = "SELECT command, description, tags " \
-                                "FROM history " \
-                                "ORDER BY rowid DESC LIMIT ?"
-            parameters = (n,)
+        if generic_filters is not None and len(generic_filters) > self.MAX_NUMBER_OF_WORDS_TO_COMBINE:
+            # TODO show feedback to user when this kind of search is done
+            combinations_generic_filters = [tuple(generic_filters)]
         else:
-            query = "SELECT command, description, tags " \
-                     "FROM history " \
-                     "WHERE " \
-                     "command LIKE ? OR " \
-                     "description LIKE ? OR " \
-                     "tags LIKE ? " \
-                     "ORDER BY rowid DESC LIMIT ?"
-            parameters = ("%" + filter + "%",  "%" + filter + "%", "%" + filter + "%", n,)
+            combinations_generic_filters = DatabaseCommon.get_all_unique_combinations(generic_filters)
 
-        # execute query
-        self.cursor.execute(query, parameters)
+        if description_filters is not None and len(description_filters) > self.MAX_NUMBER_OF_WORDS_TO_COMBINE:
+            combinations_description_filters = [tuple(description_filters)]
+        else:
+            combinations_description_filters = DatabaseCommon.get_all_unique_combinations(description_filters)
 
-        # logging.debug("simple search query: " + query + " - " + str(parameters))
-
-        return self.cursor.fetchall()
-
-    def get_last_n_elements_with_advanced_search(self, cmd_filter=None, description_filter=None, tags_filter=None, n=50):
-        """
-        get data from db
-        this is a more specific and advanced search
-        the there are 6 different combination of searching:
-            - cmd
-            - description
-            - tag (single or multiple)
-            - cmd + description
-            - cmd + tag(s)
-            - desc + tag(s)
-        all filters are combined dynamically with "AND" logic
-
-        note: when tag or description are empty, we search for any "not" empty" line (search for # -> all cmd with tags are shown)
-
-        :param cmd_filter:          string to filter cmd
-        :param description_filter:  string to filter documentation
-        :param tags_filter:         array of string to filter
-        :param n:                   max number of rows returned
-        :return:                    filtered data (array of array [command, description, tags])
-        """
         parameters = ()
-        and_needed = False
+        where_needed = True
 
-        # select
-        query = "SELECT command, description, tags FROM history WHERE "
+        query = "SELECT command, description, tags " \
+                "FROM history "
 
-        if cmd_filter is not None and len(cmd_filter) > 0:
-            query += "command LIKE ? "
-            parameters += ("%" + cmd_filter + "%", )
-            and_needed = True
+        if combinations_generic_filters is not None and len(combinations_generic_filters) > 0:
+            if where_needed:
+                query += " WHERE ("
+                where_needed = False
 
-        if description_filter is not None:
-            if and_needed:
-                query += "AND "
+            or_needed = False
+            for combination in combinations_generic_filters:
+                if or_needed:
+                    query += " OR "
+                else:
+                    or_needed = True
+
+                pattern = '%' + '%'.join(combination) + '%'
+                # a divider is used to avoid the corner case where a word matches only
+                # because of the concatenation of different columns
+                query += "(command || ? || description || ? || tags LIKE ? ) "
+                parameters += (self.CHAR_DIVIDER, self.CHAR_DIVIDER, pattern, )
+            query += ") "
+
+        if combinations_description_filters is not None and len(combinations_description_filters) > 0:
+            if where_needed:
+                query += " WHERE ("
+                where_needed = False
             else:
-                and_needed = True
-            if description_filter == DatabaseSQLite.EMPTY_STRING:
-                query += "description <> '' "
-                parameters += ()
-            else:
-                query += "description LIKE ? "
-                parameters += ("%" + description_filter + "%", )
+                query += " AND ("
 
-        if tags_filter is not None:
-            for tag_filter in tags_filter:
+            or_needed = False
+            for desc_combination in combinations_description_filters:
+                if or_needed:
+                    query += " OR "
+                else:
+                    or_needed = True
+                if desc_combination == DatabaseSQLite.EMPTY_STRING_TUPLE:
+                    query += "description <> '' "
+                    parameters += ()
+                else:
+                    desc_pattern = '%' + '%'.join(desc_combination) + '%'
+                    query += "description LIKE ? "
+                    parameters += (desc_pattern, )
+            query += ") "
+
+        if tags_filters is not None and len(tags_filters) > 0:
+            if where_needed:
+                query += " WHERE ("
+            else:
+                query += " AND ("
+
+            and_needed = False
+            for tag_filter in tags_filters:
                 if and_needed:
                     query += "AND "
                 else:
@@ -268,19 +282,21 @@ class DatabaseSQLite(object):
                     query += "tags <> '' "
                     parameters += ()
                 else:
+                    pattern = "%" + tag_filter + "%"
                     query += "tags LIKE ? "
-                    parameters += ("%%" + tag_filter + "%", )
+                    parameters += (pattern, )
+            query += ") "
 
-        # sort
         query += "ORDER BY rowid DESC LIMIT ?"
-        parameters += (n, )
+        parameters += (n,)
 
         # execute query
         self.cursor.execute(query, parameters)
 
-        logging.debug("advance search query: " + query + " - " + str(parameters))
+        logging.debug("database:search - query: " + query)
+        logging.debug("database:search - parameters: " + str(parameters))
 
-        return self.cursor.fetchall()
+        return self._cast_return_type(self.cursor.fetchall())
 
     def add_element(self, cmd, description=None, tags=None, counter=0, date=None, synced=0):
         """
@@ -303,9 +319,6 @@ class DatabaseSQLite(object):
             # remove whitespaces on the left and right
             cmd = cmd.strip()
 
-            if date is None:
-                date = self._get_time_now()
-
             # check if description and tags contains an illegal char (@ or #)
             if description is not None and (self.CHAR_TAG in description or self.CHAR_DESCRIPTION in description):
                 logging.error("database:add element - description contains illegal char " +
@@ -322,13 +335,15 @@ class DatabaseSQLite(object):
             logging.debug("database:add element - tags: " + str(tags))
             logging.debug("database:add element - description: " + str(description))
             logging.debug("database:add element - counter: " + str(counter))
-            logging.debug("database:add element - date: " + str(date))
             logging.debug("database:add element - synced: " + str(synced))
 
             self.cursor.execute("SELECT rowid, description, tags, counter FROM history WHERE command=?", (cmd,))
             matches = self.cursor.fetchall()
             matches_number = len(matches)
             if matches_number == 0:
+                if date is None:
+                    date = self._get_time_now()
+
                 if description is None:
                     description = ""
                 if tags is None:
@@ -336,65 +351,23 @@ class DatabaseSQLite(object):
                 else:
                     tags_str = self._tag_array_to_string(tags)
                 self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)",
-                                       (cmd,
-                                        description,
-                                        tags_str,
-                                        counter,
-                                        date,
-                                        synced
-                                        ))
+                                    (cmd,
+                                     description,
+                                     tags_str,
+                                     counter,
+                                     date,
+                                     synced
+                                     ))
                 logging.debug("database:add element - added NEW")
             elif matches_number == 1:
-                match = matches[0]
-                # get old values
-                match_id = match[0]
-                match_desc = match[1]
-                match_tags_str = match[2]
-                match_counter = int(match[3])
-                # match_date = int(match[4])
-
-                # set new counter
-                new_counter = match_counter + 1
-                # set new description
-                if description is not None and description is not "" and description != match_desc:
-                    if match_desc is "":
-                        new_description = description
-                    else:
-                        # concatenate old and new description
-                        new_description = description + ". " + match_desc
-                else:
-                    new_description = match_desc
-                # set new tags list
-                if tags is not None and type(tags) == list and len(tags) > 0:
-                    update_tags = False
-                    match_tags = self._tags_string_to_array(match_tags_str)
-                    for tag in tags:
-                        if tag not in match_tags and tag != "":
-                            # new tag
-                            match_tags.append(tag)
-                            update_tags = True
-                    if update_tags:
-                        new_tags_str = self._tag_array_to_string(match_tags)
-                    else:
-                        new_tags_str = match_tags_str
-                else:
-                    new_tags_str = match_tags_str
-
-                # delete old row
-                self.cursor.execute("DELETE FROM history WHERE rowid=?", (match_id,))
-
-                logging.debug("database:add element - new_tags_str: " + str(new_tags_str))
-                # create new row which will have the highest rowID (last used command)
-
-                self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)", (
-                    (cmd,
-                     new_description,
-                     new_tags_str,
-                     new_counter,
-                     date,
-                     synced
-                     )))
-                logging.debug("database:add element - command updated: " + cmd)
+                # note: in this case the given 'date' and 'sync' values are ignored
+                self._merge_elements(old_element=matches[0],
+                                     new_cmd=cmd,
+                                     new_description=description,
+                                     new_tags=tags,
+                                     new_counter=1,
+                                     update_id=True)
+                self.save_changes()
             else:
                 logging.error("database:add element - command entry is not unique: " + cmd)
                 return False
@@ -403,6 +376,149 @@ class DatabaseSQLite(object):
             return True
         except Exception as e:
             logging.error("database:add element - thrown an error: %s" % str(e))
+            self.rollback_changes()
+            return False
+
+    def _merge_elements(self, old_element, new_cmd, new_description, new_tags, new_counter, update_id=False):
+        """
+        given an old element and a new set of attributes, the old element is updated with the new values
+         merged with the old values
+
+        :param old_element:         old element from db query
+        :param new_cmd:             new command string
+        :param new_description:     new description string
+        :param new_tags:            new tags list
+        :param new_counter:         new counter int
+        :param update_id:           if true, the row id of the old element is updated
+        :return:
+        """
+        # get old values
+        old_id = old_element[0]
+        old_description = old_element[1]
+        old_tags_str = old_element[2]
+        old_counter = int(old_element[3])
+        # match_date = int(old_elements[4])
+
+        # set new counter
+        counter = old_counter + new_counter
+        # set new description
+        if new_description is not None and new_description is not "" and new_description != old_description:
+            if old_description is "":
+                description = new_description
+            else:
+                # concatenate old and new description
+                # TODO use new line TBD
+                description = old_description + ". " + new_description
+        else:
+            description = old_description
+
+        # set new tags list
+        if new_tags is not None and type(new_tags) == list and len(new_tags) > 0:
+            update_tags = False
+            match_tags = self._tags_string_to_array(old_tags_str)
+            for tag in new_tags:
+                if tag not in match_tags and tag != "":
+                    # new tag
+                    match_tags.append(tag)
+                    update_tags = True
+            if update_tags:
+                tags_str = self._tag_array_to_string(match_tags)
+            else:
+                tags_str = old_tags_str
+        else:
+            tags_str = old_tags_str
+
+        date = self._get_time_now()
+        synced = 0
+
+        # update = delete + create
+        if update_id:
+            # delete old row
+            self.cursor.execute("DELETE FROM history WHERE rowid=?", (old_id,))
+            # create new row which will have the highest rowID (last used command)
+            self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)",
+                                (new_cmd,
+                                 description,
+                                 tags_str,
+                                 counter,
+                                 date,
+                                 synced
+                                 ))
+        else:
+            self.cursor.execute("UPDATE history SET command=?, description=?, tags=?, counter=?, date=? WHERE rowid=?", (
+                new_cmd,
+                description,
+                tags_str,
+                counter,
+                date,
+                old_id))
+
+        logging.debug("database:merge element - command updated: " + new_cmd)
+
+    def update_command_field(self, old_cmd, new_cmd):
+        """
+        update item command
+        first find the item with the old_cmd
+        then find if an item with the new_cmd exist already
+        based on that make an update or a merge
+        :param old_cmd:     old command string
+        :param new_cmd:     new command string
+        :return:            True   if update is successful. False otherwise
+        """
+        try:
+            if new_cmd is None or new_cmd is "":
+                logging.error("database - update_command_field: new command is null")
+                return False
+            if old_cmd == new_cmd:
+                logging.debug("database - update_command_field: no change needed")
+                return False
+
+            logging.debug("database - update_command_field: replace " + str(old_cmd) + "  with " + str(new_cmd))
+            self.cursor.execute("SELECT rowid, description, tags, counter FROM history WHERE command=?", (old_cmd,))
+            old_matches = self.cursor.fetchall()
+            matches_number = len(old_matches)
+            if matches_number == 1:
+                old_match = old_matches[0]
+                old_row_id = old_match[0]
+                self.cursor.execute("SELECT rowid, description, tags, counter FROM history WHERE command=?", (new_cmd,))
+                new_matches = self.cursor.fetchall()
+                new_matches_number = len(new_matches)
+                # the new command does not exist already
+                if new_matches_number == 0:
+                    new_date = self._get_time_now()
+                    self.cursor.execute("UPDATE history SET command=?, date=? WHERE rowid=?", (
+                        new_cmd,
+                        new_date,
+                        old_row_id))
+                    self.save_changes()
+                    return True
+                # the new command already exists
+                elif new_matches_number == 1:
+                    new_match = new_matches[0]
+                    new_row_id = new_match[0]
+                    # merge value in old cmd
+                    self._merge_elements(old_element=old_match,
+                                         new_cmd=new_cmd,
+                                         new_description=new_match[1],
+                                         new_tags=self._tags_string_to_array(new_match[2]),
+                                         new_counter=new_match[3])
+                    # delete old command
+                    self.cursor.execute("DELETE FROM history WHERE rowid=?", (new_row_id,))
+                    self.save_changes()
+                    return True
+                else:
+                    logging.debug("database - update_command_field - command entry is not unique: " + new_cmd)
+                    return False
+            elif matches_number == 0:
+                logging.error("database - update_command_field - command entry is not unique: " + old_cmd)
+                return False
+            else:
+                logging.error("database - update_command_field - fail because of no matched command")
+                return False
+
+        except Exception as e:
+            logging.error("database: update_command_field - throw an error: %s" % str(e))
+            self.rollback_changes()
             return False
 
     def update_tags_field(self, cmd, tags):
@@ -447,6 +563,7 @@ class DatabaseSQLite(object):
                 return False
         except Exception as e:
             logging.error("database - update_tags_field error: %s" % str(e))
+            self.rollback_changes()
             return False
 
     def update_description_field(self, cmd, description):
@@ -488,6 +605,7 @@ class DatabaseSQLite(object):
                 return False
         except Exception as e:
             logging.error("database - update_description_field error: %s" % str(e))
+            self.rollback_changes()
             return False
 
     def update_position_element(self, cmd):
@@ -525,6 +643,7 @@ class DatabaseSQLite(object):
                 return False
         except Exception as e:
             logging.error("database - update_position_element error: %s" % str(e))
+            self.rollback_changes()
             return False
 
     def remove_element(self, cmd):
@@ -552,14 +671,28 @@ class DatabaseSQLite(object):
             return True
         except Exception as e:
             logging.error("database - remove_element error: %s" % str(e))
+            self.rollback_changes()
             return False
+
+    def _cast_return_type(self, data):
+        """
+        change the tags return type from string to array
+        :param data:
+        :return:
+        """
+        new_data = []
+        for i in range(len(data)):
+            tags_str = data[i][2]
+            tags = self._tags_string_to_array(tags_str)
+            new_data.append([data[i][0], data[i][1], tags])
+        return new_data
 
     def _tags_string_to_array(self, tags_string):
         """
         given the string of tags form the db it split the tags word and put it into an array
         if the string is empty and empty array is returned
 
-        :param tags_string:     #tag1#tag2#tag3
+        :param tags_string:     ǁtag1ǁtag2ǁtag3
         :return:                ["tag1","tag2","tag3"]
         """
         if type(tags_string) is not str:
@@ -567,7 +700,11 @@ class DatabaseSQLite(object):
             return None
         if tags_string == "":
             return []
-        tags = tags_string.split(self.CHAR_TAG)
+        if tags_string[0] == self.CHAR_DIVIDER:
+            tags = tags_string.split(self.CHAR_DIVIDER)
+        else:
+            # old version of fastHistory uses the # as tags divider
+            tags = tags_string.split(self.CHAR_TAG)
         if len(tags) >= 2:
             # remove first always empty value
             tags = tags[1:]
@@ -590,7 +727,7 @@ class DatabaseSQLite(object):
         tags_string = ""
         for tag in tags:
             if len(tag) > 0:
-                tags_string += self.CHAR_TAG + tag
+                tags_string += self.CHAR_DIVIDER + tag
         return tags_string
 
     def _get_time_now(self):
