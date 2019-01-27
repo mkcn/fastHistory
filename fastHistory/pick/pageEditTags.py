@@ -18,7 +18,7 @@ class PageEditTags(PageInfo):
         :param context_shift:       context shift obj
         :param data_from_man_page:  obj with man info
         """
-        PageInfo.__init__(self, drawer, option, search_filters, context_shift, data_from_man_page)
+        PageInfo.__init__(self, drawer, option, search_filters, context_shift, data_from_man_page=data_from_man_page)
 
     def draw_page_edit(self, tags_text, tags_cursor_index, input_error_msg=None):
         """
@@ -41,7 +41,6 @@ class PageEditTags(PageInfo):
                          last_column_size=0)
 
         self.drawer.new_line()
-
         self._draw_edit_tag_field(tags_text)
 
         if self.search_filters[DataManager.INPUT.INDEX_IS_ADVANCED]:
@@ -53,14 +52,15 @@ class PageEditTags(PageInfo):
 
         self.draw_info_man_page(data_from_man_page=self.data_from_man_page)
 
-        self.draw_input_error_msg(input_error_msg, 3)
+        self.cursor_y = 4
+        self.draw_input_error_msg(input_error_msg, self.cursor_y - 1)
 
         # help line in the last line
         self._draw_help_line_info()
 
         # cursor set position
         self.drawer.show_cursor()
-        self.drawer.move_cursor(self.INDENT + tags_cursor_index, 4)
+        self.drawer.move_cursor(self.INDENT + tags_cursor_index, self.cursor_y)
 
     def _draw_edit_tag_field(self, new_tags_str):
         """

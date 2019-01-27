@@ -8,7 +8,7 @@ class PageEditCommand(PageInfo):
     whit this page the user can edit the current selected command
     """
 
-    def __init__(self, drawer, option, search_filters, context_shift, data_from_man_page):
+    def __init__(self, drawer, option, search_filters, context_shift, blocks_shift, data_from_man_page):
         """
         initialize page command description
 
@@ -16,9 +16,10 @@ class PageEditCommand(PageInfo):
         :param option:          selected option
         :param search_filters:  array of strings used to filter options
         :param context_shift:   context shift obj
+        :param blocks_shift:    blocks shift number
         :param data_from_man_page:  obj with man info
         """
-        PageInfo.__init__(self, drawer, option, search_filters, context_shift, data_from_man_page)
+        PageInfo.__init__(self, drawer, option, search_filters, context_shift, blocks_shift, data_from_man_page)
 
     def draw_page_edit(self, command_text, command_cursor_index, input_error_msg=None):
         """
@@ -49,14 +50,15 @@ class PageEditCommand(PageInfo):
 
         self.draw_info_man_page(data_from_man_page=self.data_from_man_page)
 
-        self.draw_input_error_msg(input_error_msg, 0)
+        self.cursor_y = 1
+        self.draw_input_error_msg(input_error_msg, self.cursor_y - 1)
 
         # help line in the last line
         self._draw_help_line_info()
 
         # cursor set position
         self.drawer.show_cursor()
-        self.drawer.move_cursor(self.INDENT + command_cursor_index, 1)
+        self.drawer.move_cursor(self.INDENT + command_cursor_index, self.cursor_y)
 
     def _draw_edit_command_field(self, new_command_str):
         """
