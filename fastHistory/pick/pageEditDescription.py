@@ -8,7 +8,7 @@ class PageEditDescription(PageInfo):
     whit this page the user can edit the description of the current selected command
     """
 
-    def __init__(self, drawer, option, search_filters, context_shift, data_from_man_page):
+    def __init__(self, drawer, option, search_filters, context_shift, blocks_shift, data_from_man_page):
         """
         initialize page edit description
 
@@ -16,9 +16,10 @@ class PageEditDescription(PageInfo):
         :param option:          selected option
         :param search_filters:  array of strings used to filter options
         :param context_shift:   context shift obj
+        :param blocks_shift:    blocks shift number
         :param data_from_man_page:  obj with man info
         """
-        PageInfo.__init__(self, drawer, option, search_filters, context_shift, data_from_man_page)
+        PageInfo.__init__(self, drawer, option, search_filters, context_shift, blocks_shift, data_from_man_page)
 
     def draw_page_edit(self, description_text, description_cursor_index, input_error_msg=None):
         """
@@ -41,6 +42,8 @@ class PageEditDescription(PageInfo):
                          last_column_size=0)
 
         self.drawer.new_line()
+        # this is assigned here because the 'draw info tags' could increase it
+        self.cursor_y = 4
 
         if self.search_filters[DataManager.INPUT.INDEX_IS_ADVANCED]:
             self.draw_info_tags(tags=self.option[DataManager.OPTION.INDEX_TAGS],
@@ -52,14 +55,14 @@ class PageEditDescription(PageInfo):
         self._draw_edit_description_field(description_text)
         self.draw_info_man_page(data_from_man_page=self.data_from_man_page)
 
-        self.draw_input_error_msg(input_error_msg, 6)
+        self.draw_input_error_msg(input_error_msg, self.cursor_y - 1)
 
         # help line in the last line
         self._draw_help_line_info()
 
         # cursor set position
         self.drawer.show_cursor()
-        self.drawer.move_cursor(self.INDENT + description_cursor_index, 7)
+        self.drawer.move_cursor(self.INDENT + description_cursor_index, self.cursor_y)
 
     def _draw_edit_description_field(self, new_description_str):
         """

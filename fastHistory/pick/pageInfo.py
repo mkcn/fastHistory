@@ -13,11 +13,14 @@ class PageInfo(PageGeneric):
     INDENT = 2
     SUB_TITLE_LEN = 15
 
+    MIN_BLOCK_NUM_TO_SHOW_TAGS = 1
+    MIN_BLOCK_NUM_TO_SHOW_DESCRIPTION = 2
+
     MESSAGE_NO_TAG = "To add a tag press "
     MESSAGE_NO_DESC = "To add a description press "
     MESSAGE_NO_MAN_PAGE_AVAILABLE = "No info available"
 
-    def __init__(self, drawer, option, search_filters, context_shift, data_from_man_page):
+    def __init__(self, drawer, option, search_filters, context_shift, blocks_shift=0, data_from_man_page=None):
         """
         initialize page info drawer
 
@@ -25,6 +28,7 @@ class PageInfo(PageGeneric):
         :param option:                  selected option
         :param search_filters:          array of strings used to filter options
         :param context_shift:           context shift obj
+        :param blocks_shift:            blocks shift number
         :param data_from_man_page:      data retrieved from the man page
         """
         PageGeneric.__init__(self, drawer)
@@ -32,6 +36,9 @@ class PageInfo(PageGeneric):
         self.search_filters = search_filters
         self.context_shift = context_shift
         self.data_from_man_page = data_from_man_page
+        self.cursor_y = 0
+
+        self.blocks_shift = blocks_shift
 
     def update_option_value(self, option):
         """
@@ -41,6 +48,25 @@ class PageInfo(PageGeneric):
         :return:
         """
         self.option = option
+
+    def shift_blocks_down(self):
+        """
+        move blocks down to show one block less
+        :return:
+        """
+        if self.blocks_shift < 2:
+            self.blocks_shift += 1
+
+    def shift_blocks_up(self):
+        """
+        move blocks up to show one block more
+        :return:
+        """
+        if self.blocks_shift > 0:
+            self.blocks_shift -= 1
+
+    def get_blocks_shift(self):
+        return self.blocks_shift
 
     def draw_page(self):
         """
@@ -109,30 +135,32 @@ class PageInfo(PageGeneric):
         :param filter_tags:     tag filters
         :return:
         """
-        self.drawer.new_line()
-        self.drawer.draw_row(self.CHAR_SPACE * self.SUB_TITLE_LEN, x=self.INDENT, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Tags", x=self.INDENT + 1, color=self.drawer.color_columns_title)
-        self.drawer.new_line()
-        self.drawer.draw_row(self.CHAR_SPACE * self.INDENT)
-        if tags is not None and len(tags) > 0:
-            for tag in tags:
-                self.drawer.draw_row(self.CHAR_TAG, color=self.drawer.color_hash_tag)
-                found = False
-                for filter_tag in filter_tags:
-                    # TODO make more efficient (use the index tag value)
-                    index_tag = tag.lower().find(filter_tag)
-                    if index_tag != -1:
-                        found = True
-                        self.draw_marked_string(tag, filter_tag, color_marked=self.drawer.color_search)
-                        break
-                if not found:
-                    self.drawer.draw_row(tag)
-                self.drawer.draw_row(self.CHAR_SPACE)
-        else:
-            self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
-            self.drawer.draw_row(self.MESSAGE_NO_TAG)
-            self.drawer.draw_row(self.CHAR_TAG + "]", color=self.drawer.color_hash_tag)
-        self.drawer.new_line()
+        if self.blocks_shift < self.MIN_BLOCK_NUM_TO_SHOW_TAGS:
+            self.drawer.new_line()
+            self.drawer.draw_row(self.CHAR_SPACE * self.SUB_TITLE_LEN, x=self.INDENT, color=self.drawer.color_columns_title)
+            self.drawer.draw_row("Tags", x=self.INDENT + 1, color=self.drawer.color_columns_title)
+            self.drawer.new_line()
+            self.drawer.draw_row(self.CHAR_SPACE * self.INDENT)
+            if tags is not None and len(tags) > 0:
+                for tag in tags:
+                    self.drawer.draw_row(self.CHAR_TAG, color=self.drawer.color_hash_tag)
+                    found = False
+                    for filter_tag in filter_tags:
+                        # TODO make more efficient (use the index tag value)
+                        index_tag = tag.lower().find(filter_tag)
+                        if index_tag != -1:
+                            found = True
+                            self.draw_marked_string(tag, filter_tag, color_marked=self.drawer.color_search)
+                            break
+                    if not found:
+                        self.drawer.draw_row(tag)
+                    self.drawer.draw_row(self.CHAR_SPACE)
+            else:
+                self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
+                self.drawer.draw_row(self.MESSAGE_NO_TAG)
+                self.drawer.draw_row(self.CHAR_TAG + "]", color=self.drawer.color_hash_tag)
+            self.drawer.new_line()
+            self.cursor_y += 3
 
     def draw_info_description(self, desc, filter_desc):
         """
@@ -142,19 +170,20 @@ class PageInfo(PageGeneric):
         :param filter_desc:     description filter
         :return:
         """
-        self.drawer.new_line()
-        self.drawer.draw_row(self.CHAR_SPACE * self.SUB_TITLE_LEN, x=self.INDENT, color=self.drawer.color_columns_title)
-        self.drawer.draw_row("Description", x=self.INDENT + 1, color=self.drawer.color_columns_title)
-        self.drawer.new_line()
-        self.drawer.draw_row(self.CHAR_SPACE * self.INDENT)
-        if desc is not None and len(desc) > 0:
-            self.drawer.draw_row(self.CHAR_DESCRIPTION, color=self.drawer.color_hash_tag)
-            self.draw_marked_string(desc, filter_desc, color_marked=self.drawer.color_search)
-        else:
-            self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
-            self.drawer.draw_row(self.MESSAGE_NO_DESC)
-            self.drawer.draw_row(self.CHAR_DESCRIPTION + "]", color=self.drawer.color_hash_tag)
-        self.drawer.new_line()
+        if self.blocks_shift < self.MIN_BLOCK_NUM_TO_SHOW_DESCRIPTION:
+            self.drawer.new_line()
+            self.drawer.draw_row(self.CHAR_SPACE * self.SUB_TITLE_LEN, x=self.INDENT, color=self.drawer.color_columns_title)
+            self.drawer.draw_row("Description", x=self.INDENT + 1, color=self.drawer.color_columns_title)
+            self.drawer.new_line()
+            self.drawer.draw_row(self.CHAR_SPACE * self.INDENT)
+            if desc is not None and len(desc) > 0:
+                self.drawer.draw_row(self.CHAR_DESCRIPTION, color=self.drawer.color_hash_tag)
+                self.draw_marked_string(desc, filter_desc, color_marked=self.drawer.color_search)
+            else:
+                self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
+                self.drawer.draw_row(self.MESSAGE_NO_DESC)
+                self.drawer.draw_row(self.CHAR_DESCRIPTION + "]", color=self.drawer.color_hash_tag)
+            self.drawer.new_line()
 
     def draw_info_man_page(self, data_from_man_page):
         """
@@ -172,24 +201,25 @@ class PageInfo(PageGeneric):
         info_man_shown = False
         self.drawer.new_line()
 
-        for item in data_from_man_page:
-            cmd_main = item[BashParser.INDEX_CMD]
-            cmd_flags = item[BashParser.INDEX_FLAGS]
-            # cmd meaning found in the man page
-            if cmd_main[BashParser.INDEX_MEANING]:
-                info_man_shown = True
-                self.drawer.draw_row(self.CHAR_SPACE * self.INDENT)
-                self.drawer.draw_row(cmd_main[BashParser.INDEX_VALUE], color=self.drawer.color_selected_row)
-                self.drawer.draw_row(": ")
-                # the cmd meaning could be on more line
-                self._draw_cmd_meaning(None, cmd_main[BashParser.INDEX_MEANING])
-                # print each flag meaning
-                for flag in cmd_flags:
-                    # if flag found in the man page
-                    if flag[BashParser.INDEX_MEANING]:
-                        self._draw_cmd_meaning([flag[BashParser.INDEX_VALUE]], flag[BashParser.INDEX_MEANING],
-                                               is_flag=True)
-                self.drawer.new_line()
+        if data_from_man_page is not None:
+            for item in data_from_man_page:
+                cmd_main = item[BashParser.INDEX_CMD]
+                cmd_flags = item[BashParser.INDEX_FLAGS]
+                # cmd meaning found in the man page
+                if cmd_main[BashParser.INDEX_MEANING]:
+                    info_man_shown = True
+                    self.drawer.draw_row(self.CHAR_SPACE * self.INDENT)
+                    self.drawer.draw_row(cmd_main[BashParser.INDEX_VALUE], color=self.drawer.color_selected_row)
+                    self.drawer.draw_row(": ")
+                    # the cmd meaning could be on more line
+                    self._draw_cmd_meaning(None, cmd_main[BashParser.INDEX_MEANING])
+                    # print each flag meaning
+                    for flag in cmd_flags:
+                        # if flag found in the man page
+                        if flag[BashParser.INDEX_MEANING]:
+                            self._draw_cmd_meaning([flag[BashParser.INDEX_VALUE]], flag[BashParser.INDEX_MEANING],
+                                                   is_flag=True)
+                    self.drawer.new_line()
         if not info_man_shown:
             self.drawer.draw_row(self.CHAR_SPACE * self.INDENT)
             self.drawer.draw_row("[", color=self.drawer.color_hash_tag)

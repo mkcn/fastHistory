@@ -220,7 +220,7 @@ class Picker(object):
                 tmp_options.append([False, option])
         return tmp_options
 
-    def run_loop_edit_command(self, data_from_man_page):
+    def run_loop_edit_command(self,blocks_shift, data_from_man_page):
         """
         loop to capture user input keys to interact with the "edit command" page
 
@@ -232,6 +232,7 @@ class Picker(object):
                                     option=self.current_selected_option,
                                     search_filters=self.data_manager.get_search_filters(),
                                     context_shift=self.context_shift,
+                                    blocks_shift=blocks_shift,
                                     data_from_man_page=data_from_man_page)
 
         current_command = self.current_selected_option[DataManager.OPTION.INDEX_CMD]
@@ -320,7 +321,7 @@ class Picker(object):
             else:
                 logging.error("loop edit command - input not handled: " + repr(c))
 
-    def run_loop_edit_description(self, data_from_man_page):
+    def run_loop_edit_description(self, blocks_shift, data_from_man_page):
         """
         loop to capture user input keys to interact with the "add description" page
 
@@ -332,6 +333,7 @@ class Picker(object):
                                         option=self.current_selected_option,
                                         search_filters=self.data_manager.get_search_filters(),
                                         context_shift=self.context_shift,
+                                        blocks_shift=blocks_shift,
                                         data_from_man_page=data_from_man_page)
 
         current_command = self.current_selected_option[DataManager.OPTION.INDEX_CMD]
@@ -556,8 +558,12 @@ class Picker(object):
             # <- command
             elif c == KEY_LEFT:
                 self.context_shift.shift_context_left()
+            elif c == KEY_DOWN:
+                page_info.shift_blocks_down()
+            elif c == KEY_UP:
+                page_info.shift_blocks_up()
             elif c in KEYS_EDIT:
-                if self.run_loop_edit_command(data_from_man_page):
+                if self.run_loop_edit_command(page_info.get_blocks_shift(), data_from_man_page):
                     # reload options from db
                     self.options = self.data_manager.filter(self.search_t.get_text_lower(),
                                                             self.index + self.get_number_options_to_draw())
@@ -574,7 +580,7 @@ class Picker(object):
                     self.get_options()
                     page_info.update_option_value(self.current_selected_option)
             elif c == KEY_AT:  # "@"
-                if self.run_loop_edit_description(data_from_man_page):
+                if self.run_loop_edit_description(page_info.get_blocks_shift(), data_from_man_page):
                     self.options = self.data_manager.filter(self.search_t.get_text_lower(),
                                                             self.index + self.get_number_options_to_draw())
                     self.update_options_to_draw()
