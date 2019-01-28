@@ -137,30 +137,30 @@ class PageInfo(PageGeneric):
         """
         if self.blocks_shift < self.MIN_BLOCK_NUM_TO_SHOW_TAGS:
             self.drawer.new_line()
+            self.cursor_y += 1
             self.drawer.draw_row(self.CHAR_SPACE * self.SUB_TITLE_LEN, x=self.INDENT, color=self.drawer.color_columns_title)
             self.drawer.draw_row("Tags", x=self.INDENT + 1, color=self.drawer.color_columns_title)
             self.drawer.new_line()
+            self.cursor_y += 1
             self.drawer.draw_row(self.CHAR_SPACE * self.INDENT)
             if tags is not None and len(tags) > 0:
                 for tag in tags:
+                    logging.debug("draw info tags - tag: " + str(tag))
+                    logging.debug("draw info tags - filter tag: " + str(filter_tags))
                     self.drawer.draw_row(self.CHAR_TAG, color=self.drawer.color_hash_tag)
-                    found = False
-                    for filter_tag in filter_tags:
-                        # TODO make more efficient (use the index tag value)
-                        index_tag = tag.lower().find(filter_tag)
-                        if index_tag != -1:
-                            found = True
-                            self.draw_marked_string(tag, filter_tag, color_marked=self.drawer.color_search)
-                            break
-                    if not found:
-                        self.drawer.draw_row(tag)
+                    count_printed_lines = self.draw_marked_string(tag, filter_tags,
+                                                                  color_marked=self.drawer.color_search,
+                                                                  multi_lines=True,
+                                                                  multi_lines_index=self.INDENT)
+                    self.cursor_y += count_printed_lines
                     self.drawer.draw_row(self.CHAR_SPACE)
             else:
                 self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
                 self.drawer.draw_row(self.MESSAGE_NO_TAG)
                 self.drawer.draw_row(self.CHAR_TAG + "]", color=self.drawer.color_hash_tag)
+                self.cursor_y += 1
             self.drawer.new_line()
-            self.cursor_y += 3
+            self.cursor_y += 1
 
     def draw_info_description(self, desc, filter_desc):
         """
@@ -178,7 +178,10 @@ class PageInfo(PageGeneric):
             self.drawer.draw_row(self.CHAR_SPACE * self.INDENT)
             if desc is not None and len(desc) > 0:
                 self.drawer.draw_row(self.CHAR_DESCRIPTION, color=self.drawer.color_hash_tag)
-                self.draw_marked_string(desc, filter_desc, color_marked=self.drawer.color_search)
+                self.draw_marked_string(desc, filter_desc,
+                                        color_marked=self.drawer.color_search,
+                                        multi_lines=True,
+                                        multi_lines_index=self.INDENT)
             else:
                 self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
                 self.drawer.draw_row(self.MESSAGE_NO_DESC)

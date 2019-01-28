@@ -75,29 +75,42 @@ class PageGeneric(object):
 
             if index_sub_str is not -1:
                 self.drawer.set_x(len_text)
-                self.drawer.draw_row(x= text[index_sub_str:index_sub_str + len_sub_str], color=color_marked)
+                self.drawer.draw_row(x=text[index_sub_str:index_sub_str + len_sub_str], color=color_marked)
 
             self.drawer.draw_row()
 
     def draw_marked_string(self, text, words_to_mark, color_default=1, color_marked=None,
-                           case_sensitive=False, recursive=True):
+                           case_sensitive=False, recursive=True, multi_lines=False, multi_lines_index=0):
         """
         given a string and a sub string it will print the string with the sub string of a different color
 
-        :param text:             string to print
-        :param words_to_mark:    array of strings to print with a different color
-        :param color_default:    default color
-        :param color_marked:     color sub string
-        :param case_sensitive:   case sensitive search
-        :param recursive:        if False stop the search at the first match, if True search all matches recursively
-        :return:
+        :param text:                string to print
+        :param words_to_mark:       array of strings to print with a different color
+        :param color_default:       default color
+        :param color_marked:        color sub string
+        :param case_sensitive:      case sensitive search
+        :param recursive:           False stop the search at the first match, True search all matches recursively
+        :param multi_lines:         True the multi lines are allowed, False if the string must be cut
+        :param multi_lines_index:   the starting index of the printed new lines
+        :return:                    the number of lines printed
         """
 
+        count_new_lines = 0
         for section in self.find_sections_to_mark(text, words_to_mark, case_sensitive, recursive):
             if not section[self.INDEX_SECTION_IS_MARKED]:
-                self.drawer.draw_row(section[self.INDEX_SECTION_VALUE], color=color_default)
+                color = color_default
             else:
-                self.drawer.draw_row(section[self.INDEX_SECTION_VALUE], color=color_marked)
+                color = color_marked
+            if not multi_lines:
+                self.drawer.draw_row(section[self.INDEX_SECTION_VALUE], color=color)
+            else:
+                unprinted = section[self.INDEX_SECTION_VALUE]
+                while unprinted != "":
+                    unprinted = self.drawer.draw_row(unprinted, color=color, return_unprinted=True)
+                    if unprinted != "":
+                        self.drawer.new_line(x=multi_lines_index)
+                        count_new_lines += 1
+        return count_new_lines
 
     def draw_option(self, option, search_filters, context_shift, last_column_size=0, selected=False):
         """

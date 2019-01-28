@@ -165,7 +165,7 @@ class Drawer(object):
     def get_max_y(self):
         return self.max_y
 
-    def draw_row(self, text, x=None, x_indent=0, color=1, allow_last_row=False):
+    def draw_row(self, text, x=None, x_indent=0, color=1, allow_last_row=False, return_unprinted=False):
         """
         draw data to console and take care to not exceed borders
         :param text:
@@ -173,8 +173,10 @@ class Drawer(object):
         :param x_indent:
         :param color:
         :param allow_last_row:
+        :param return_unprinted:
         :return:
         """
+        empty_str = ""
         # if x is defined use it as absolute x
         if x is None:
             self.x += x_indent
@@ -192,7 +194,7 @@ class Drawer(object):
             text_len = len(text)
             # if empty text
             if text_len == 0:
-                return
+                return empty_str
             # if no space left
             elif self.max_x - self.x <= 0:
                 self.terminal_screen.addstr(self.y, self.max_x - len(self.text_too_long) - 1, self.text_too_long, color)
@@ -214,10 +216,16 @@ class Drawer(object):
                 self.x += text_len
             else:
                 # cut part of text longer than max
-                cut_text = text[:(self.max_x - self.x - 1)]
+                cut_index = (self.max_x - self.x - 1)
+                cut_text = text[:cut_index]
                 self.terminal_screen.addstr(self.y, self.x, str(cut_text), color)
                 self.x += len(cut_text)
-                self.terminal_screen.addstr(self.y, self.max_x - len(self.text_too_long) - 1, self.text_too_long, color)
-                self.x += len(self.text_too_long)
+                if return_unprinted:
+                    # return the unprinted string
+                    return text[cut_index:]
+                else:
+                    self.terminal_screen.addstr(self.y, self.max_x - len(self.text_too_long) - 1, self.text_too_long, color)
+                    self.x += len(self.text_too_long)
+        return empty_str
 
 
