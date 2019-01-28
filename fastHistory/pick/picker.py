@@ -572,6 +572,10 @@ class Picker(object):
                     self.get_options()  # TODO check if needed
                     # update option to show
                     page_info.update_option_value(self.current_selected_option)
+                    # reload man page
+                    data_from_man_page = BashParser.load_data_for_info_from_man_page(
+                        self.current_selected_option[DataManager.OPTION.INDEX_CMD])
+                    page_info.update_man_page(data_from_man_page)
             elif c == KEY_TAG:  # "#"
                 if self.run_loop_edit_tags(data_from_man_page):
                     self.options = self.data_manager.filter(self.search_t.get_text_lower(),

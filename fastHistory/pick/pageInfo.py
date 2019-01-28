@@ -45,9 +45,16 @@ class PageInfo(PageGeneric):
         update option value, this is called when the data is changed and must be reloaded (e.g. edit tag)
 
         :param option:
-        :return:
         """
         self.option = option
+
+    def update_man_page(self, man_page):
+        """"
+        update man page info
+
+        :param man_page
+        """
+        self.data_from_man_page = man_page
 
     def shift_blocks_down(self):
         """
