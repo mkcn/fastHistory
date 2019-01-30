@@ -73,20 +73,7 @@ Furthermore, for each saved command you can get a fast summary from the man page
 
 # How to install
 
-**Warning**: this tool is still under development! A first version will be soon released
-
-1) download this repository
-```sh
-cd $HOME
-git clone https://github.com/mkcn/fastHistory.git
-```
-
-2) enable **fastHistory** in your terminal
-```sh
-echo 'source "$HOME/fastHistory/bash/f.sh"' >> .bashrc
-```
-
-done!
+[Download](https://github.com/mkcn/fastHistory/releases) the most recent version and follow the instructions
 
 
 # Commands and syntax
@@ -109,22 +96,22 @@ fadd command_to_save [#[tag [#tag ...]][@description]]
 f [filter]
 ```
 
-**OR search**: match any row where at least one of the following conditions is true:
+**OR search**: match any row where **at least one** of the following conditions is true:
 
-*  the __filter__ word is contained in the **command** 
-*  the __filter__ word is contained in one or more of the **tags**
-*  the __filter__ word is contained in the **description**
+* the __filter__ words are contained in the **command** 
+* the __filter__ words are contained in the **tags** list
+* the __filter__ words are contained in the **description**
 
 #### Advanced search
 ```
-f [command_filter] [#tag_filter ...] [@description_filter]
+f [filter] [#tag_filter ...] [@description_filter]
 ```
 
-**AND search**: match any rows where all the following conditions are true:
+**AND search**: match any rows where **all** the following conditions are true:
 
-*  the __command_filter__ is contained in the **command** 
-*  all the __tag_filter__ are contained in the tag list
-*  the __description_filter__ is contained in the **description**
+* the __filter__ words are contained in the **command** OR **tags** OR **description**
+* the __tag_filter__ words are contained in the **tag** list
+* the __description_filter__ words contained in the **description**
 
 
 License
