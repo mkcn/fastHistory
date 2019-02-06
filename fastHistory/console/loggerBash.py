@@ -16,10 +16,10 @@ class LoggerBash:
 		"""
 		initialize colored variable with default theme (AZURE)
 		"""
-		self.tag_colored = colors.Blue + "#" + colors.Color_Off
-		self.desc_colored = colors.Blue + "@" + colors.Color_Off
-		self.log_fh_info = colors.Blue + "fastHistory" + colors.Color_Off
-		self.log_debug = colors.Blue + "DEBUG" + colors.Color_Off
+		self.tag_colored = colors.Cyan + "#" + colors.Color_Off
+		self.desc_colored = colors.Cyan + "@" + colors.Color_Off
+		self.log_fh_info = colors.Cyan + "fastHistory" + colors.Color_Off
+		self.log_debug = colors.Cyan + "DEBUG" + colors.Color_Off
 
 		self.log_error = colors.Red + "ERROR" + colors.Color_Off
 		self.log_info = colors.White + "INFO " + colors.Color_Off
