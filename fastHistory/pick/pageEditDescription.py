@@ -45,12 +45,8 @@ class PageEditDescription(PageInfo):
         # this is assigned here because the 'draw info tags' could increase it
         self.cursor_y = 4
 
-        if self.search_filters[DataManager.INPUT.INDEX_IS_ADVANCED]:
-            self.draw_info_tags(tags=self.option[DataManager.OPTION.INDEX_TAGS],
-                                filter_tags=self.search_filters[DataManager.INPUT.INDEX_TAGS])
-        else:
-            self.draw_info_tags(tags=self.option[DataManager.OPTION.INDEX_TAGS],
-                                filter_tags=self.search_filters[DataManager.INPUT.INDEX_MAIN_WORDS])
+        self.draw_info_tags(tags=self.option[DataManager.OPTION.INDEX_TAGS],
+                            filter_tags=self.search_filters.get_tags())
 
         self._draw_edit_description_field(description_text)
         self.draw_info_man_page(data_from_man_page=self.data_from_man_page)

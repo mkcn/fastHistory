@@ -93,16 +93,10 @@ class PageInfo(PageGeneric):
                          last_column_size=0)
         self.drawer.new_line()
 
-        if self.search_filters[DataManager.INPUT.INDEX_IS_ADVANCED]:
-            self.draw_info_tags(tags=self.option[DataManager.OPTION.INDEX_TAGS],
-                                filter_tags=self.search_filters[DataManager.INPUT.INDEX_TAGS])
-            self.draw_info_description(desc=self.option[DataManager.OPTION.INDEX_DESC],
-                                       filter_desc=self.search_filters[DataManager.INPUT.INDEX_DESC_WORDS])
-        else:
-            self.draw_info_tags(tags=self.option[DataManager.OPTION.INDEX_TAGS],
-                                filter_tags=self.search_filters[DataManager.INPUT.INDEX_MAIN_WORDS])
-            self.draw_info_description(desc=self.option[DataManager.OPTION.INDEX_DESC],
-                                       filter_desc=self.search_filters[DataManager.INPUT.INDEX_MAIN_WORDS])
+        self.draw_info_tags(tags=self.option[DataManager.OPTION.INDEX_TAGS],
+                            filter_tags=self.search_filters.get_tags())
+        self.draw_info_description(desc=self.option[DataManager.OPTION.INDEX_DESC],
+                                   filter_desc=self.search_filters.get_description_words())
 
         self.draw_info_man_page(data_from_man_page=self.data_from_man_page)
         # help line in the last line
@@ -152,8 +146,6 @@ class PageInfo(PageGeneric):
             self.drawer.draw_row(self.CHAR_SPACE * self.INDENT)
             if tags is not None and len(tags) > 0:
                 for tag in tags:
-                    logging.debug("draw info tags - tag: " + str(tag))
-                    logging.debug("draw info tags - filter tag: " + str(filter_tags))
                     self.drawer.draw_row(self.CHAR_TAG, color=self.drawer.color_hash_tag)
                     count_printed_lines = self.draw_marked_string(tag, filter_tags,
                                                                   color_marked=self.drawer.color_search,

@@ -116,18 +116,13 @@ class PageGeneric(object):
         """
         draw selected option and highlight words match filters
         """
-
         cmd = option[DataManager.OPTION.INDEX_CMD]
         desc = option[DataManager.OPTION.INDEX_DESC]
         tags = option[DataManager.OPTION.INDEX_TAGS]
-        if search_filters[DataManager.INPUT.INDEX_IS_ADVANCED]:
-            filter_cmd = search_filters[DataManager.INPUT.INDEX_MAIN_WORDS]
-            filter_desc = search_filters[DataManager.INPUT.INDEX_DESC_WORDS]
-            filter_tags = search_filters[DataManager.INPUT.INDEX_TAGS]
-        else:
-            filter_cmd = search_filters[DataManager.INPUT.INDEX_MAIN_WORDS]
-            filter_desc = search_filters[DataManager.INPUT.INDEX_MAIN_WORDS]
-            filter_tags = search_filters[DataManager.INPUT.INDEX_MAIN_WORDS]
+
+        filter_cmd = search_filters.get_main_words()
+        filter_desc = search_filters.get_description_words()
+        filter_tags = search_filters.get_tags()
 
         self.drawer.new_line()
 

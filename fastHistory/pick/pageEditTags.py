@@ -43,12 +43,8 @@ class PageEditTags(PageInfo):
         self.drawer.new_line()
         self._draw_edit_tag_field(tags_text)
 
-        if self.search_filters[DataManager.INPUT.INDEX_IS_ADVANCED]:
-            self.draw_info_description(desc=self.option[DataManager.OPTION.INDEX_DESC],
-                                       filter_desc=self.search_filters[DataManager.INPUT.INDEX_DESC_WORDS])
-        else:
-            self.draw_info_description(desc=self.option[DataManager.OPTION.INDEX_DESC],
-                                       filter_desc=self.search_filters[DataManager.INPUT.INDEX_MAIN_WORDS])
+        self.draw_info_description(desc=self.option[DataManager.OPTION.INDEX_DESC],
+                                   filter_desc=self.search_filters.get_description_words())
 
         self.draw_info_man_page(data_from_man_page=self.data_from_man_page)
 

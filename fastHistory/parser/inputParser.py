@@ -1,6 +1,8 @@
 import re
 import logging
 
+from database.InputData import Input
+
 
 class InputParser(object):
     """
@@ -227,16 +229,16 @@ class InputParser(object):
             desc = None
 
         if is_advanced_search:
-            generic_word_filters = InputParser.get_list_words(cmd)
-            description_word_filters = InputParser.get_list_words(desc)
-            return [True,
-                    cmd,
-                    generic_word_filters,
-                    desc,
-                    description_word_filters,
-                    tags]
+            return Input(True,
+                         command_str=cmd,
+                         command_words=InputParser.get_list_words(cmd),
+                         description=desc,
+                         description_words=InputParser.get_list_words(desc),
+                         tags=tags)
         else:
-            return [False, cmd, InputParser.get_list_words(cmd)]
+            return Input(False,
+                         command_str=cmd,
+                         command_words=InputParser.get_list_words(cmd))
 
     @staticmethod
     def get_list_words(string):

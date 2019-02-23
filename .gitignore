@@ -10,7 +10,7 @@ venv/
 notes/
 
 # Log and user data
-fastHistory/data/
+data/
 
 # Ignored file for bashlex
 fastHistory/parser/bashlex/parsetab.py

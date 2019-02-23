@@ -3,7 +3,6 @@ from unittest import TestCase
 
 import os
 
-from database.dataManager import DataManager
 from parser.inputParser import InputParser
 
 
@@ -58,10 +57,10 @@ class TestInputParser(TestCase):
             if test[1] is None:
                 self.assertEqual(res, None)
             else:
-                self.assertEqual(res[DataManager.INPUT.INDEX_MAIN], test[1][0])
-                if res[DataManager.INPUT.INDEX_IS_ADVANCED]:
-                    self.assertEqual(res[DataManager.INPUT.INDEX_DESC], test[1][1])
-                    self.assertEqual(res[DataManager.INPUT.INDEX_TAGS], test[1][2])
+                self.assertEqual(res.get_main_str(), test[1][0])
+                if res.is_advanced():
+                    self.assertEqual(res.get_description_str(), test[1][1])
+                    self.assertEqual(res.get_tags(strict=True), test[1][2])
 
     def test_parse_cmd_search(self):
         """
@@ -71,10 +70,9 @@ class TestInputParser(TestCase):
         :return:
         """
         # [test, result]
-
         test_cases = [
             ["ls -la", ["ls -la", None, []]],
-            ["ls -la #", ["ls -la", None, [""]]],
+            ["ls -ll #", ["ls -ll", None, [""]]],
             ["ls -la # #", ["ls -la", None, ["", ""]]],
             ["ls -la @", ["ls -la", "", []]],
             ["ls -la #1", ["ls -la", None, ["1"]]],
@@ -107,10 +105,49 @@ class TestInputParser(TestCase):
 
         for test in test_cases:
             res = InputParser.parse_input(test[0], is_search_cmd=True)
-            self.assertEqual(res[DataManager.INPUT.INDEX_MAIN], test[1][0])
-            if res[DataManager.INPUT.INDEX_IS_ADVANCED]:
-                self.assertEqual(res[DataManager.INPUT.INDEX_DESC], test[1][1])
-                self.assertEqual(res[DataManager.INPUT.INDEX_TAGS], test[1][2])
+            self.assertEqual(res.get_main_str(), test[1][0])
+            if res.is_advanced():
+                self.assertEqual(res.get_description_str(), test[1][1])
+                self.assertEqual(res.get_tags(strict=True), test[1][2])
+
+    def test_parse_cmd_search_words(self):
+        """
+        test different combination of user input with tags and description
+        the test is successful if the returned array match the expected one
+
+        :return:
+        """
+        # [test, result]
+        test_cases = [
+            ["aa #aa @aa", [["aa"], ["aa"], ["aa"]]],
+            ["ls -la", [["ls", "-la"], [], []]],
+            ["ls -ll #", [["ls", "-ll"], [], [""]]],
+            ["ls -la # #", [["ls", "-la"], [], ["", ""]]],
+            ["ls -la @", [["ls", "-la"], [""], []]],
+            ["ls -la #1", [["ls", "-la"], [], ["1"]]],
+            ["ls -la #1 #2 #3 @desc", [["ls", "-la"], ["desc"], ["1", "2", "3"]]],
+
+            ["ls -la #2 words @3 words !", [["ls", "-la"], ["3", "words", "!"], ["2 words"]]],
+            ["echo 2 ", [["echo", "2"], [], []]],
+            [" echo 2  ",  [["echo", "2"], [], []]],
+
+            ["#allowed", [[""], [], ["allowed"]]],
+            [" #allowed", [[""], [], ["allowed"]]],
+            ["@allowed", [[""], ["allowed"], []]],
+            [" @allowed", [[""], ["allowed"], []]],
+
+            ["#", [[""], [], [""]]],
+            ["@", [[""], [""], []]]
+        ]
+
+        for test in test_cases:
+            res = InputParser.parse_input(test[0], is_search_cmd=True)
+            self.assertEqual(res.get_main_words(), test[1][0])
+            if res.is_advanced():
+                self.assertEqual(res.get_description_words(strict=True), test[1][1])
+                self.assertEqual(sorted(res.get_description_words(strict=False)), sorted(set(test[1][0] + test[1][1])))
+                self.assertEqual(res.get_tags(strict=True), test[1][2])
+                self.assertEqual(sorted(res.get_tags(strict=False)), sorted(set(test[1][0] + test[1][2])))
 
     def test_input_validation_edit_tags(self):
         """

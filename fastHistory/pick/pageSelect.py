@@ -35,7 +35,7 @@ class PageSelector(PageGeneric):
         :return:
         """
         # title
-        if search_filters[DataManager.INPUT.INDEX_IS_ADVANCED]:
+        if search_filters.is_advanced():
             self.drawer.draw_row(self.TITLE_ADVANCE_SEARCH, color=self.drawer.color_columns_title)
             title_len = len(self.TITLE_ADVANCE_SEARCH)
         else:
@@ -47,22 +47,21 @@ class PageSelector(PageGeneric):
         search_text = search_t.get_text_to_print()
 
         # search text
-        if search_filters[DataManager.INPUT.INDEX_IS_ADVANCED]:
-
-            if search_filters[DataManager.INPUT.INDEX_MAIN] != "":
+        if search_filters.is_advanced():
+            if search_filters.get_main_str() != "":
                 # find index of cmd filter in search text (e.g. "what" in "what #cmd @desc")
-                index_cmd = search_text.find(search_filters[DataManager.INPUT.INDEX_MAIN])
+                index_cmd = search_text.find(search_filters.get_main_str())
                 if index_cmd != -1:
                     # print until the end of the cmd option
-                    index_cmd_end = index_cmd + len(search_filters[DataManager.INPUT.INDEX_MAIN])
+                    index_cmd_end = index_cmd + len(search_filters.get_main_str())
                     self.drawer.draw_row(search_text[0:index_cmd])
                     self.drawer.draw_row(search_text[index_cmd:index_cmd_end])
                     # cut string with unprinted section
                     search_text = search_text[index_cmd_end:]
                 else:
-                    logging.error("option cmd string not found in search field: " + search_filters[DataManager.INPUT.INDEX_MAIN])
+                    logging.error("option cmd string not found in search field: " + search_filters.get_main_str())
 
-            for tag in search_filters[DataManager.INPUT.INDEX_TAGS]:
+            for tag in search_filters.get_tags(strict=True):
                 # find index of tag filter in search text (e.g. "cmd" in "what #cmd @desc")
                 index_tag = search_text.find(tag)
                 if index_tag != -1:
@@ -75,18 +74,18 @@ class PageSelector(PageGeneric):
                 else:
                     logging.error("option tag string not found in search field: " + tag)
 
-            if search_filters[DataManager.INPUT.INDEX_DESC] is not None:
+            if search_filters.get_description_str() is not None:
                 # find index of desc filter in search text (e.g. "desc" in "what #cmd @desc")
-                index_desc = search_text.find(search_filters[DataManager.INPUT.INDEX_DESC])
+                index_desc = search_text.find(search_filters.get_description_str())
                 if index_desc != -1:
                     # print until the end of the cmd option
-                    index_desc_end = index_desc + len(search_filters[DataManager.INPUT.INDEX_DESC])
+                    index_desc_end = index_desc + len(search_filters.get_description_str())
                     self.drawer.draw_row(search_text[0:index_desc], color=self.drawer.color_hash_tag)
                     self.drawer.draw_row(search_text[index_desc:index_desc_end])
                     # cut string with unprinted section
                     search_text = search_text[index_desc_end:]
                 else:
-                    logging.error("option tag string not found in search field: " + search_filters[DataManager.INPUT.INDEX_DESC])
+                    logging.error("option tag string not found in search field: " + search_filters.get_description_str())
 
             # print the rest of the unprinted text
             # NOTE: this is printed with color and it can contain "#" and "@"
@@ -135,7 +134,7 @@ class PageSelector(PageGeneric):
         :return:
         """
         msg_no_result = "no result"
-        if search_filters[DataManager.INPUT.INDEX_IS_ADVANCED]:
+        if search_filters.is_advanced():
             shift = 3
         else:
             shift = 1
@@ -165,7 +164,7 @@ class PageSelector(PageGeneric):
             self.drawer.new_line()
         """
 
-        if search_filters[DataManager.INPUT.INDEX_IS_ADVANCED]:
+        if search_filters.is_advanced():
             msg_help_title = " Advanced search syntax "
             msg_help = "[command_filter] [#tag_filter ...] [@description_filter]"
 

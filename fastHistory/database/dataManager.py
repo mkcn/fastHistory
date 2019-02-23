@@ -1,5 +1,6 @@
 import logging
 
+from database.InputData import Input
 from parser.inputParser import InputParser
 
 
@@ -14,18 +15,10 @@ class DataManager(object):
 		INDEX_DESC = 1
 		INDEX_TAGS = 2
 
-	class INPUT:
-		INDEX_IS_ADVANCED = 0
-		INDEX_MAIN = 1
-		INDEX_MAIN_WORDS = 2
-		INDEX_DESC = 3
-		INDEX_DESC_WORDS = 4
-		INDEX_TAGS = 5
-
 	DATABASE_MODE_SQLITE = 0
 	DATABASE_MODE_MYSQL = 1
 
-	DUMMY_SEARCH_FILTERS = [False, ""]
+	DUMMY_INPUT_DATA = Input(False, "", [])
 
 	def __init__(self, project_path, db_relative_path, old_db_relative_paths, mode=DATABASE_MODE_SQLITE):
 		self.last_search = None
@@ -36,7 +29,7 @@ class DataManager(object):
 		else:
 			logging.error("database mode not selected")
 		# set dummy as default
-		self.search_filters = self.DUMMY_SEARCH_FILTERS
+		self.search_filters = self.DUMMY_INPUT_DATA
 		# define special chars based on the chosen database
 		self.forbidden_chars = ['\n', '\r', self.database.CHAR_DIVIDER]
 
@@ -66,21 +59,20 @@ class DataManager(object):
 		search = search.lower()
 
 		# parse input search text
-		search_filters = InputParser.parse_input(search, is_search_cmd=True)
+		input_data = InputParser.parse_input(search, is_search_cmd=True)
 
-		if search_filters:
-			logging.debug("parsed input search filters: " + str(search_filters))
-			self.search_filters = search_filters
+		if input_data:
+			self.search_filters = input_data
 
-			if not self.search_filters[self.INPUT.INDEX_IS_ADVANCED]:
+			if not input_data.is_advanced():
 				filtered_data = self.database.get_last_n_filtered_elements(
-								generic_filters=search_filters[DataManager.INPUT.INDEX_MAIN_WORDS],
+								generic_filters=input_data.get_main_words(),
 								n=n)
 			else:
 				filtered_data = self.database.get_last_n_filtered_elements(
-								generic_filters=search_filters[DataManager.INPUT.INDEX_MAIN_WORDS],
-								description_filters=search_filters[DataManager.INPUT.INDEX_DESC_WORDS],
-								tags_filters=search_filters[DataManager.INPUT.INDEX_TAGS],
+								generic_filters=input_data.get_main_words(),
+								description_filters=input_data.get_description_words(strict=True),
+								tags_filters=input_data.get_tags(strict=True),
 								n=n)
 			if filtered_data:
 				return filtered_data
@@ -88,7 +80,7 @@ class DataManager(object):
 				return []
 		else:
 			# the string inserted does not match the regex and a dummy response is returned
-			self.search_filters = self.DUMMY_SEARCH_FILTERS
+			self.search_filters = self.DUMMY_INPUT_DATA
 			return []
 
 	def add_new_element(self, cmd, description, tags):

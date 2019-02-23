@@ -76,9 +76,9 @@ def handle_add_request(input_cmd_str, project_directory, error_feedback=False):
 			logger_console.log_on_console_info("Syntax : command [#[tag [#tag ...]][@description]]")
 			logger_console.log_on_console_info("Example: ls -la #tag1 #tag2 #tag2 @a long description")
 	else:
-		cmd = parser_res[DataManager.INPUT.INDEX_MAIN]
-		description = parser_res[DataManager.INPUT.INDEX_DESC]
-		tags = parser_res[DataManager.INPUT.INDEX_TAGS]
+		cmd = parser_res.get_main_str()
+		description = parser_res.get_description_str()
+		tags = parser_res.get_tags(strict=True)
 
 		data_manager = DataManager(project_directory, PATH_DATABASE_FILE, PATH_DATABASE_FILES_OLD, DATABASE_MODE)
 		stored = data_manager.add_new_element(cmd, description, tags)
