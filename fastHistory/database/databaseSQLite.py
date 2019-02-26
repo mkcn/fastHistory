@@ -408,31 +408,38 @@ class DatabaseSQLite(object):
                     tags_str = ""
                 else:
                     tags_str = self._tag_array_to_string(tags)
-                self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)",
-                                    (cmd,
+                if self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)", (
+                                     cmd,
                                      description,
                                      tags_str,
                                      counter,
                                      date,
                                      synced
-                                     ))
-                logging.debug("database:add element - added NEW")
+                                     )).rowcount != 1:
+                    self.rollback_changes()
+                    return False
+                else:
+                    self.save_changes()
+                    logging.debug("database:add element - added NEW")
+                    return True
             elif matches_number == 1:
                 # note: in this case the given 'date' and 'sync' values are ignored
-                self._merge_elements(old_element=matches[0],
-                                     new_cmd=cmd,
-                                     new_description=description,
-                                     new_tags=tags,
-                                     new_counter=None,
-                                     new_date=date,
-                                     update_id=(not imported))
-                self.save_changes()
+                if not self._merge_elements(old_element=matches[0],
+                                            new_cmd=cmd,
+                                            new_description=description,
+                                            new_tags=tags,
+                                            new_counter=None,
+                                            new_date=date,
+                                            update_id=(not imported)):
+                    self.rollback_changes()
+                    return False
+                else:
+                    self.save_changes()
+                    logging.debug("database:add element - added NEW (merged)")
+                    return True
             else:
                 logging.error("database:add element - command entry is not unique: " + cmd)
                 return False
-
-            self.save_changes()
-            return True
         except Exception as e:
             logging.error("database:add element - thrown an error: %s" % str(e))
             self.rollback_changes()
@@ -505,24 +512,29 @@ class DatabaseSQLite(object):
             # delete old row
             self.cursor.execute("DELETE FROM history WHERE rowid=?", (old_id,))
             # create new row which will have the highest rowID (last used command)
-            self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)",
+            if self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)",
                                 (new_cmd,
                                  description,
                                  tags_str,
                                  counter,
                                  date,
                                  synced
-                                 ))
+                                 )).rowcount != 1:
+                logging.error("database:merge element - insert failed")
+                return False
         else:
-            self.cursor.execute("UPDATE history SET command=?, description=?, tags=?, counter=?, date=? WHERE rowid=?", (
-                new_cmd,
-                description,
-                tags_str,
-                counter,
-                date,
-                old_id))
+            if self.cursor.execute("UPDATE history SET command=?, description=?, tags=?, counter=?, date=? WHERE rowid=?", (
+                    new_cmd,
+                    description,
+                    tags_str,
+                    counter,
+                    date,
+                    old_id)).rowcount != 1:
+                logging.error("database:merge element - update failed")
+                return False
 
         logging.debug("database:merge element - command updated: " + new_cmd)
+        return True
 
     def update_command_field(self, old_cmd, new_cmd):
         """
@@ -555,27 +567,33 @@ class DatabaseSQLite(object):
                 # the new command does not exist already
                 if new_matches_number == 0:
                     new_date = self._get_time_now()
-                    self.cursor.execute("UPDATE history SET command=?, date=? WHERE rowid=?", (
-                        new_cmd,
-                        new_date,
-                        old_row_id))
-                    self.save_changes()
-                    return True
+                    if self.cursor.execute("UPDATE history SET command=?, date=? WHERE rowid=?", (
+                            new_cmd,
+                            new_date,
+                            old_row_id)).rowcount != 1:
+                        self.rollback_changes()
+                        return False
+                    else:
+                        self.save_changes()
+                        return True
                 # the new command already exists
                 elif new_matches_number == 1:
                     new_match = new_matches[0]
                     new_row_id = new_match[0]
                     # merge value in old cmd
-                    self._merge_elements(old_element=old_match,
-                                         new_cmd=new_cmd,
-                                         new_description=new_match[1],
-                                         new_tags=self._tags_string_to_array(new_match[2]),
-                                         new_counter=new_match[3],  # use counter from new command
-                                         new_date=None)  # this will update the date to now
-                    # delete old command
-                    self.cursor.execute("DELETE FROM history WHERE rowid=?", (new_row_id,))
-                    self.save_changes()
-                    return True
+                    if not self._merge_elements(old_element=old_match,
+                                                new_cmd=new_cmd,
+                                                new_description=new_match[1],
+                                                new_tags=self._tags_string_to_array(new_match[2]),
+                                                new_counter=new_match[3],  # use counter from new command
+                                                new_date=None):  # this will update the date to now
+                        self.rollback_changes()
+                        return False
+                    else:
+                        # delete old command
+                        self.cursor.execute("DELETE FROM history WHERE rowid=?", (new_row_id,))
+                        self.save_changes()
+                        return True
                 else:
                     logging.debug("database - update_command_field - command entry is not unique: " + new_cmd)
                     return False
@@ -662,12 +680,15 @@ class DatabaseSQLite(object):
                 new_date = self._get_time_now()
                 if item_desc_str != description:
                     # update tags
-                    self.cursor.execute("UPDATE history SET description=?, date=? WHERE rowid=?", (
-                        description,
-                        new_date,
-                        item_row_id))
-                    self.save_changes()
-                    return True
+                    if self.cursor.execute("UPDATE history SET description=?, date=? WHERE rowid=?", (
+                            description,
+                            new_date,
+                            item_row_id)).rowcount != 1:
+                        self.rollback_changes()
+                        return False
+                    else:
+                        self.save_changes()
+                        return True
                 else:
                     return True
             else:
@@ -699,15 +720,18 @@ class DatabaseSQLite(object):
                 # delete old row
                 self.cursor.execute("DELETE FROM history WHERE rowid=?", (matched_id,))
                 # create new row which will have the highest rowID (last used command)
-                self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)", (
+                if self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)", (
                     cmd,
                     match[1],
                     match[2],
                     int(match[3]) + 1,
                     match[4],
-                    match[5]))
-                self.save_changes()
-                return True
+                    match[5])).rowcount != 1:
+                    self.rollback_changes()
+                    return False
+                else:
+                    self.save_changes()
+                    return True
             else:
                 logging.error("database - update_position_element - fail because of no matched command")
                 return False
@@ -726,19 +750,19 @@ class DatabaseSQLite(object):
         try:
             logging.info("delete command: " + str(cmd))
             if cmd is None:
-                logging.error("remove_element: " + "cmd is None")
+                logging.error("remove_element: cmd is None")
                 return False
-            # remove whitespaces on the left and right
-            cmd = cmd.strip()
             if len(cmd) == 0:
-                logging.error("remove_element: " + "cmd is empty")
+                logging.error("remove_element: cmd is empty")
                 return False
 
-            # delete item
-            self.cursor.execute("DELETE FROM history WHERE  command=?", (cmd,))
-            self.save_changes()
-            logging.debug("delete completed")
-            return True
+            if self.cursor.execute("DELETE FROM history WHERE  command=?", (cmd,)).rowcount != 1:
+                self.rollback_changes()
+                return False
+            else:
+                self.save_changes()
+                logging.debug("delete completed")
+                return True
         except Exception as e:
             logging.error("database - remove_element error: %s" % str(e))
             self.rollback_changes()

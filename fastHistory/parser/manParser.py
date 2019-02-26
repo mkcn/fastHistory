@@ -82,6 +82,10 @@ class ManParser(object):
             logging.error("load man page - timeout: " + str(cmd))
             self.man_page = None
             return False
+        except PermissionError as e:
+            logging.error("load man page - permission denied: " + str(cmd))
+            self.man_page = None
+            return False
 
     def open_interactive_man_page(self, cmd=None):
         """
