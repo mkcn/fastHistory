@@ -143,3 +143,12 @@ class DataManager(object):
 		:return:
 		"""
 		return self.database.get_all_data()
+
+	def import_data_to_db(self, db_abs_path):
+		"""
+		import data from old or backed up database file
+		:param db_abs_path:	database absolute path
+		:return:
+		"""
+		return self.database.import_external_database(db_abs_path)
+

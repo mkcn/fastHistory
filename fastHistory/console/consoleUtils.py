@@ -36,10 +36,12 @@ class ConsoleUtils:
 	def handler_close_signal(signum, frame):
 		"""
 		gracefully close the program when a SIGINT (ctrl + c) is detected
+		before to close it print a new line
 		:param signum:
 		:param frame:
 		:return:
 		"""
+		print("")
 		exit(0)
 
 	@staticmethod

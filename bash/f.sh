@@ -12,7 +12,7 @@ _fast_history_hooked_cmd=""
 _fast_history_short_cmd=false
 
 # define custom function to call the fastHistory in SEARCH mode
-fsearch() {
+f-search() {
     # trick to capture all input (otherwise the comments are removed)
     arguments=${_fast_history_hooked_cmd:${#FUNCNAME[0]} + 1}
     python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "search" "$arguments";
@@ -28,12 +28,34 @@ f() {
 }
 
 # define function to add a command to fastHistory without execute it
-fadd() {
+f-add() {
     # trick to capture all input (otherwise the comments are removed)
     arguments=${_fast_history_hooked_cmd:${#FUNCNAME[0]} + 1}
     python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "add-explicit" "$arguments";
     unset _fast_history_hooked_cmd;
     }
+    
+f-import(){
+    DIR=$1
+    if [ "${DIR:0:1}" = "/" ]; then
+        python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "import" "$1";
+    else
+        python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "import" "$(pwd)/$1";
+    fi
+}
+
+f-export(){
+    if [ $# -eq 0 ]; then
+    	python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "export" "fastHistory_$(date +'%Y-%m-%d').db";
+    else
+    	DIR=$1
+    	if [ "${DIR:0:1}" = "/" ]; then
+    	    python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "export" "$1";
+    	else
+    	    python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "export" "$(pwd)/$1";
+    	fi
+    fi
+}
 
 # load bash hook functions
 # more info: https://github.com/rcaloras/bash-preexec/

@@ -1,3 +1,4 @@
+import time
 import unittest
 import logging
 import os
@@ -244,9 +245,9 @@ class TestDatabaseSQLite(unittest.TestCase):
             logging.info(str(i))
         db.close()
 
-    def test_automatic_migration(self):
+    def test_automatic_migration_database_type_0(self):
         """
-        test migration from old databse (type 0) to current database
+        test migration from old database (type 0) to current database
 
         :return:
         """
@@ -292,7 +293,7 @@ class TestDatabaseSQLite(unittest.TestCase):
         # initialize new db
         db = DatabaseSQLite(self.output_test_path,
                             self.TEST_DB_FILENAME,
-                            [[0, self.TEST_DB_FILENAME_OLD]],  # 0 is the type
+                            [self.TEST_DB_FILENAME_OLD],
                             delete_all_data_from_db=True)
         data = db.get_all_data()
 
@@ -310,6 +311,189 @@ class TestDatabaseSQLite(unittest.TestCase):
 
         # check if migration is successful (true if old file does not exist anymore)
         self.assertFalse(os.path.exists(self.output_test_path + self.TEST_DB_FILENAME_OLD))
+
+    def test_import_database_type_0(self):
+        """
+        test import database (type 0) to current database
+
+        :return:
+        """
+        self._set_text_logger()
+
+        # clean test directory
+        if os.path.exists(self.output_test_path + self.TEST_DB_FILENAME_OLD):
+            os.remove(self.output_test_path + self.TEST_DB_FILENAME_OLD)
+
+        # create old db with structure type 0
+        self.conn = sqlite3.connect(self.output_test_path + self.TEST_DB_FILENAME_OLD)
+        self.cursor = self.conn.cursor()
+        self.cursor.execute("""CREATE TABLE history 
+            (
+                command  TEXT,
+                counter BIGINT,
+                description TEXT,
+                tags TEXT
+            )
+            """)
+        # add data with old structure (type 0)
+        self.cursor.execute("INSERT INTO history values (?, ?, ?, ?)",
+                            ("test1",
+                             2,
+                             "description",
+                             "#tag1#tag2#tag3"
+                             ))
+        self.cursor.execute("INSERT INTO history values (?, ?, ?, ?)",
+                            ("test2",
+                             4,
+                             "only description",
+                             ""
+                             ))
+        self.cursor.execute("INSERT INTO history values (?, ?, ?, ?)",
+                            ("test3",
+                             4,
+                             "",
+                             "#only-tags"
+                             ))
+        self.conn.commit()
+        self.conn.close()
+
+        # initialize new db
+        db = DatabaseSQLite(self.output_test_path,
+                            self.TEST_DB_FILENAME,
+                            [],
+                            delete_all_data_from_db=True)
+        result_import = db.import_external_database(self.output_test_path + self.TEST_DB_FILENAME_OLD)
+
+        # check if the number of element matches
+        self.assertEqual(result_import, 3)
+        # test search for command
+        res = db.get_last_n_filtered_elements(generic_filters=["test1"])
+        self.assertEqual(len(res), 1)
+        # test search for tag
+        res = db.get_last_n_filtered_elements(generic_filters=["only-tags"])
+        self.assertEqual(len(res), 1)
+        # test search for description
+        res = db.get_last_n_filtered_elements(generic_filters=["only description"])
+        self.assertEqual(len(res), 1)
+
+    def test_import_database_type_1(self):
+        """
+        test import database (type 1) to current database
+
+        :return:
+        """
+        self._set_text_logger()
+
+        # clean test directory
+        if os.path.exists(self.output_test_path + self.TEST_DB_FILENAME_OLD):
+            os.remove(self.output_test_path + self.TEST_DB_FILENAME_OLD)
+
+        # create old db with structure type 0
+        self.conn = sqlite3.connect(self.output_test_path + self.TEST_DB_FILENAME_OLD)
+        self.cursor = self.conn.cursor()
+        self.cursor.execute("""CREATE TABLE history 
+            (
+                command  TEXT,
+                description TEXT,
+                tags TEXT,
+                counter INTEGER,
+                date INTEGER,
+                synced TINYINT
+            )
+            """)
+        # add data with old structure (type 0)
+        self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)",
+                            ("test1",
+                             "description",
+                             "ǁtag1ǁtag2ǁtag3",
+                             2,
+                             1551202801,
+                             0
+                             ))
+        self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)",
+                            ("test2",
+                             "only description",
+                             "",
+                             4,
+                             int(time.time()),
+                             0
+                             ))
+        self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)",
+                            ("test3",
+                             "",
+                             "ǁonly-tags",
+                             4,
+                             int(time.time()),
+                             0
+                             ))
+        self.cursor.execute("INSERT INTO history values (?, ?, ?, ?, ?, ?)",
+                            ("test4-existing-item",
+                             "test4-new",
+                             "ǁtag4-new",
+                             4,
+                             1551202801,  # note: this is older than the item in the local database
+                             0
+                             ))
+        self.conn.commit()
+        self.conn.close()
+
+        # initialize new db
+        db = DatabaseSQLite(self.output_test_path,
+                            self.TEST_DB_FILENAME,
+                            [],
+                            delete_all_data_from_db=True)
+        # add element to create a merge conflict
+        db.add_element("test4-existing-item", "test4-old", ["tag4-old"], 7, date=1551202920, synced=0)
+        res = db.get_column_field("test4-existing-item", "rowid")
+        item_local_rowid = int(res)
+
+        # import the database twice (this should give the same result as importing it once)
+        db.import_external_database(self.output_test_path + self.TEST_DB_FILENAME_OLD)
+        result_import = db.import_external_database(self.output_test_path + self.TEST_DB_FILENAME_OLD)
+
+        # check if the number of element matches
+        self.assertEqual(result_import, 4)
+        # test search for command
+        res = db.get_last_n_filtered_elements(generic_filters=["test1"])
+        self.assertEqual(len(res), 1)
+        # test search for tag
+        res = db.get_last_n_filtered_elements(generic_filters=["only-tags"])
+        self.assertEqual(len(res), 1)
+        # test search for description
+        res = db.get_last_n_filtered_elements(generic_filters=["only description"])
+        self.assertEqual(len(res), 1)
+        res = db.get_last_n_filtered_elements(tags_filters=["tag4-old", "tag4-new"])
+        self.assertEqual(len(res), 1)
+
+        # check counter value
+        res = db.get_column_field("test1", "counter")
+        self.assertEqual(int(res), 2)
+
+        res = db.get_column_field("test4-existing-item", "counter")
+        self.assertEqual(int(res), 7)  # note: the kept value is the local one
+
+        # check date value
+        res = db.get_column_field("test1", "date")
+        self.assertEqual(int(res), 1551202801)
+
+        res = db.get_column_field("test4-existing-item", "date")
+        self.assertEqual(int(res), 1551202920)  # note: the kept value is the newest one
+
+        # check if row id value is kept the same
+        res = db.get_column_field("test4-existing-item", "rowid")
+        self.assertEqual(int(res), item_local_rowid)
+
+    def test_import_not_existing_database(self):
+        # clean test directory
+        if os.path.exists(self.output_test_path + self.TEST_DB_FILENAME_OLD):
+            os.remove(self.output_test_path + self.TEST_DB_FILENAME_OLD)
+
+        db = DatabaseSQLite(self.output_test_path,
+                            self.TEST_DB_FILENAME,
+                            old_db_relative_paths=None,
+                            delete_all_data_from_db=True)
+        result_import = db.import_external_database(self.output_test_path + self.TEST_DB_FILENAME_OLD + "")
+        self.assertEqual(result_import, -1)
 
     def _set_text_logger(self):
         """
