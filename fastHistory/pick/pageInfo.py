@@ -104,30 +104,6 @@ class PageInfo(PageGeneric):
         # cursor set position
         self.drawer.hide_cursor()
 
-    def _draw_help_line_info(self):
-        """
-        Draw info at the end of the console
-        :return:
-        """
-        self.drawer.set_y(self.drawer.get_max_y() - 1)
-        self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Select", x_indent=1, allow_last_row=True)
-
-        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Go back", x_indent=1, allow_last_row=True)
-
-        self.drawer.draw_row("Canc", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Delete", x_indent=1, allow_last_row=True)
-
-        self.drawer.draw_row(self.CHAR_EDIT, x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Edit", x_indent=1, allow_last_row=True)
-
-        self.drawer.draw_row(self.CHAR_TAG, x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Tag", x_indent=1, allow_last_row=True)
-
-        self.drawer.draw_row(self.CHAR_DESCRIPTION, x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Description", x_indent=1, allow_last_row=True)
-
     def draw_info_tags(self, tags, filter_tags):
         """
         draw tags section
@@ -269,3 +245,27 @@ class PageInfo(PageGeneric):
             self.drawer.set_y(row)
             self.drawer.draw_row(self.CHAR_SPACE + "Invalid input ", x_indent=2, color=self.drawer.color_search)
             self.drawer.draw_row(self.CHAR_SPACE + input_error_msg + self.CHAR_SPACE, color=self.drawer.color_selected_row)
+
+    def _draw_help_line_info(self):
+        """
+        Draw info at the end of the console
+        :return:
+        """
+        self.drawer.set_y(self.drawer.get_max_y() - 1)
+        self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Select", x_indent=1, allow_last_row=True)
+
+        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Go back", x_indent=1, allow_last_row=True)
+
+        self.drawer.draw_row("Del", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Delete", x_indent=1, allow_last_row=True)
+
+        self.drawer.draw_row(self.CHAR_EDIT + " ", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Edit", x_indent=1, allow_last_row=True)
+
+        self.drawer.draw_row(self.CHAR_TAG + " ", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Tag", x_indent=1, allow_last_row=True)
+
+        self.drawer.draw_row(self.CHAR_DESCRIPTION + " ", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Description", x_indent=1, allow_last_row=True)
