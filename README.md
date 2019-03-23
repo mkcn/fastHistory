@@ -65,10 +65,18 @@ $ f secure
 ![Search sample](images/sample.gif)
 
 
-Furthermore, for each saved command you can get a fast summary from the man page with details of the used options/flags
+For each saved command you can get a fast summary from the man page with details of the used options/flags
 **Warning**: this feature currently does not cover the syntax of all commands
 
 ![Info ls sample](images/show.info.ls.png)
+
+Furthermore, you can easily export/import all data to make __backups__ and to share your commands with a different machine
+
+```sh
+$ f-export
+
+$ f-import fastHistory_2019-03-23.db
+```
 
 
 # How to install
@@ -81,19 +89,19 @@ Furthermore, for each saved command you can get a fast summary from the man page
 #### Simple adding
 
 ```
-command_to_save [#[tag [#tag ...]][@description]]
+<command_to_save> #[<tag> [#<tag> ...]][@<description>]
 ```
 
 #### Explicit adding without execution
 
 ```
-fadd command_to_save [#[tag [#tag ...]][@description]]
+f-add <command_to_save> #[<tag> [#<tag> ...]][@<description>]
 ```
 
 #### Simple search 
 
 ```
-f [filter]
+f [<filter>]
 ```
 
 **OR search**: match any row where **at least one** of the following conditions is true:
@@ -104,7 +112,7 @@ f [filter]
 
 #### Advanced search
 ```
-f [filter] [#tag_filter ...] [@description_filter]
+f [<filter>] [#<tag_filter> ...] [@<description_filter>]
 ```
 
 **AND search**: match any rows where **all** the following conditions are true:
@@ -113,6 +121,19 @@ f [filter] [#tag_filter ...] [@description_filter]
 * the __tag_filter__ words are contained in the **tag** list
 * the __description_filter__ words contained in the **description**
 
+#### Export database
+```
+f-export [<output_name>]
+```
+* the __output__ is the file name of the output database (this parameter is optional)
+
+#### Import external database
+```
+f-import <input_name>
+```
+
+
+* the __input_name__ is the file name of the input database (e.g. fastHistory_2019-03-23.db)
 
 License
 ----
