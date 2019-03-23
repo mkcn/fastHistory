@@ -70,7 +70,7 @@ def handle_add_request(input_cmd_str, project_directory, error_feedback=False):
 	if parser_res is None:
 		if error_feedback:
 			logger_console.log_on_console_error("wrong input")
-			logger_console.log_on_console_info("syntax : f-add <command_to_save> #[<tag> [#<tag> ...]][@<description>]")
+			logger_console.log_on_console_info("syntax : f-add <command> #[<tag> [#<tag> ...]][@<description>]")
 			logger_console.log_on_console_info("example: f-add ls -la #tag1 #tag2 #tag2 @a long description")
 	else:
 		cmd = parser_res.get_main_str()
