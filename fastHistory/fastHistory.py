@@ -70,8 +70,8 @@ def handle_add_request(input_cmd_str, project_directory, error_feedback=False):
 	if parser_res is None:
 		if error_feedback:
 			logger_console.log_on_console_error("wrong input")
-			logger_console.log_on_console_info("syntax : command [#[tag [#tag ...]][@description]]")
-			logger_console.log_on_console_info("example: ls -la #tag1 #tag2 #tag2 @a long description")
+			logger_console.log_on_console_info("syntax : f-add <command_to_save> #[<tag> [#<tag> ...]][@<description>]")
+			logger_console.log_on_console_info("example: f-add ls -la #tag1 #tag2 #tag2 @a long description")
 	else:
 		cmd = parser_res.get_main_str()
 		description = parser_res.get_description_str()
@@ -119,7 +119,7 @@ def handle_import_db(db_abs_path, project_directory):
 											os.path.abspath(project_directory + PATH_LOG_FILE))
 	# show correct usage
 	logger_console.log_on_console_info("syntax : f-import FILENAME")
-	logger_console.log_on_console_info("example: f-import fastHistory_20180809.db")
+	logger_console.log_on_console_info("example: f-import fastHistory_2018-08-09.db")
 
 
 def handle_export_db(output_path, project_directory):
