@@ -43,9 +43,9 @@ class InputParser(object):
     TAGS_REGEXP_SEARCH_CMD = "((?:(?:^#|\ #)[\w\d\-\_\ \t]*)*)((?:^@|\ @)[\w\d\-\_\.\,\!\?\ \t\:\;\%\+\(\)]*)?$"
     # general
     #   - tag: allowed special chars: ' ' '-' '_' '\t'
-    #   - description: allowed special chars: '-' '_' '.' ',' '!' '?' ' ' '\t' ':' ';' '%' '+' '(' ')'
+    #   - description: allowed special chars: '-' '_' '.' ',' '!' '?' ' ' '\t' ':' ';' '%' '+' '(' ')' '\' '/' '%' '$'
     INPUT_TAGS_REGEXP = "^\ *((?:(?:#|\ #)[\w\d\-\_\ \t]*)*)$"
-    INPUT_DESCRIPTION_REGEXP = "^\ *(@[\w\d\-\_\.\,\!\?\ \t\:\;\%\+\(\)]*)$"
+    INPUT_DESCRIPTION_REGEXP = "^\ *(@[\w\d\-\_\.\,\!\?\ \t\:\;\%\+\(\)\\\/\'\%\$]*)$"
 
     @staticmethod
     def is_privacy_mode_enable(cmd):
