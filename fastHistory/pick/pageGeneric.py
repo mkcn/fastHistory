@@ -255,7 +255,7 @@ class PageGeneric(object):
         map_mark = [0] * string_len
         sections = []
 
-        if words_to_mark is None:
+        if words_to_mark is None or words_to_mark == "":
             return [[string, False]]
 
         for word in words_to_mark:

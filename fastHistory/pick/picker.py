@@ -24,6 +24,7 @@ KEY_TAB = '\t'
 KEY_ESC = '\x1b'  # NOTE: the KEY_ESC can be received with some delay
 KEY_CTRL_A = '\x01'
 KEY_CTRL_E = '\x05'
+KEY_CTRL_SPACE = '\x00'
 KEY_START = curses.KEY_HOME
 KEY_END = curses.KEY_END
 KEYS_EDIT = ('e', 'E')
@@ -632,7 +633,9 @@ class Picker(object):
                         self.search_t.get_text_lower(),
                         self.index + self.get_number_options_to_draw())
             elif c in KEYS_ENTER:
-                return self.get_selected()
+                return [True, self.get_selected()]
+            elif c == KEY_CTRL_SPACE:
+                return [False, self.get_selected()]
             # note: currently not implemented
             elif c == KEY_SELECT and self.is_multi_select:
                 self.mark_index()

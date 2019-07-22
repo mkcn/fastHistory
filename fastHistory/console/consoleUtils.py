@@ -4,10 +4,10 @@ import subprocess
 import termios
 import sys
 
-
 import struct
 import os
 
+import pyperclip
 
 class ConsoleUtils:
 	"""
@@ -31,6 +31,13 @@ class ConsoleUtils:
 		# clear output printed by the previous command
 		# and leave only the terminal with the submitted input
 		sys.stdout.write('\r')
+
+	@staticmethod
+	def set_value_clipboard(data):
+		try:
+			pyperclip.copy(data)
+		except:
+			print("error")
 
 	@staticmethod
 	def handler_close_signal(signum, frame):
