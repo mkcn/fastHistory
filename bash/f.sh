@@ -1,7 +1,15 @@
 #!/bin/bash
 
-# absolute path of the project folder
-_fast_history_project_directory="${BASH_SOURCE[0]%/*}/../"
+# check if bash or zsh
+if [ -n "$BASH_VERSION" ]; then
+	_fast_history_project_directory="${BASH_SOURCE[0]%/*}/../";
+elif [ -n "$ZSH_VERSION" ]; then
+	_fast_history_project_directory="$0:a:h/../";
+	echo "zsh detected";
+else
+	echo "[fastHistory][ERROR] your shell is not supported";
+	exit;
+fi
 
 # if true the return code of the executed command is check before to store it
 # by default this feature is disable
@@ -14,7 +22,7 @@ _fast_history_short_cmd=false
 # define custom function to call the fastHistory in SEARCH mode
 f-search() {
     # trick to capture all input (otherwise the comments are removed)
-    arguments=${_fast_history_hooked_cmd:${#FUNCNAME[0]} + 1}
+    arguments=${_fast_history_hooked_cmd:8 + 1}
     python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "search" "$arguments";
     unset _fast_history_hooked_cmd;
     }
@@ -22,7 +30,7 @@ f-search() {
 # define an alternative (shorter and faster to type) function to call the fastHistory in SEARCH mode
 f() {
     # trick to capture all input (otherwise the comments are removed)
-    arguments=${_fast_history_hooked_cmd:${#FUNCNAME[0]} + 1}
+    arguments=${_fast_history_hooked_cmd:1 + 1}
     python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "search" "$arguments";
     unset _fast_history_hooked_cmd;
 }
@@ -30,7 +38,7 @@ f() {
 # define function to add a command to fastHistory without execute it
 f-add() {
     # trick to capture all input (otherwise the comments are removed)
-    arguments=${_fast_history_hooked_cmd:${#FUNCNAME[0]} + 1}
+    arguments=${_fast_history_hooked_cmd:5 + 1}
     python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "add-explicit" "$arguments";
     unset _fast_history_hooked_cmd;
     }
