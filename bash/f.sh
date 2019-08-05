@@ -1,23 +1,61 @@
 #!/bin/bash
 
-# check if bash or zsh
-if [ -n "$BASH_VERSION" ]; then
-	_fast_history_project_directory="${BASH_SOURCE[0]%/*}/../";
-elif [ -n "$ZSH_VERSION" ]; then
-	_fast_history_project_directory="$0:a:h/../";
-	echo "zsh detected";
-else
-	echo "[fastHistory][ERROR] your shell is not supported";
-	exit;
-fi
+############################################################
+# tool: fastHistory
+# note: this script must be called with "source <file>" 
+# author: Mirko Conti
+# date: 2019-07-24
+############################################################
 
-# if true the return code of the executed command is check before to store it
-# by default this feature is disable
-_fast_history_check_return_code=false
 _fast_history_bash_debug=false
 
 _fast_history_hooked_cmd=""
 _fast_history_short_cmd=false
+# [sperimental feature, off by default] if true the return code of the executed command is check before to store it
+_fast_history_check_return_code=false
+
+# define internal log function 
+_fast_history_log() {
+	if [ "$1" = "error" ]; then
+		echo "[fastHistory][ERROR] $2";  
+	elif  [ "$1" = "info" ]; then
+		echo "[fastHistory][INFO ] $2"; 
+	elif [ "$1" = "debug" ] && $_fast_history_bash_debug ; then
+		echo "[fastHistory][DEBUG] $2";
+	fi
+}
+
+# start message
+_fast_history_log "debug" "loading fastHistory start..";
+
+# check if bash or zsh
+if [ -n "$BASH_VERSION" ]; then
+	_fast_history_log "debug" "bash detected";
+	_fast_history_project_directory="${BASH_SOURCE[0]%/*}/../";
+elif [ -n "$ZSH_VERSION" ]; then
+	_fast_history_log "debug" "zsh detected";
+	_fast_history_project_directory="$0:a:h/../";
+else
+	_fast_history_log "error" "your shell is not supported";
+	return 1;
+fi
+
+# check environment
+if [ -s "$_fast_history_project_directory"fastHistory/version.txt ]; then
+	_fast_history_log "debug" "installation folder: $_fast_history_project_directory";
+else
+	_fast_history_log "error" "cannot find installation folder";
+	return 1;
+fi
+
+# load bash hook functions (more info: https://github.com/rcaloras/bash-preexec/)
+source "$_fast_history_project_directory"bash/bash-preexec.sh;
+if [ -z "$__bp_imported" ]; then
+	_fast_history_log "error" "preexec cannot be loaded";
+	return 1;
+else
+	_fast_history_log "debug" "preexec loaded correctly";
+fi
 
 # define custom function to call the fastHistory in SEARCH mode
 f-search() {
@@ -43,6 +81,7 @@ f-add() {
     unset _fast_history_hooked_cmd;
     }
     
+# define function to import db
 f-import(){
     DIR=$1
     if [ "${DIR:0:1}" = "/" ]; then
@@ -52,6 +91,7 @@ f-import(){
     fi
 }
 
+# define function to export db
 f-export(){
     if [ $# -eq 0 ]; then
     	python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "export" "fastHistory_$(date +'%Y-%m-%d').db";
@@ -64,10 +104,6 @@ f-export(){
     	fi
     fi
 }
-
-# load bash hook functions
-# more info: https://github.com/rcaloras/bash-preexec/
-source "$_fast_history_project_directory"bash/bash-preexec.sh
 
 # "preexec" is executed just after a command has been read and is about to be executed
 # we store the hooked command in a bash variable
@@ -87,14 +123,15 @@ precmd() {
 				python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "add" "$_fast_history_hooked_cmd"
 				# clean the cmd, this is needed because precmd can be trigged without preexec (example ctrl+c)
 				unset _fast_history_hooked_cmd;
-			else
-				if $_fast_history_bash_debug ; then echo "[fastHistory][DEBUG] '#' not found: command ignored"; fi;
+			else	
+				_fast_history_log "debug" "shell command ignored";
 			fi;
 		else
-			if $_fast_history_bash_debug ; then echo "[fastHistory][DEBUG] error code detected: command ignored"; fi;
+			_fast_history_log "debug" "error code detected: command ignored";
 		fi;
-	else
-		if $_fast_history_bash_debug ; then echo "[fastHistory][DEBUG] _fast_history_hooked_cmd: empty"; fi;
 	fi;
      }
+     
+
+_fast_history_log "debug" "loading fastHistory completed. Use 'f' to start"; 
 
