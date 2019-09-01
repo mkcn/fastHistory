@@ -81,7 +81,21 @@ $ f-import fastHistory_2019-03-23.db
 
 # How to install
 
-[Download](https://github.com/mkcn/fastHistory/releases) the most recent version and follow the instructions
+- Download this repository
+
+  - `cd $HOME`
+
+  - `git clone https://github.com/mkcn/fastHistory.git`
+
+- Enable fastHistory in your terminal ()
+
+  - `echo 'source "$HOME/fastHistory/bash/f.sh"' >> .bashrc`
+
+- Close and reopen your terminal
+
+### How to update ###
+
+ - `git pull`
 
 
 # Commands and syntax
