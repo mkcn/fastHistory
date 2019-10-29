@@ -39,9 +39,9 @@ class ManParser(object):
     #       "\n      -q\n--quiet     Turn off Wget's output."
 
     _regexp_flag = r"^(?:OPTIONS)?((\n {2,7}-.+)?" \
-                   r"\n {2,7}(-.+, )*" \
+                   r"\n {2,7}(-.+[,;] )*" \
                    r"%s" \
-                   r"((\[)?[,=].+(\])?)?" \
+                   r"((\[)?[,;=].+(\])?)?" \
                    r"( .*)?" \
                    r"\n" \
                    r"( +.*\n)*)$"

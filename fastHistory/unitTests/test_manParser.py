@@ -66,7 +66,8 @@ class TestManParser(TestCase):
             "ls",
             "netstat",
             "wget",
-            "grep"
+            "grep",
+            "nmap"
         ]
         for t in test_string:
             logging.info("test: " + str(t))
@@ -92,7 +93,11 @@ class TestManParser(TestCase):
             ["lsof", "-i"],
             ["wget", "--quiet"],
             ["git", "--help"],
-            ["git", "--version"]
+            ["git", "--version"],
+            ["nmap", "-p"],
+            ["nmap", "-sC"],
+            ["nmap", "-sN"],  # -sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)
+            ["nmap", "-sF"],  # -sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)
         ]
         for t in test_string:
             logging.info("test: " + str(t))
