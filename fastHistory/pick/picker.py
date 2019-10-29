@@ -39,6 +39,7 @@ class Picker(object):
     DESCRIPTION_CONTEXT_LENGTH = 5
     EDIT_FIELD_MARGIN = 4
     SEARCH_FIELD_MARGIN = 23
+    TEXT_NOT_ALLOWED_STR = "text not allowed"
 
     DEBUG_MODE = True
 
@@ -275,9 +276,7 @@ class Picker(object):
                             logging.error(msg)
                             input_error_msg = msg
                     else:
-                        msg = "no tags and description are allowed here"
-                        logging.error(msg + ": " + str(command_t.get_text()))
-                        input_error_msg = msg
+                        input_error_msg = "no tags and description are allowed here"
 
             # exit without saving
             elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
@@ -313,7 +312,6 @@ class Picker(object):
                 self.drawer.reset()
                 command_t.set_max_x(self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
             elif type(c) is str:
-                # TODO check input max len
                 command_t.add_string(c, self.data_manager.get_forbidden_chars())
                 input_error_msg = None
             elif type(c) is int:
@@ -364,9 +362,7 @@ class Picker(object):
                         logging.error(msg)
                         input_error_msg = msg
                 else:
-                    msg = "new description text not allowed"
-                    logging.error(msg + ": " + str(description_t.get_text()))
-                    input_error_msg = msg
+                    input_error_msg = self.TEXT_NOT_ALLOWED_STR
 
             # exit without saving
             elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
@@ -389,7 +385,12 @@ class Picker(object):
             # delete a char of the search
             elif c in KEYS_DELETE:
                 description_t.delete_char()
-                input_error_msg = None
+                if input_error_msg is not None:
+                    new_description = InputParser.parse_description(description_t.get_text())
+                    if new_description is None:
+                        input_error_msg = self.TEXT_NOT_ALLOWED_STR
+                    else:
+                        input_error_msg = None
             # move cursor to the beginning
             elif c == KEY_START or c == KEY_CTRL_A:
                 description_t.move_cursor_to_start()
@@ -402,9 +403,12 @@ class Picker(object):
                 self.drawer.reset()
                 description_t.set_max_x(self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
             elif type(c) is str:
-                # TODO check input max len
                 description_t.add_string(c, self.data_manager.get_forbidden_chars())
-                input_error_msg = None
+                new_description = InputParser.parse_description(description_t.get_text())
+                if new_description is None:
+                    input_error_msg = self.TEXT_NOT_ALLOWED_STR
+                else:
+                    input_error_msg = None
             elif type(c) is int:
                 logging.debug("loop edit description - integer input not handled: " + repr(c))
             else:
@@ -458,9 +462,7 @@ class Picker(object):
                         logging.error(msg)
                         input_error_msg = msg
                 else:
-                    msg = "new tags text is not allowed"
-                    logging.error(msg + ": " + str(new_tags_t.get_text()))
-                    input_error_msg = msg
+                    input_error_msg = self.TEXT_NOT_ALLOWED_STR
             # exit without saving
             # TODO fix return if "alt+char" is pressed
             elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
@@ -486,7 +488,12 @@ class Picker(object):
                 # the delete is allowed if the search text is not empty and if
                 if new_tags_t.delete_char():
                     self.context_shift.reset_context_shifted()
-                input_error_msg = None
+                if input_error_msg is not None:
+                    new_tags_array = InputParser.parse_tags_str(new_tags_t.get_text())
+                    if new_tags_array is None:
+                        input_error_msg = self.TEXT_NOT_ALLOWED_STR
+                    else:
+                        input_error_msg = None
             # move cursor to the beginning
             elif c == KEY_START or c == KEY_CTRL_A:
                 new_tags_t.move_cursor_to_start()
@@ -500,7 +507,11 @@ class Picker(object):
                 new_tags_t.set_max_x(self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
             elif type(c) is str:
                 new_tags_t.add_string(c, self.data_manager.get_forbidden_chars())
-                input_error_msg = None
+                new_tags_array = InputParser.parse_tags_str(new_tags_t.get_text())
+                if new_tags_array is None:
+                    input_error_msg = self.TEXT_NOT_ALLOWED_STR
+                else:
+                    input_error_msg = None
             elif type(c) is int:
                 logging.debug("loop edit tag - integer input not handled: " + repr(c))
             else:
