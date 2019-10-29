@@ -16,36 +16,23 @@ class InputParser(object):
 
     EMTPY_STRING = ""
 
-    # https://regex101.com/r/Cs8C45/3
-    # examples:
-    #       ls - la  #
-    #       ls - la  # 1
-    #       ls - la  # 2#2
-    #       ls - la  # 1#2#3 @Mün
-    #       ls - la  # 1# 2#3 @Mün
-    #       ls - la  # 1# 2 #3 @Mün
-    #       ls - la  # 1#2	 @desc
-    #       ls - la  # @desc
-    #       echo \  # toignore #1
-    #       echo
-    #       "#toignore"  # 1-2
-    #       echo
-    #       "#toignore"  # @desc
-    #       ls - la  # toignore
+    # allowed chars
+    TAGS_ALLOWED_CHARS = "\w\d\-\_\ \t"
+    DESCRIPTION_ALLOWED_CHARS = "\w\d\-\_\.\,\!\?\ \t\:\;\%\+\(\)\\\/\'\"\`\%\$\="
+
+    # https://regex101.com/r/ZYtE0R/2
     # notes:
     #   - before each # a space is needed
     #   - before @ a space is NOT needed
-    TAGS_REGEXP_INSERT_CMD = "((?:\ #[\w\d\-\_\ \t]*)+)(@[\w\d\-\_\.\,\!\?\ \t\:\;\%\+\(\)]*)?$"
+    REGEXP_INSERT_CMD = "((?:\ #[" + TAGS_ALLOWED_CHARS + "]*)+)(@[" + DESCRIPTION_ALLOWED_CHARS + "]*)?$"
     # notes:
     #   - it can start with #
     #   - it can start with @
     #   - unless the string start with them, before each # and @ a space is needed
-    TAGS_REGEXP_SEARCH_CMD = "((?:(?:^#|\ #)[\w\d\-\_\ \t]*)*)((?:^@|\ @)[\w\d\-\_\.\,\!\?\ \t\:\;\%\+\(\)]*)?$"
+    REGEXP_SEARCH_CMD = "((?:(?:^#|\ #)[" + TAGS_ALLOWED_CHARS + "]*)*)((?:^@|\ @)[" + DESCRIPTION_ALLOWED_CHARS + "]*)?$"
     # general
-    #   - tag: allowed special chars: ' ' '-' '_' '\t'
-    #   - description: allowed special chars: '-' '_' '.' ',' '!' '?' ' ' '\t' ':' ';' '%' '+' '(' ')' '\' '/' '%' '$'
-    INPUT_TAGS_REGEXP = "^\ *((?:(?:#|\ #)[\w\d\-\_\ \t]*)*)$"
-    INPUT_DESCRIPTION_REGEXP = "^\ *(@[\w\d\-\_\.\,\!\?\ \t\:\;\%\+\(\)\\\/\'\%\$]*)$"
+    REGEXP_INPUT_TAGS = "^\ *((?:(?:#|\ #)[" + TAGS_ALLOWED_CHARS + "]*)*)$"
+    REGEXP_INPUT_DESCRIPTION = "^\ *(@[" + DESCRIPTION_ALLOWED_CHARS + "]*)$"
 
     @staticmethod
     def is_privacy_mode_enable(cmd):
@@ -63,7 +50,7 @@ class InputParser(object):
         :return:            if the input is valid -> array of tags (e.g. ['tag1','tag2','tag3','tag4-0')
                             otherwise None
         """
-        match = re.search(InputParser.INPUT_TAGS_REGEXP, tags_str, flags=re.UNICODE)
+        match = re.search(InputParser.REGEXP_INPUT_TAGS, tags_str, flags=re.UNICODE)
         if match:
             logging.debug("tag parser: regex matches")
             tags_str = match.group(1)
@@ -107,7 +94,7 @@ class InputParser(object):
         if description is InputParser.EMTPY_STRING:
             return InputParser.EMTPY_STRING
 
-        match = re.search(InputParser.INPUT_DESCRIPTION_REGEXP, description, flags=re.UNICODE)
+        match = re.search(InputParser.REGEXP_INPUT_DESCRIPTION, description, flags=re.UNICODE)
         if match:
             logging.debug("description parser: regex matches")
             desc_str = match.group(1)
@@ -138,7 +125,7 @@ class InputParser(object):
         :param cmd_str: command string to evaluate
         :return:        true if valid, false otherwise
         """
-        match = re.search(InputParser.TAGS_REGEXP_INSERT_CMD, cmd_str, flags=re.UNICODE)
+        match = re.search(InputParser.REGEXP_INSERT_CMD, cmd_str, flags=re.UNICODE)
 
         if match:
             logging.debug("command parser: regex matches")
@@ -178,9 +165,9 @@ class InputParser(object):
         is_advanced_search = False
 
         if is_search_cmd:
-            match = re.search(InputParser.TAGS_REGEXP_SEARCH_CMD, cmd, flags=re.UNICODE)
+            match = re.search(InputParser.REGEXP_SEARCH_CMD, cmd, flags=re.UNICODE)
         else:
-            match = re.search(InputParser.TAGS_REGEXP_INSERT_CMD, cmd, flags=re.UNICODE)
+            match = re.search(InputParser.REGEXP_INSERT_CMD, cmd, flags=re.UNICODE)
 
         if match:
             logging.debug("input parser: regex matches")

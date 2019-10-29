@@ -186,7 +186,7 @@ class TestInputParser(TestCase):
             ["", ""],
             ["@", ""],
             ["@description", "description"],
-            ["@-_.,!?\t :;%+()", "-_.,!?\t :;%+()"],
+            ["@-_.,!?\t :;%+()=", "-_.,!?\t :;%+()="],
             ["@#notvalid", None],
             [" @to-trim ", "to-trim"]
         ]
