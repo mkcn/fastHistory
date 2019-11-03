@@ -84,14 +84,18 @@ $ f-import fastHistory_2019-03-23.db
 - Download this repository
 
   - `cd $HOME`
-
   - `git clone https://github.com/mkcn/fastHistory.git`
 
-- Enable fastHistory in your terminal ()
+- Enable fastHistory for bash
 
   - `echo 'source "$HOME/fastHistory/bash/f.sh"' >> .bashrc`
 
-- Close and reopen your terminal
+- Enable fastHistory for zsh (**only if** zsh is installed)
+  
+  - `echo 'source "$HOME/fastHistory/bash/f.sh"' >> .zshrc`
+
+- Close and reopen your shell
+
 
 ### How to update ###
 
