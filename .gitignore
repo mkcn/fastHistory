@@ -11,6 +11,7 @@ notes/
 
 # Log and user data
 data/
+data_test/
 
 # Ignored file for bashlex
 fastHistory/parser/bashlex/parsetab.py
