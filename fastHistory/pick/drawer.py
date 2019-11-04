@@ -98,14 +98,19 @@ class Drawer(object):
     def wait_next_char(self):
         """
         wait input from user
+        the get_wch function supports wide characters, getch does not
+        to debug get_wch use curses.unctrl(c) and repr(c)
+        to debug getch use curses.keyname(c) and repr(c)
+        more info: https://docs.python.org/3/library/curses.html
+
+        on macOS the resize key does not work as expected
+        as a workaround we send the resize key when the get_wch throws an error
+
         :return:
         """
-        # this supports wide characters
         try:
             c = self.terminal_screen.get_wch()
         except curses.error:
-            # on macOS the resize key does not work as expected
-            # as a workaround we send the resize key when the get_wch throws an error
             return curses.KEY_RESIZE
         except ValueError:
             return ""

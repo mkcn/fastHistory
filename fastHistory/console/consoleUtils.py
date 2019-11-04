@@ -7,7 +7,6 @@ import sys
 import struct
 import os
 
-import pyperclip
 
 class ConsoleUtils:
 	"""
@@ -35,9 +34,11 @@ class ConsoleUtils:
 	@staticmethod
 	def set_value_clipboard(data):
 		try:
+			import pyperclip
 			pyperclip.copy(data)
-		except:
-			print("error")
+			return True
+		except Exception as e:
+			return False
 
 	@staticmethod
 	def handler_close_signal(signum, frame):

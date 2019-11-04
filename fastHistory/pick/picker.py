@@ -535,7 +535,9 @@ class Picker(object):
 
             # select current entry
             if c in KEYS_ENTER:
-                return self.get_selected()
+                return [True, self.get_selected()]
+            elif c == KEY_CTRL_SPACE:
+                return [False, self.get_selected()]
             # delete current selected option
             elif c == KEY_CANC:
                 self.data_manager.delete_element(self.current_selected_option[DataManager.OPTION.INDEX_CMD])
@@ -609,6 +611,7 @@ class Picker(object):
         self.initialize_options_to_draw()
 
         while True:
+
             if self.page_selector.has_minimum_size():
                 self.page_selector.clean_page()
                 self.page_selector.draw_page(
