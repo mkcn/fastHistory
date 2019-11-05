@@ -252,20 +252,20 @@ class PageInfo(PageGeneric):
         :return:
         """
         self.drawer.set_y(self.drawer.get_max_y() - 1)
-        self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Select", x_indent=1, allow_last_row=True)
+        self.drawer.draw_row("Enter ", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Select", allow_last_row=True)
 
-        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Go back", x_indent=1, allow_last_row=True)
+        self.drawer.draw_row("Tab ", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Go back", allow_last_row=True)
 
-        self.drawer.draw_row("Del", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Delete", x_indent=1, allow_last_row=True)
+        self.drawer.draw_row("Del ", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Delete", allow_last_row=True)
 
         self.drawer.draw_row(self.CHAR_EDIT + " ", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Edit", x_indent=1, allow_last_row=True)
+        self.drawer.draw_row("Edit", allow_last_row=True)
 
         self.drawer.draw_row(self.CHAR_TAG + " ", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Tag", x_indent=1, allow_last_row=True)
+        self.drawer.draw_row("Tag", allow_last_row=True)
 
         self.drawer.draw_row(self.CHAR_DESCRIPTION + " ", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Description", x_indent=1, allow_last_row=True)
+        self.drawer.draw_row("Description", allow_last_row=True)

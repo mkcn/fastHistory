@@ -80,8 +80,8 @@ class PageEditTags(PageInfo):
         :return:
         """
         self.drawer.set_y(self.drawer.get_max_y() - 1)
-        self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Save", x_indent=1, allow_last_row=True)
+        self.drawer.draw_row("Enter ", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Save", allow_last_row=True)
 
-        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Go back without saving", x_indent=1, allow_last_row=True)
+        self.drawer.draw_row("Tab ", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Go back without saving", allow_last_row=True)

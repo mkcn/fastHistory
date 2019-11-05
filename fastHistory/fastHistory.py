@@ -43,7 +43,7 @@ def handle_search_request(input_cmd_str, project_directory, theme, last_column_s
 			ConsoleUtils.fill_terminal_input(selected_option[1])
 		else:
 			if ConsoleUtils.set_value_clipboard(selected_option[1]):
-				logger_console.log_on_console_info("command copied")
+				logger_console.log_on_console_info("command copied to clipboard")
 			else:
 				logger_console.log_on_console_error("pyperclip package not found")
 				logger_console.log_on_console_error("To enable auto-copy execute the following command:")
