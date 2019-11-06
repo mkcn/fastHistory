@@ -66,6 +66,7 @@ $ f secure
 
 
 For each saved command you can get a fast summary from the man page with details of the used options/flags
+
 **Warning**: this feature currently does not cover the syntax of all commands
 
 ![Info ls sample](images/show.info.srm.png)
