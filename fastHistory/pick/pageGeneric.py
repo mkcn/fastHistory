@@ -95,7 +95,6 @@ class PageGeneric(object):
         :return:                    the number of lines printed
         """
 
-        count_new_lines = 0
         for section in self.find_sections_to_mark(text, words_to_mark, case_sensitive, recursive):
             if not section[self.INDEX_SECTION_IS_MARKED]:
                 color = color_default
@@ -109,8 +108,6 @@ class PageGeneric(object):
                     unprinted = self.drawer.draw_row(unprinted, color=color, return_unprinted=True)
                     if unprinted != "":
                         self.drawer.new_line(x=multi_lines_index)
-                        count_new_lines += 1
-        return count_new_lines
 
     def draw_option(self, option, search_filters, context_shift, last_column_size=0, selected=False):
         """
