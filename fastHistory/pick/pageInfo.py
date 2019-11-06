@@ -123,17 +123,15 @@ class PageInfo(PageGeneric):
             if tags is not None and len(tags) > 0:
                 for tag in tags:
                     self.drawer.draw_row(self.CHAR_TAG, color=self.drawer.color_hash_tag)
-                    count_printed_lines = self.draw_marked_string(tag, filter_tags,
-                                                                  color_marked=self.drawer.color_search,
-                                                                  multi_lines=True,
-                                                                  multi_lines_index=self.INDENT)
-                    self.cursor_y += count_printed_lines
+                    self.draw_marked_string(tag, filter_tags,
+                                            color_marked=self.drawer.color_search,
+                                            multi_lines=False,
+                                            multi_lines_index=self.INDENT)
                     self.drawer.draw_row(self.CHAR_SPACE)
             else:
                 self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
                 self.drawer.draw_row(self.MESSAGE_NO_TAG)
                 self.drawer.draw_row(self.CHAR_TAG + "]", color=self.drawer.color_hash_tag)
-                self.cursor_y += 1
             self.drawer.new_line()
             self.cursor_y += 1
 
