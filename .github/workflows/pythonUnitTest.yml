@@ -1,0 +1,25 @@
+name: Python UnitTest
+
+on: [push]
+
+jobs:
+  build:
+    strategy:
+        matrix:
+            os: [ubuntu-18.04]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.6
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.6
+    - name: Check environment
+      run: |
+          lsb_release -a
+          python --version
+    - name: Test with UnitTest
+      run: |
+          python3 -m unittest discover -s /home/runner/work/fastHistory/fastHistory/fastHistory/
