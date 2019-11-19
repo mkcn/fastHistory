@@ -16,10 +16,12 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: 3.6
-    - name: Check environment
+    - name: Check environment and install dependences 
       run: |
           lsb_release -a
           python --version
+          # nmap is needed for the man parser in UnitTest
+          apt-get install nmap 
     - name: Test with UnitTest
       run: |
           python3 -m unittest discover -s /home/runner/work/fastHistory/fastHistory/fastHistory/
