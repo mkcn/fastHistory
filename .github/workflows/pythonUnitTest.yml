@@ -21,7 +21,7 @@ jobs:
           lsb_release -a
           python --version
           # nmap is needed for the man parser in UnitTest
-          apt-get install nmap 
+          sudo apt-get install nmap 
     - name: Test with UnitTest
       run: |
           python3 -m unittest discover -s /home/runner/work/fastHistory/fastHistory/fastHistory/
