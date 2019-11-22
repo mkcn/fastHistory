@@ -261,6 +261,9 @@ class PageInfo(PageGeneric):
         self.drawer.draw_row("Del ", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Delete", allow_last_row=True)
 
+        self.drawer.draw_row("M ", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("man", allow_last_row=True)
+
         self.drawer.draw_row(self.CHAR_EDIT + " ", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Edit", allow_last_row=True)
 

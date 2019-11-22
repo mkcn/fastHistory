@@ -27,6 +27,28 @@ class Drawer(object):
         self.color_columns_title = None
         self.init_colors(theme)
 
+    def update_screen(self):
+        # TODO find better solution, this create a new screen and fix the mess made by the "less" command
+        stdscr = curses.initscr()
+
+        # Turn off echoing of keys, and enter cbreak mode,
+        # where no buffering is performed on keyboard input
+        curses.noecho()
+        curses.cbreak()
+
+        # In keypad mode, escape sequences for special keys
+        # (like the cursor keys) will be interpreted and
+        # a special value like curses.KEY_LEFT will be returned
+        stdscr.keypad(1)
+        self.terminal_screen = stdscr
+
+    def close_screen(self):
+        # TODO find solution, this screen cannot be properly cleaned when program exits
+        self.terminal_screen.keypad(0)
+        curses.echo()
+        curses.nocbreak()
+        curses.endwin()
+
     def init_colors(self, theme):
         """
         define and set console colors

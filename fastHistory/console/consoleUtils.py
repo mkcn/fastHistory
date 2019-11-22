@@ -68,9 +68,9 @@ class ConsoleUtils:
 		:return:    return true if the man page has been open correctly
 		"""
 		if cmd is not None:
-			res = subprocess.call(["man", cmd])
-			if res == 0:
-				return True
-			else:
+			try:
+				res = subprocess.call(["man", cmd])
+				return res == 0
+			except Exception as e:
 				return False
-		return None
+		return False

@@ -28,6 +28,7 @@ KEY_CTRL_SPACE = '\x00'
 KEY_START = curses.KEY_HOME
 KEY_END = curses.KEY_END
 KEYS_EDIT = ('e', 'E')
+KEYS_MAN = ('m', 'M')
 KEY_TAG = '#'
 KEY_AT = '@'
 
@@ -549,12 +550,13 @@ class Picker(object):
             elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
                 return None
             # open man page
-            elif c == 109:  # char 'm'
-                # TODO fix and show description in help line
+            elif c in KEYS_MAN:
                 from console import consoleUtils
                 cmd = data_from_man_page[0][BashParser.INDEX_CMD][BashParser.INDEX_VALUE]
                 consoleUtils.ConsoleUtils.open_interactive_man_page(cmd)
-                return ""
+                # TODO fix this. Partial solution
+                self.drawer.update_screen()
+
             # -> command
             elif c == KEY_RIGHT:
                 self.context_shift.shift_context_right()
