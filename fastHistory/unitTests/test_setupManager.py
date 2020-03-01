@@ -37,8 +37,10 @@ class TestSetupManager(TestCase):
         logging.basicConfig(filename=self.log_path, level=logging.DEBUG)
 
     def _clean_and_setup_environment(self, bash=False, zsh=False):
-        shutil.rmtree(self.folder_installation)
-        shutil.rmtree(self.folder_home)
+        if os.path.exists(self.folder_installation):
+            shutil.rmtree(self.folder_installation)
+        if os.path.exists(self.folder_home):
+            shutil.rmtree(self.folder_home)
         if not os.path.exists(self.output_test_path):
             os.makedirs(self.output_test_path)
         if not os.path.exists(self.folder_installation):
@@ -126,9 +128,9 @@ class TestSetupManager(TestCase):
         self.assertTrue(f.read().find(self.path_bashrc) == -1)
         f.close()
 
-    def test_backup_rc_creation(self):       
-	#TODO
-	pass 
+    def test_backup_rc_creation(self):
+        #TODO
+        pass 
 
     def _set_text_logger(self):
         """
