@@ -101,7 +101,6 @@ __bp_precmd_invoke_cmd() {
     # Invoke every function defined in our function array.
     local precmd_function
     for precmd_function in "${precmd_functions[@]}"; do
-
         # Only execute this function if it actually exists.
         # Test existence of functions with: declare -[Ff]
         if type -t "$precmd_function" 1>/dev/null; then
@@ -182,18 +181,22 @@ __bp_preexec_invoke_exec() {
         fi
     fi
 
-    if  __bp_in_prompt_command "$BASH_COMMAND"; then
+    local this_command
+    this_command=$(HISTTIMEFORMAT= builtin history 1 | { IFS=" " read -r _ this_command; echo "$this_command"; })
+	
+    # FastHistory change: if this is a comment allow it
+    if [[ "$this_command" != "#"* ]] && __bp_in_prompt_command "$BASH_COMMAND"; then
         # If we're executing something inside our prompt_command then we don't
         # want to call preexec. Bash prior to 3.1 can't detect this at all :/
         __bp_preexec_interactive_mode=""
+    	echo "[bash-preexec] command ignored"; # TODO remove
         return
     fi
-
-    local this_command
-    this_command=$(HISTTIMEFORMAT= builtin history 1 | { IFS=" " read -r _ this_command; echo "$this_command"; })
+    echo "[bash-preexec] command found";  # TODO remove
 
     # Sanity check to make sure we have something to invoke our function with.
     if [[ -z "$this_command" ]]; then
+    	echo "[bash-preexec] command empty";  # TODO remove
         return
     fi
 
@@ -206,7 +209,6 @@ __bp_preexec_invoke_exec() {
     local preexec_function_ret_value
     local preexec_ret_value=0
     for preexec_function in "${preexec_functions[@]}"; do
-
         # Only execute each function if it actually exists.
         # Test existence of function with: declare -[fF]
         if type -t "$preexec_function" 1>/dev/null; then

@@ -3,7 +3,7 @@ import unittest
 import logging
 import os
 import inspect
-from database.databaseSQLite import DatabaseSQLite
+from fastHistory.database.databaseSQLite import DatabaseSQLite
 import sqlite3
 from datetime import datetime
 

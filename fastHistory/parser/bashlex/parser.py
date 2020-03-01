@@ -1,7 +1,7 @@
 import os, copy
 
-from parser.bashlex import yacc, flags, errors, heredoc
-from parser.bashlex import tokenizer, state, ast, subst
+from fastHistory.parser.bashlex import yacc, flags, errors, heredoc
+from fastHistory.parser.bashlex import tokenizer, state, ast, subst
 
 
 def _partsspan(parts):

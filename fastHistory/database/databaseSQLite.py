@@ -3,7 +3,7 @@ import logging
 import os
 import time
 
-from database.databaseCommon import DatabaseCommon
+from fastHistory.database.databaseCommon import DatabaseCommon
 
 
 class DatabaseSQLite(object):

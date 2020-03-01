@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from parser import bashlex, bashParser
+from fastHistory.parser import bashlex, bashParser
 
 
 class TestBashParser(TestCase):

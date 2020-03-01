@@ -1,7 +1,7 @@
 import logging
 
-from parser import bashlex
-from parser.manParser import ManParser
+from fastHistory.parser import bashlex
+from fastHistory.parser.manParser import ManParser
 
 
 class BashParser(object):

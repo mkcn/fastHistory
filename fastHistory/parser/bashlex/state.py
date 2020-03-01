@@ -1,4 +1,4 @@
-from parser.bashlex import flags
-from parser.bashlex import utils
+from fastHistory.parser.bashlex import flags
+from fastHistory.parser.bashlex import utils
 
 parserstate = lambda: utils.typedset(flags.parser)

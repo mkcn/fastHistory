@@ -1,7 +1,7 @@
 import logging
 
-from database.InputData import Input
-from parser.inputParser import InputParser
+from fastHistory.database.InputData import Input
+from fastHistory.parser.inputParser import InputParser
 
 
 class DataManager(object):
@@ -24,7 +24,7 @@ class DataManager(object):
 		self.last_search = None
 		self.filtered_data = None
 		if mode == self.DATABASE_MODE_SQLITE:
-			from database.databaseSQLite import DatabaseSQLite
+			from fastHistory.database.databaseSQLite import DatabaseSQLite
 			self.database = DatabaseSQLite(project_path, db_relative_path, old_db_relative_paths)
 		else:
 			logging.error("database mode not selected")

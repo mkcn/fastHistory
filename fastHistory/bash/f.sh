@@ -7,12 +7,13 @@
 # date: 2019-07-24
 ############################################################
 
-_fast_history_bash_debug=false
+_fast_history_bash_debug=true
 
 _fast_history_hooked_cmd=""
 _fast_history_short_cmd=false
 # [sperimental feature, off by default] if true the return code of the executed command is check before to store it
 _fast_history_check_return_code=false
+_fast_history_executable=fff
 
 # define internal log function 
 _fast_history_log() {
@@ -41,7 +42,7 @@ else
 fi
 
 # check environment
-if [ -s "$_fast_history_project_directory"fastHistory/version.txt ]; then
+if [ -s "$_fast_history_project_directory"../fastHistory/__init__.py ]; then
 	_fast_history_log "debug" "installation folder: $_fast_history_project_directory";
 else
 	_fast_history_log "error" "cannot find installation folder";
@@ -57,57 +58,31 @@ else
 	_fast_history_log "debug" "preexec loaded correctly";
 fi
 
-# define custom function to call the fastHistory in SEARCH mode
-f-search() {
-    # trick to capture all input (otherwise the comments are removed)
-    arguments=${_fast_history_hooked_cmd:8 + 1}
-    python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "search" "$arguments";
-    unset _fast_history_hooked_cmd;
-    }
-
-# define an alternative (shorter and faster to type) function to call the fastHistory in SEARCH mode
-f() {
-    # trick to capture all input (otherwise the comments are removed)
-    arguments=${_fast_history_hooked_cmd:1 + 1}
-    python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "search" "$arguments";
-    unset _fast_history_hooked_cmd;
-}
-
-# define function to add a command to fastHistory without execute it
-f-add() {
-    # trick to capture all input (otherwise the comments are removed)
-    arguments=${_fast_history_hooked_cmd:5 + 1}
-    python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "add-explicit" "$arguments";
-    unset _fast_history_hooked_cmd;
-    }
-    
-# define function to import db
-f-import(){
-    DIR=$1
-    if [ "${DIR:0:1}" = "/" ]; then
-        python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "import" "$1";
-    else
-        python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "import" "$(pwd)/$1";
-    fi
-}
-
-# define function to export db
-f-export(){
-    if [ $# -eq 0 ]; then
-    	python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "export" "fastHistory_$(date +'%Y-%m-%d').db";
-    else
-    	DIR=$1
-    	if [ "${DIR:0:1}" = "/" ]; then
-    	    python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "export" "$1";
-    	else
-    	    python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "export" "$(pwd)/$1";
-    	fi
-    fi
-}
+# check if $PATH is correctly set 
+_fast_history_local_bin=$HOME/.local/bin
+if [ -f $_fast_history_local_bin/$_fast_history_executable ]; then
+	if echo "$PATH" | grep -q -F $_fast_history_local_bin; then 
+		_fast_history_log "debug" "$_fast_history_local_bin is already in your PATH variable";
+	else
+		export PATH=$PATH:$_fast_history_local_bin
+		_fast_history_log "debug" "$_fast_history_local_bin has been added to your PATH variable";
+	fi
+fi
 
 # "preexec" is executed just after a command has been read and is about to be executed
 # we store the hooked command in a bash variable
-preexec() { _fast_history_hooked_cmd="$1"; }
+preexec() {
+	_fast_history_hooked_cmd="$1";
+	# TODO move this to python context, not sure
+	if [[ "$_fast_history_hooked_cmd" == "#"* ]]; then
+		# remove the intial #
+		_fast_history_hooked_cmd="${_fast_history_hooked_cmd:1}"
+		echo "f.sh-this command will be saved but NOT executed!: '$_fast_history_hooked_cmd'" ;
+	else
+		echo "f.sh-this command will may be saved AND executed!: '$_fast_history_hooked_cmd'" ;
+	fi
+}
+
 
 # "precmd" is executed just before each prompt
 # we use the previous hooked command and we store it with fastHistory
@@ -117,10 +92,11 @@ precmd() {
 	if [[ $_fast_history_hooked_cmd ]]; then
 		if ! $_fast_history_check_return_code || [ $? -eq 0 ]; then
 		    	# check if the hooked cmd contains the 'comment' char, any command without it will be ignored
+			# check also if the command is fasthistory itself (e.g. 'f #test' should not be stored)
 		    	# this is just a preliminary check, in the python module a strict regex will be used
 		    	# this is only done to avoid to load the python module for each command
-		    	if [[ "$_fast_history_hooked_cmd" = *"#"* ]]; then
-				python3 "$_fast_history_project_directory"fastHistory/fastHistory.py "add" "$_fast_history_hooked_cmd"
+		    	if [[ "$_fast_history_hooked_cmd" == *"#"* ]] && [[ "$_fast_history_hooked_cmd" != "$_fast_history_executable "* ]] ; then
+				$_fast_history_executable --add-from-bash "$_fast_history_hooked_cmd"
 				# clean the cmd, this is needed because precmd can be trigged without preexec (example ctrl+c)
 				unset _fast_history_hooked_cmd;
 			else	
@@ -131,7 +107,6 @@ precmd() {
 		fi;
 	fi;
      }
-     
 
 _fast_history_log "debug" "loading fastHistory completed. Use 'f' to start"; 
 

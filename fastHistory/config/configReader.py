@@ -1,5 +1,5 @@
 import configparser
-
+import os
 
 class ConfigReader:
     """
@@ -29,9 +29,11 @@ class ConfigReader:
     _config = None
     _checkError = ""
 
-    def __init__(self, config_file):
+    def __init__(self, project_dir, config_file):
+        
         self._config = configparser.ConfigParser()
-        self._config.read(config_file)
+        self.project_dir = project_dir
+        self.config_path_file = project_dir + config_file
 
     def check_config(self):
         """
@@ -39,29 +41,33 @@ class ConfigReader:
 
         :return: true if valid
         """
-        if self._config is None:
-            self._checkError = "file not found or malformed"
-        elif self._MAIN not in self._config:
-            self._checkError = "file not found or malformed"
-        elif self._MAIN_LOG_LEVEL not in self._config[self._MAIN] or \
-                self._config[self._MAIN][self._MAIN_LOG_LEVEL] not in self._ALLOWED_LOG_LEVELS:
-            self._checkError = "%s must be chosen between: %s, current value: '%s'" % \
-                                (self._MAIN_LOG_LEVEL,
-                                 str(self._ALLOWED_LOG_LEVELS),
-                                 self._config[self._MAIN][self._MAIN_LOG_LEVEL])
-        elif self._MAIN_THEME not in self._config[self._MAIN] or \
-                self._config[self._MAIN][self._MAIN_THEME] not in self._ALLOWED_THEME:
-            self._checkError = "%s must be chosen between: %s, current value: '%s'" % \
-                               (self._MAIN_THEME,
-                                str(self._ALLOWED_THEME),
-                                self._config[self._MAIN][self._MAIN_THEME])
-        elif self._MAIN_TAGS_COLUMN_SIZE not in self._config[self._MAIN] or \
-                not self._config[self._MAIN][self._MAIN_TAGS_COLUMN_SIZE].isdigit():
-            self._checkError = "%s must be a percentage between 0 and 50, current value: '%s'%%" % \
-                                (self._MAIN_TAGS_COLUMN_SIZE,
-                                 self._config[self._MAIN][self._MAIN_TAGS_COLUMN_SIZE])
+        if not os.path.isdir(self.project_dir):
+            self._checkError = "project folder not found"
         else:
-            return True
+            self._config.read(self.config_path_file)
+            if self._config is None:
+                self._checkError = "file not found or malformed"
+            elif self._MAIN not in self._config:
+                self._checkError = "file not found or malformed"
+            elif self._MAIN_LOG_LEVEL not in self._config[self._MAIN] or \
+                self._config[self._MAIN][self._MAIN_LOG_LEVEL] not in self._ALLOWED_LOG_LEVELS:
+                self._checkError = "%s must be chosen between: %s, current value: '%s'" % \
+                        (self._MAIN_LOG_LEVEL,
+                         str(self._ALLOWED_LOG_LEVELS),
+                         self._config[self._MAIN][self._MAIN_LOG_LEVEL])
+            elif self._MAIN_THEME not in self._config[self._MAIN] or \
+                self._config[self._MAIN][self._MAIN_THEME] not in self._ALLOWED_THEME:
+                self._checkError = "%s must be chosen between: %s, current value: '%s'" % \
+                       (self._MAIN_THEME,
+                        str(self._ALLOWED_THEME),
+                        self._config[self._MAIN][self._MAIN_THEME])
+            elif self._MAIN_TAGS_COLUMN_SIZE not in self._config[self._MAIN] or \
+                 not self._config[self._MAIN][self._MAIN_TAGS_COLUMN_SIZE].isdigit():
+                self._checkError = "%s must be a percentage between 0 and 50, current value: '%s'%%" % \
+                        (self._MAIN_TAGS_COLUMN_SIZE,
+                         self._config[self._MAIN][self._MAIN_TAGS_COLUMN_SIZE])
+            else:
+                 return True
         return False
 
     def get_error_msg(self):

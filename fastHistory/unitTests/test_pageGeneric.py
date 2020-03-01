@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from pick.pageGeneric import PageGeneric
+from fastHistory.pick.pageGeneric import PageGeneric
 
 
 class TestPageGeneric(TestCase):

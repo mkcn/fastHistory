@@ -4,7 +4,7 @@ from unittest import TestCase
 
 import os
 
-from parser.manParser import ManParser
+from fastHistory.parser.manParser import ManParser
 
 
 class TestManParser(TestCase):
@@ -110,6 +110,7 @@ class TestManParser(TestCase):
             else:
                 print("warning! program not found in your system:" + t[0])
                 logging.warning("warning! program not found in your system:" + t[0])
+                self.assertTrue(False)
 
     def _set_text_logger(self):
         """

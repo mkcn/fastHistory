@@ -1,7 +1,7 @@
 import re
 import logging
 
-from database.InputData import Input
+from fastHistory.database.InputData import Input
 
 
 class InputParser(object):

@@ -3,7 +3,7 @@ from unittest import TestCase
 
 import os
 
-from parser.inputParser import InputParser
+from fastHistory.parser.inputParser import InputParser
 
 
 class TestInputParser(TestCase):

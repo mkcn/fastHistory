@@ -3,12 +3,12 @@
 import curses
 import logging
 
-from parser.bashParser import BashParser
-from database.dataManager import DataManager
-from parser.inputParser import InputParser
-from pick.drawer import Drawer
-from pick.pageSelect import PageSelector
-from pick.textManager import TextManager, ContextShifter
+from fastHistory.parser.bashParser import BashParser
+from fastHistory.database.dataManager import DataManager
+from fastHistory.parser.inputParser import InputParser
+from fastHistory.pick.drawer import Drawer
+from fastHistory.pick.pageSelect import PageSelector
+from fastHistory.pick.textManager import TextManager, ContextShifter
 
 KEYS_ENTER = (curses.KEY_ENTER, '\n', '\r')
 KEY_SELECT = None  # used for future feature (multi select)
@@ -228,7 +228,7 @@ class Picker(object):
         :return:
         """
         # import this locally to improve performance when the program is loaded
-        from pick.pageEditCommand import PageEditCommand
+        from fastHistory.pick.pageEditCommand import PageEditCommand
         page_desc = PageEditCommand(self.drawer,
                                     option=self.current_selected_option,
                                     search_filters=self.data_manager.get_search_filters(),
@@ -326,7 +326,7 @@ class Picker(object):
         :return:
         """
         # import this locally to improve performance when the program is loaded
-        from pick.pageEditDescription import PageEditDescription
+        from fastHistory.pick.pageEditDescription import PageEditDescription
         page_desc = PageEditDescription(self.drawer,
                                         option=self.current_selected_option,
                                         search_filters=self.data_manager.get_search_filters(),
@@ -421,7 +421,7 @@ class Picker(object):
         :return:
         """
         # import this locally to improve performance when the program is loaded
-        from pick.pageEditTags import PageEditTags
+        from fastHistory.pick.pageEditTags import PageEditTags
         page_tags = PageEditTags(self.drawer,
                                  option=self.current_selected_option,
                                  search_filters=self.data_manager.get_search_filters(),
@@ -524,7 +524,7 @@ class Picker(object):
         :return:
         """
         # import this locally to improve performance when the program is loaded
-        from pick.pageInfo import PageInfo
+        from fastHistory.pick.pageInfo import PageInfo
 
         data_from_man_page = BashParser.load_data_for_info_from_man_page(
             cmd_text=self.current_selected_option[DataManager.OPTION.INDEX_CMD])
@@ -559,7 +559,7 @@ class Picker(object):
             # open man page
             elif c == 109:  # char 'm'
                 # TODO fix and show description in help line
-                from console import consoleUtils
+                from fastHistory.console import consoleUtils
                 cmd = data_from_man_page[0][BashParser.INDEX_CMD][BashParser.INDEX_VALUE]
                 consoleUtils.ConsoleUtils.open_interactive_man_page(cmd)
                 return ""

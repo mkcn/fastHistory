@@ -1,5 +1,5 @@
-from console import colors
-from config.configReader import ConfigReader
+from fastHistory.console import colors
+from fastHistory.config.configReader import ConfigReader
 
 
 class LoggerBash:

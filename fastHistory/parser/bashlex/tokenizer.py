@@ -1,7 +1,7 @@
 import collections, enum
 
-from parser.bashlex import flags, errors, heredoc
-from parser.bashlex import utils, shutils
+from fastHistory.parser.bashlex import flags, errors, heredoc
+from fastHistory.parser.bashlex import utils, shutils
 
 sh_syntaxtab = collections.defaultdict(set)
 

@@ -8,6 +8,9 @@ __pycache__/
 venv/
 .idea/
 notes/
+pip/dist/
+pip/build/
+pip/build-env/
 
 # Log and user data
 data/

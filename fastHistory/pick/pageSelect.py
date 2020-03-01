@@ -1,7 +1,7 @@
 import logging
 
-from database.dataManager import DataManager
-from pick.pageGeneric import PageGeneric
+from fastHistory.database.dataManager import DataManager
+from fastHistory.pick.pageGeneric import PageGeneric
 
 
 class PageSelector(PageGeneric):

@@ -1,5 +1,5 @@
-from parser.bashlex import errors
-from parser.bashlex import ast
+from fastHistory.parser.bashlex import errors
+from fastHistory.parser.bashlex import ast
 
 
 def gatherheredocuments(tokenizer):

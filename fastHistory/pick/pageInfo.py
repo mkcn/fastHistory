@@ -1,9 +1,9 @@
 import logging
 
-from parser.bashParser import BashParser
-from parser.manParser import ManParser
-from database.dataManager import DataManager
-from pick.pageGeneric import PageGeneric
+from fastHistory.parser.bashParser import BashParser
+from fastHistory.parser.manParser import ManParser
+from fastHistory.database.dataManager import DataManager
+from fastHistory.pick.pageGeneric import PageGeneric
 
 
 class PageInfo(PageGeneric):
