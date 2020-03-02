@@ -18,10 +18,10 @@ jobs:
         python-version: 3.6
     - name: Check environment and install dependences 
       run: |
-          lsb_release -a
           echo "\$PATH: " $PATH
           python --version
           python3 --version
+          pip3 --version
 
           if [[ "$OSTYPE" == "linux-gnu" ]]; then
               echo "OS: Linux"
@@ -29,11 +29,6 @@ jobs:
               sudo apt-get install nmap
           elif [[ "$OSTYPE" == "darwin"* ]]; then
               echo "OS: Mac OSX"
-              ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-              export PATH="/usr/local/opt/python/libexec/bin:$PATH"
-              brew install python
-              python --version
-              python3 --version
           else
               echo "unknown: " $OSTYPE
           fi
