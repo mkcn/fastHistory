@@ -35,4 +35,13 @@ jobs:
 
     - name: Test with UnitTest
       run: |
+        if [[ "$OSTYPE" == "linux-gnu" ]]; then
+          echo "OS: Linux"
           python3 -m unittest discover -s /home/runner/work/fastHistory/fastHistory/
+        elif [[ "$OSTYPE" == "darwin"* ]]; then
+          echo "OS: Mac OSX"
+          python3 -m unittest discover -s /Users/runner/runners/*/work/fastHistory/fastHistory
+        else
+          echo "unknown: " $OSTYPE
+        fi
+
