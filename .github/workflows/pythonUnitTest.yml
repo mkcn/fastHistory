@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
         matrix:
-            os: [ubuntu-18.04]
+            os: [ubuntu-16.04, ubuntu-18.04, macos-10.14, macos-10.15]
 
     runs-on: ${{ matrix.os }}
 
@@ -19,9 +19,25 @@ jobs:
     - name: Check environment and install dependences 
       run: |
           lsb_release -a
+          echo "\$PATH: " $PATH
           python --version
-          # nmap is needed for the man parser in UnitTest
-          sudo apt-get install nmap 
+          python3 --version
+
+          if [[ "$OSTYPE" == "linux-gnu" ]]; then
+              echo "OS: Linux"
+              # nmap is needed for the man parser in UnitTest
+              sudo apt-get install nmap
+          elif [[ "$OSTYPE" == "darwin"* ]]; then
+              echo "OS: Mac OSX"
+              ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+              export PATH="/usr/local/opt/python/libexec/bin:$PATH"
+              brew install python
+              python --version
+              python3 --version
+          else
+              echo "unknown: " $OSTYPE
+          fi
+
     - name: Test with UnitTest
       run: |
           python3 -m unittest discover -s /home/runner/work/fastHistory/fastHistory/
