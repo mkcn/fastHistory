@@ -45,4 +45,14 @@ jobs:
         else
           echo "unknown: " $OSTYPE
         fi
-
+    - name: Read UnitTest output logs
+      run: |
+        if [[ "$OSTYPE" == "linux-gnu" ]]; then
+          echo "OS: Linux"
+          for i in /home/runner/work/fastHistory/data_test/*.log; do printf "\n\n## $i ## \n\n" ; cat "$i"; printf "\n" ; done ;
+        elif [[ "$OSTYPE" == "darwin"* ]]; then
+          echo "OS: Mac OSX"
+          for i in /Users/runner/runners/*/work/fastHistory/data_test/*.log; do printf "\n\n## $i ## \n\n" ; cat "$i"; printf "\n" ; done ;
+        else
+          echo "unknown: " $OSTYPE
+        fi
