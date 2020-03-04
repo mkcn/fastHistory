@@ -18,8 +18,6 @@ jobs:
         python-version: 3.6
     - name: Check environment and install dependences 
       run: |
-          echo "\$PATH: " $PATH
-          python --version
           python3 --version
           pip3 --version
 
@@ -33,7 +31,6 @@ jobs:
           else
               echo "unknown: " $OSTYPE
           fi
-
     - name: Test with UnitTest
       run: |
         if [[ "$OSTYPE" == "linux-gnu" ]]; then
@@ -46,13 +43,14 @@ jobs:
           echo "unknown: " $OSTYPE
         fi
     - name: Read UnitTest output logs
+      if: always()
       run: |
         if [[ "$OSTYPE" == "linux-gnu" ]]; then
           echo "OS: Linux"
-          for i in /home/runner/work/fastHistory/data_test/*.log; do printf "\n\n## $i ## \n\n" ; cat "$i"; printf "\n" ; done ;
+          for i in /home/runner/work/fastHistory/fastHistory/data_test/*.log; do printf "\n\n## $i ## \n\n" ; cat "$i"; printf "\n" ; done ;
         elif [[ "$OSTYPE" == "darwin"* ]]; then
           echo "OS: Mac OSX"
-          for i in /Users/runner/runners/*/work/fastHistory/data_test/*.log; do printf "\n\n## $i ## \n\n" ; cat "$i"; printf "\n" ; done ;
+          for i in /Users/runner/runners/*/work/fastHistory/fastHistory/data_test/*.log; do printf "\n\n## $i ## \n\n" ; cat "$i"; printf "\n" ; done ;
         else
           echo "unknown: " $OSTYPE
         fi

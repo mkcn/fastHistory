@@ -109,6 +109,7 @@ class ManParser(object):
         """
         final_result = []
         if self.man_page is None:
+            logging.error("get_flag_meaning: man_page is None")
             return None
         else:
             try:
@@ -117,7 +118,8 @@ class ManParser(object):
                     # get group (1) and not the all string
                     result = result.group(1)
                 else:
-                    logging.debug("get_flag_meaning: regex does not match")
+                    logging.error("get_flag_meaning: regex does not match")
+                    logging.error("get_flag_meaning:" + str(self.man_page))
                     return None
             except sre_constants.error:
                 logging.error("flag meaning parser: ", sys.exc_info()[0])

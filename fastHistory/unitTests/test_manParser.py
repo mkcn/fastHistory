@@ -86,7 +86,7 @@ class TestManParser(TestCase):
         parser = ManParser()
 
         test_string = [
-            ["tar", "-d"],
+            # ["tar", "-d"], # disabled because macOS has a different tar utility
             ["ls", "-l"],
             ["netstat", "-a"],
             ["netstat", "-n"],
@@ -100,13 +100,11 @@ class TestManParser(TestCase):
             ["nmap", "-sF"],  # -sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)
         ]
         for t in test_string:
-            logging.info("test: " + str(t))
+            logging.info("test input: " + str(t))
             if parser.load_man_page(t[0]):
                 flag_meaning = parser.get_flag_meaning(t[1])
                 self.assertTrue(flag_meaning)
                 logging.info("flag meaning: " + str(flag_meaning))
-                #print(t[0] + " " + t[1])
-                #print("result: '" + str(flag_meaning) + "'")
             else:
                 print("warning! program not found in your system:" + t[0])
                 logging.warning("warning! program not found in your system:" + t[0])
