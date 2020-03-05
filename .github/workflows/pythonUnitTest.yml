@@ -23,13 +23,17 @@ jobs:
 
           if [[ "$OSTYPE" == "linux-gnu" ]]; then
               echo "OS: Linux"
-              # nmap is needed for the man parser in UnitTest
-              sudo apt-get install nmap
+              pip3 install bashlex
+              pip3 install pyperclip
+              sudo apt-get install nmap # nmap is needed for the man parser in UnitTest
           elif [[ "$OSTYPE" == "darwin"* ]]; then
               echo "OS: Mac OSX"
+              pip3 install bashlex
+              pip3 install pyperclip
               brew install nmap
           else
               echo "unknown: " $OSTYPE
+              exit 1
           fi
     - name: Test with UnitTest
       run: |
@@ -41,6 +45,7 @@ jobs:
           python3 -m unittest discover -s /Users/runner/runners/*/work/fastHistory/fastHistory
         else
           echo "unknown: " $OSTYPE
+          exit 1
         fi
     - name: Read UnitTest output logs
       if: always()
@@ -53,4 +58,5 @@ jobs:
           for i in /Users/runner/runners/*/work/fastHistory/fastHistory/data_test/*.log; do printf "\n\n## $i ## \n\n" ; cat "$i"; printf "\n" ; done ;
         else
           echo "unknown: " $OSTYPE
+          exit 1
         fi

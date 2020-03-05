@@ -1,6 +1,5 @@
 import logging
-
-from fastHistory.parser import bashlex
+import bashlex
 from fastHistory.parser.manParser import ManParser
 
 
