@@ -12,10 +12,10 @@ url_project="http://github.com/mkcn/fasthistory"
 author="Mirko Conti"
 author_email="mirko.conti29@gmail.com"
 keywords="bash history search fast"
-
+version_file = project_path + project_name + "/config/default_version.txt"
 
 try:
-	f = open(project_path + project_name + "/config/default_version.txt", "r")
+	f = open(version_file, "r")
 	version = f.read()
 	f.close()
 
@@ -30,6 +30,11 @@ try:
 		author_email=author_email,
 		license=license,
 		platforms='OS-independent',
+		# dependeces
+		install_requires={
+			"bashlex>=0.14",
+			"pyperclip>=1.7.0"
+		},
 		# all data files to include 
 		package_data={
 			'': [ 
@@ -42,7 +47,7 @@ try:
 		packages=find_packages(where=project_path, exclude=["*unitTests"]),
 		entry_points={
 			'console_scripts': [
-				'fff=fastHistory:f',
+				'f=fastHistory:f',
 			]
 		},
 		# https://pypi.org/classifiers/
