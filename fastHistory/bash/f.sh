@@ -13,7 +13,7 @@ _fast_history_hooked_cmd=""
 _fast_history_short_cmd=false
 # [sperimental feature, off by default] if true the return code of the executed command is check before to store it
 _fast_history_check_return_code=false
-_fast_history_executable=fff
+_fast_history_executable="f"
 
 # define internal log function 
 _fast_history_log() {
@@ -48,6 +48,10 @@ else
 	_fast_history_log "error" "cannot find installation folder";
 	return 1;
 fi
+
+# share variable with python to find any inconsistency between the bash hook and the installation folder
+export _fast_history_project_directory
+_fast_history_log "debug" "_fast_history_project_directory exported";
 
 # load bash hook functions (more info: https://github.com/rcaloras/bash-preexec/)
 source "$_fast_history_project_directory"bash/bash-preexec.sh;
