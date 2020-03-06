@@ -41,10 +41,11 @@ Black_On_White = "\033[47m;30m"
 Color_Off = "\033[0m"       # Text Reset
 
 # Regular Colors
-Black = "\033[0;30m"        # Black
-Red = "\033[0;31m"          # Red
-Green = "\033[0;32m"        # Green
-Blue = "\033[0;34m"         # Blue
-Cyan = "\033[0;36m"        # Cyan
-White = "\033[0;37m"        # White
-
+Black = "\033[0;30m"
+Red = "\033[0;31m"
+Green = "\033[0;32m"
+Blue = "\033[0;34m"
+Cyan = "\033[0;36m"
+White = "\033[1;37m"
+Yellow = "\033[1;33m"
+Gray = "\033[0;37m"

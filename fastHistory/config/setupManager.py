@@ -34,8 +34,7 @@ class SetupManager:
 	
 		if not self.copy_default_file(self.current_script_path + "/config/" + self.default_prefix + self.version_file , self.project_directory + self.version_file):
 			return False
-				
-		self.logger_console.log_on_console_info("setup completed")
+
 		return True
 
 	def get_hook_str(self):
@@ -85,7 +84,8 @@ class SetupManager:
 
 		if answer:
 			if self.handle_setup():
-				self.logger_console.log_on_console_info("setup completed. Please restart your terminal. ")
+				self.logger_console.log_on_console_info("setup completed")
+				self.logger_console.log_on_console_warn("Please restart your terminal and then use 'f' to start. ")
 			else:
 				self.logger_console.log_on_console_error("setup failed")
 		else:

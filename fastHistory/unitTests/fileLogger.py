@@ -12,6 +12,9 @@ class FileLogger:
     def log_on_console_info(self, msg):
         logging.info(str(msg))
 
+    def log_on_console_warn(self, msg):
+        logging.warning(str(msg))
+
     def log_on_console_error(self, msg):
         logging.error(str(msg))
 
