@@ -10,7 +10,7 @@ import inspect
 
 class TestSetupManager(TestCase):
 
-    TEST_FOLDER = "../../data_test/"
+    TEST_FOLDER = "/data_test/"
     TEST_LOG_FILENAME = "test_setupManager.txt"
 
     def setUp(self):
@@ -18,18 +18,21 @@ class TestSetupManager(TestCase):
         setup absolute log path and log level
         :return:
         """
-        self.output_test_path = os.path.dirname(os.path.realpath(__file__)) + "/" + self.TEST_FOLDER
+        # TODO create shared test class for setup
+        self.folder_code = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+        self.folder_test_output = os.path.dirname(self.folder_code) + self.TEST_FOLDER
+        self.folder_home = self.folder_test_output + "test_installation_home/"
+        self.folder_data = self.folder_test_output + "test_installation_data/"
 
-        self.folder_installation = self.output_test_path + "test_installation_data/"
-        self.folder_home = self.output_test_path + "test_installation_home/"
         self.path_bashrc = self.folder_home + ".bashrc"
         self.path_zshrc = self.folder_home + ".zshrc"
+
 
         self.context_test = "test context"
         self.context_hook = "source \"some_folder/fastHistory/bash/f.sh\""
         self.context_hook_to_ignore = "#source \"some_folder/fastHistory/bash/f.sh\""
 
-        self.log_path = self.output_test_path + self.TEST_LOG_FILENAME
+        self.log_path = self.folder_test_output + self.TEST_LOG_FILENAME
         self.configuration_file = "fastHistory.conf"
         self.version_file = "version.txt"
 
@@ -37,14 +40,14 @@ class TestSetupManager(TestCase):
         logging.basicConfig(filename=self.log_path, level=logging.DEBUG)
 
     def _clean_and_setup_environment(self, bash=False, zsh=False):
-        if os.path.exists(self.folder_installation):
-            shutil.rmtree(self.folder_installation)
+        if os.path.exists(self.folder_data):
+            shutil.rmtree(self.folder_data)
         if os.path.exists(self.folder_home):
             shutil.rmtree(self.folder_home)
-        if not os.path.exists(self.output_test_path):
-            os.makedirs(self.output_test_path)
-        if not os.path.exists(self.folder_installation):
-            os.makedirs(self.folder_installation)
+        if not os.path.exists(self.folder_test_output):
+            os.makedirs(self.folder_test_output)
+        if not os.path.exists(self.folder_data):
+            os.makedirs(self.folder_data)
         if not os.path.exists(self.folder_home):
             os.makedirs(self.folder_home)
         if bash:
@@ -57,9 +60,9 @@ class TestSetupManager(TestCase):
             f.close()
 
     def _check_correct_installation(self, hook_str=None, bash=None, zsh=None):
-        res = os.path.isfile(self.folder_installation + self.configuration_file)
+        res = os.path.isfile(self.folder_data + self.configuration_file)
         self.assertTrue(res)
-        res = os.path.isfile(self.folder_installation + self.version_file)
+        res = os.path.isfile(self.folder_data + self.version_file)
         self.assertTrue(res)
         # note: in our check we add "\n" to check if the line start with the "hook_str" string
         # this is done to do a different check that the one already in the SetupManager class
@@ -75,22 +78,22 @@ class TestSetupManager(TestCase):
     def test_setup_fail_with_empty_environment(self):
         self._set_text_logger()
         self._clean_and_setup_environment()
-        setup = SetupManager(self.logger_console, self.folder_installation, self.configuration_file, version_file=self.version_file, home_path=self.folder_home)
+        setup = SetupManager(self.logger_console, self.folder_data, self.folder_code, self.configuration_file, version_file=self.version_file, home_path=self.folder_home)
         self.assertFalse(setup.handle_setup())
-        res = os.path.isfile(self.folder_installation + self.version_file)
+        res = os.path.isfile(self.folder_data + self.version_file)
         self.assertFalse(res)
 
     def test_setup_with_basic_zsh_environment(self):
         self._set_text_logger()
         self._clean_and_setup_environment(zsh=True)
-        setup = SetupManager(self.logger_console, self.folder_installation, self.configuration_file, version_file=self.version_file, home_path=self.folder_home)
+        setup = SetupManager(self.logger_console, self.folder_data, self.folder_code, self.configuration_file, version_file=self.version_file, home_path=self.folder_home)
         self.assertTrue(setup.handle_setup())
         self._check_correct_installation(hook_str=setup.get_hook_str(), zsh=True)
 
     def test_setup_with_basic_bash_environment(self):
         self._set_text_logger()
         self._clean_and_setup_environment(bash=True)
-        setup = SetupManager(self.logger_console, self.folder_installation, self.configuration_file, version_file=self.version_file, home_path=self.folder_home)
+        setup = SetupManager(self.logger_console, self.folder_data, self.folder_code, self.configuration_file, version_file=self.version_file, home_path=self.folder_home)
         self.assertTrue(setup.handle_setup())
         self._check_correct_installation(hook_str=setup.get_hook_str(), bash=True)
 
@@ -103,7 +106,7 @@ class TestSetupManager(TestCase):
         f.write("\n")
         f.write(self.context_test)
         f.close()
-        setup = SetupManager(self.logger_console, self.folder_installation, self.configuration_file,
+        setup = SetupManager(self.logger_console, self.folder_data, self.folder_code, self.configuration_file,
                              version_file=self.version_file, home_path=self.folder_home)
         self.assertTrue(setup.handle_setup())
         self._check_correct_installation(hook_str=setup.get_hook_str(), bash=True)
@@ -120,7 +123,7 @@ class TestSetupManager(TestCase):
         f = open(self.path_bashrc, "a")
         f.write("\n" + self.context_hook)
         f.close()
-        setup = SetupManager(self.logger_console, self.folder_installation, self.configuration_file, version_file=self.version_file, home_path=self.folder_home)
+        setup = SetupManager(self.logger_console, self.folder_data, self.folder_code, self.configuration_file, version_file=self.version_file, home_path=self.folder_home)
         setup.handle_setup()
         self._check_correct_installation(hook_str=setup.get_hook_str(), bash=True)
         # the old hook should be removed by SetupManager
