@@ -32,8 +32,8 @@ if [ -f setup.py ]; then
 			# upload 
 			# you need to have configured the ".pypirc" file
 			echo ""
-			read -p "Do you wish to upload it to the test pypi?[Y/n] " YN
-			if [[ $YN == "y" || $YN == "Y" || $YN == "" ]]; then
+			read -p "Do you wish to upload it to the test pypi?[y/N] " YN
+			if [[ $YN == "y" || $YN == "Y" ]]; then
 				python3 -m twine upload --repository testpypi dist/*.whl
 			else
 				echo "Upload skipped"
