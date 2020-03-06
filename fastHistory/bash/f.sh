@@ -4,10 +4,11 @@
 # tool: fastHistory
 # note: this script must be called with "source <file>" 
 # author: Mirko Conti
-# date: 2019-07-24
+# date: 2020-03
 ############################################################
 
-_fast_history_bash_debug=true
+# enable this to debug the bash hook of fastHistory
+_fast_history_bash_debug=false
 
 _fast_history_hooked_cmd=""
 _fast_history_short_cmd=false
@@ -18,11 +19,9 @@ _fast_history_executable="f"
 # define internal log function 
 _fast_history_log() {
 	if [ "$1" = "error" ]; then
-		echo "[fastHistory][ERROR] $2";  
-	elif  [ "$1" = "info" ]; then
-		echo "[fastHistory][INFO ] $2"; 
+		printf "[\033[0;31mfastHistory\033[0m][BASH][ERROR] $2\n";
 	elif [ "$1" = "debug" ] && $_fast_history_bash_debug ; then
-		echo "[fastHistory][DEBUG] $2";
+		printf "[\033[0;36mfastHistory\033[0m][BASH][DEBUG] $2\n";
 	fi
 }
 
@@ -77,16 +76,12 @@ fi
 # we store the hooked command in a bash variable
 preexec() {
 	_fast_history_hooked_cmd="$1";
-	# TODO move this to python context, not sure
 	if [[ "$_fast_history_hooked_cmd" == "#"* ]]; then
 		# remove the intial #
 		_fast_history_hooked_cmd="${_fast_history_hooked_cmd:1}"
-		echo "f.sh-this command will be saved but NOT executed!: '$_fast_history_hooked_cmd'" ;
-	else
-		echo "f.sh-this command will may be saved AND executed!: '$_fast_history_hooked_cmd'" ;
+		_fast_history_log "debug" "command will not be executed!"
 	fi
 }
-
 
 # "precmd" is executed just before each prompt
 # we use the previous hooked command and we store it with fastHistory
@@ -95,17 +90,17 @@ precmd() {
 	# check if variable is set
 	if [[ $_fast_history_hooked_cmd ]]; then
 		if ! $_fast_history_check_return_code || [ $? -eq 0 ]; then
-		    	# check if the hooked cmd contains the 'comment' char, any command without it will be ignored
-			# check also if the command is fasthistory itself (e.g. 'f #test' should not be stored)
-		    	# this is just a preliminary check, in the python module a strict regex will be used
-		    	# this is only done to avoid to load the python module for each command
-		    	if [[ "$_fast_history_hooked_cmd" == *"#"* ]] && [[ "$_fast_history_hooked_cmd" != "$_fast_history_executable "* ]] ; then
-				$_fast_history_executable --add-from-bash "$_fast_history_hooked_cmd"
-				# clean the cmd, this is needed because precmd can be trigged without preexec (example ctrl+c)
-				unset _fast_history_hooked_cmd;
-			else	
-				_fast_history_log "debug" "shell command ignored";
-			fi;
+		    # check if the hooked cmd contains the 'comment' char, any command without it will be ignored
+			  # check also if the command is fasthistory itself (e.g. 'f #test' should not be stored)
+		    # this is just a preliminary check, in the python module a strict regex will be used
+		    # this is only done to avoid to load the python module for each command
+		    if [[ "$_fast_history_hooked_cmd" == *"#"* ]] && [[ "$_fast_history_hooked_cmd" != "$_fast_history_executable "* ]] ; then
+          $_fast_history_executable --add-from-bash "$_fast_history_hooked_cmd"
+          # clean the cmd, this is needed because precmd can be trigged without preexec (example ctrl+c)
+          unset _fast_history_hooked_cmd;
+        else
+          _fast_history_log "debug" "command ignored";
+        fi;
 		else
 			_fast_history_log "debug" "error code detected: command ignored";
 		fi;

@@ -6,19 +6,19 @@ from shutil import copyfile, move
 
 class SetupManager:
 
-	def __init__(self, logger_console, project_directory, configuration_file, version_file="version.txt", home_path=None):
+	def __init__(self, logger_console, project_directory, current_path, configuration_file, version_file="version.txt", home_path=None):
 		self.logger_console = logger_console
 		self.project_directory = project_directory	
 		self.configuration_file =  configuration_file
 		self.version_file = version_file 
 		self.default_prefix = "default_"
-		self.current_script_path = os.path.dirname(os.path.realpath(__file__))
+		self.current_script_path = current_path
 		if home_path is None:
 			self.home_path = os.environ['HOME'] + "/"
 		else:
 			self.home_path = home_path
 
-		hook_bash_path = os.path.dirname(self.current_script_path) + "/bash/f.sh"
+		hook_bash_path = self.current_script_path + "/bash/f.sh"
 		self.hook_updated_str = "source \"" + hook_bash_path + "\""
 
 	def handle_setup(self):
@@ -29,10 +29,10 @@ class SetupManager:
 		if not self.setup_rc_file():
 			return False
 		
-		if not self.copy_default_file(self.current_script_path + "/" + self.default_prefix + self.configuration_file , self.project_directory + self.configuration_file):
+		if not self.copy_default_file(self.current_script_path + "/config/" + self.default_prefix + self.configuration_file , self.project_directory + self.configuration_file):
 			return False
 	
-		if not self.copy_default_file(self.current_script_path + "/" + self.default_prefix + self.version_file , self.project_directory + self.version_file):
+		if not self.copy_default_file(self.current_script_path + "/config/" + self.default_prefix + self.version_file , self.project_directory + self.version_file):
 			return False
 				
 		self.logger_console.log_on_console_info("setup completed")
@@ -61,10 +61,29 @@ class SetupManager:
 				return False
 		return True
 
-	def auto_setup(self):
-		self.logger_console.log_on_console_error("environment not correctly configured")
-		res=input("do you want to configure/fix it? [y/n]: ")
-		if (res.lower() == "y"):
+	def auto_setup(self, reason=None, force=False):
+		if reason is None:
+			pass
+		elif reason[0] is True:
+			self.logger_console.log_on_console_info("environment not configured: " + reason[1])
+			question_str = "do you want to proceed with the configuration? [Y/n]: "
+		elif reason[0] is False:
+			self.logger_console.log_on_console_error("environment issue found: " + reason[1])
+			question_str = "do you want to try to fix it? [Y/n]: "
+		elif reason[0] is None:
+			self.logger_console.log_on_console_error("environment issue found: " + reason[1])
+			return
+		else:
+			self.logger_console.log_on_console_error("environment issue found: " + reason[1])
+			return
+
+		if force:
+			answer = True
+		else:
+			res = input(question_str)
+			answer = (res.lower() == "y" or res == "")
+
+		if answer:
 			if self.handle_setup():
 				self.logger_console.log_on_console_info("setup completed. Please restart your terminal. ")
 			else:

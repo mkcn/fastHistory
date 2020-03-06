@@ -169,18 +169,26 @@ def edit_config_file(logger_console, project_dir):
 		logger_console.log_on_console(config_file)
 
 
-   
-def main():
+def f():
+	"""
+	entry point from bash
+	"""
 	logger_console = loggerBash.LoggerBash()
-	#try:
+
 	# set SIGINT handler
 	ConsoleUtils.handle_close_signal()
 
 	# get execution path
-	project_dir = os.environ['HOME'] + PATH_DATA_FOLDER
-		
+	if 'HOME' in os.environ:
+		project_dir = os.environ['HOME'] + PATH_DATA_FOLDER
+	else:
+		logger_console.log_on_console_error("error: HOME variable cannot be found")
+
+	# get execution folder
+	current_path = os.path.dirname(os.path.realpath(__file__))
+
 	# load config file
-	configReader = ConfigReader(project_dir, PATH_CONFIGURATION_FILE)
+	configReader = ConfigReader(project_dir, current_path, PATH_CONFIGURATION_FILE)
 	if configReader.check_config():
 		# set color for console logs
 		logger_console.set_theme(configReader.get_theme())
@@ -205,15 +213,19 @@ def main():
 			elif (arg1 == "--search-from-bash") and args_len == 3:
 				input_cmd = " ".join(sys.argv[2:]).strip()
 				handle_search_request(logger_console, input_cmd, project_dir, configReader.get_theme(), configReader.get_last_column_size())
-			elif (arg1 == "--config") and args_len == 2: # TODO , this should be reachable even if the file is broken
+			elif (arg1 == "--config") and args_len == 2:
 				edit_config_file(logger_console,project_dir)
-			elif (arg1 == "-i" or arg1 == "--import") and args_len == 3:
+			elif (arg1 == "--setup") and args_len == 2:
+				from fastHistory.config.setupManager import SetupManager
+				setupManager = SetupManager(logger_console, project_dir, current_path, PATH_CONFIGURATION_FILE)
+				setupManager.auto_setup(force=True)
+			elif arg1 == "--import" and args_len == 3:
 				import_file = sys.argv[2]
 				handle_import_db(logger_console, import_file, project_dir)
-			elif (arg1 == "-e" or arg1 == "--export") and args_len == 3:
+			elif arg1 == "--export" and args_len == 3:
 				output_path = sys.argv[2]
 				handle_export_db(logger_console, output_path, project_dir)
-			elif (arg1 == "-e" or arg1 == "--export") and args_len == 2:
+			elif arg1 == "--export" and args_len == 2:
 				handle_export_db(logger_console, None, project_dir)
 			elif (arg1 == "-h" or arg1 == "--help") and args_len == 2:
 				# TODO print help
@@ -221,22 +233,20 @@ def main():
 			else:
 				input_cmd = " ".join(sys.argv[1:])
 				handle_search_request(logger_console, input_cmd, project_dir, configReader.get_theme(), configReader.get_last_column_size())
-	elif (False):
-		# TODO manage "--setup" and "--config"
-		pass
+	elif len(sys.argv) >= 2 and (sys.argv[1] == "--config" or sys.argv[1] == "--setup"):
+		if sys.argv[1] == "--config":
+			edit_config_file(logger_console, project_dir)
+		elif sys.argv[1] == "--setup":
+			from fastHistory.config.setupManager import SetupManager
+			setupManager = SetupManager(logger_console, project_dir, current_path, PATH_CONFIGURATION_FILE)
+			setupManager.auto_setup(force=True)
+		else:
+			logger_console.log_on_console_error("corner case not handled")
 	else:
-		logger_console.log_on_console_error("error: %s" % configReader.get_error_msg())
 		from fastHistory.config.setupManager import SetupManager
-		setupManager = SetupManager(logger_console, project_dir, PATH_CONFIGURATION_FILE)
-		setupManager.auto_setup()
-	
-		
-	#epxcept Exception as e:
-	#	logger_console.log_on_console_error("general error detected: %s" % str(e))
+		setupManager = SetupManager(logger_console, project_dir, current_path, PATH_CONFIGURATION_FILE)
+		setupManager.auto_setup(reason=configReader.get_error_msg(), force=False)
 
-
-def f():
-	main()
 
 if __name__ == "__main__":
 	"""

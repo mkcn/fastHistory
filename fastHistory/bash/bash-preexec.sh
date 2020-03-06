@@ -189,14 +189,11 @@ __bp_preexec_invoke_exec() {
         # If we're executing something inside our prompt_command then we don't
         # want to call preexec. Bash prior to 3.1 can't detect this at all :/
         __bp_preexec_interactive_mode=""
-    	echo "[bash-preexec] command ignored"; # TODO remove
         return
     fi
-    echo "[bash-preexec] command found";  # TODO remove
 
     # Sanity check to make sure we have something to invoke our function with.
     if [[ -z "$this_command" ]]; then
-    	echo "[bash-preexec] command empty";  # TODO remove
         return
     fi
 

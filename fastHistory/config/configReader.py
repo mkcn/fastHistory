@@ -11,6 +11,7 @@ class ConfigReader:
     _MAIN_LOG_LEVEL = "LOG_LEVEL"
     _MAIN_THEME = "THEME"
     _MAIN_TAGS_COLUMN_SIZE = "TAGS_COLUMN_SIZE"
+    _BASH_SHARED_VALUE = "_fast_history_project_directory"
 
     DB_ENABLED = "R_DB_ENABLED"
     DB_HOST = "R_DB_HOST"
@@ -27,47 +28,66 @@ class ConfigReader:
     _ALLOWED_THEME = [THEME_AZURE, THEME_GREEN]
 
     _config = None
-    _checkError = ""
+    _checkError = [False, ""]
 
-    def __init__(self, project_dir, config_file):
+    def __init__(self, project_dir, current_path, config_file):
         
         self._config = configparser.ConfigParser()
         self.project_dir = project_dir
+        self.current_path = current_path
         self.config_path_file = project_dir + config_file
 
     def check_config(self):
         """
-        validate configuration file
+        check if:
+            - configuration folder has been created, if not, probably is the first installation
+            - the hook in the bash script is the correct one (detect bash issues, old installation, manual changes)
+            - the configuration file has some invalid value
 
-        :return: true if valid
+        :return: true if all checks are ok
         """
+        general_advice = "Please use the '--config' option to fix it manually"
+
         if not os.path.isdir(self.project_dir):
-            self._checkError = "project folder not found"
+            self._checkError = [True, "installation folder not found"]
+        elif self._BASH_SHARED_VALUE not in os.environ:
+            self._checkError = [False, "bash hook not set or loaded (you may have forgot to restart your terminal)"]
+        elif os.environ[self._BASH_SHARED_VALUE] != self.current_path + "/bash/../":
+            self._checkError = [True, "old bash hook found (reconfiguration needed)"]
         else:
-            self._config.read(self.config_path_file)
-            if self._config is None:
-                self._checkError = "file not found or malformed"
-            elif self._MAIN not in self._config:
-                self._checkError = "file not found or malformed"
-            elif self._MAIN_LOG_LEVEL not in self._config[self._MAIN] or \
-                self._config[self._MAIN][self._MAIN_LOG_LEVEL] not in self._ALLOWED_LOG_LEVELS:
-                self._checkError = "%s must be chosen between: %s, current value: '%s'" % \
-                        (self._MAIN_LOG_LEVEL,
-                         str(self._ALLOWED_LOG_LEVELS),
-                         self._config[self._MAIN][self._MAIN_LOG_LEVEL])
-            elif self._MAIN_THEME not in self._config[self._MAIN] or \
-                self._config[self._MAIN][self._MAIN_THEME] not in self._ALLOWED_THEME:
-                self._checkError = "%s must be chosen between: %s, current value: '%s'" % \
-                       (self._MAIN_THEME,
-                        str(self._ALLOWED_THEME),
-                        self._config[self._MAIN][self._MAIN_THEME])
-            elif self._MAIN_TAGS_COLUMN_SIZE not in self._config[self._MAIN] or \
-                 not self._config[self._MAIN][self._MAIN_TAGS_COLUMN_SIZE].isdigit():
-                self._checkError = "%s must be a percentage between 0 and 50, current value: '%s'%%" % \
-                        (self._MAIN_TAGS_COLUMN_SIZE,
-                         self._config[self._MAIN][self._MAIN_TAGS_COLUMN_SIZE])
-            else:
-                 return True
+            try:
+                self._config.read(self.config_path_file)
+                if self._config is None:
+                    self._checkError = [False, "file not found or malformed"]
+                elif self._MAIN not in self._config:
+                    self._checkError = [False, "file not found or malformed"]
+                elif self._MAIN_LOG_LEVEL not in self._config[self._MAIN] or \
+                    self._config[self._MAIN][self._MAIN_LOG_LEVEL] not in self._ALLOWED_LOG_LEVELS:
+                    self._checkError = [None, "%s must be chosen between: %s, current value: '%s'. %s" % \
+                            (self._MAIN_LOG_LEVEL,
+                             str(self._ALLOWED_LOG_LEVELS),
+                             self._config[self._MAIN][self._MAIN_LOG_LEVEL],
+                             general_advice)]
+                elif self._MAIN_THEME not in self._config[self._MAIN] or \
+                    self._config[self._MAIN][self._MAIN_THEME] not in self._ALLOWED_THEME:
+                    self._checkError = [None, "%s must be chosen between: %s, current value: '%s'. %s" % \
+                           (self._MAIN_THEME,
+                            str(self._ALLOWED_THEME),
+                            self._config[self._MAIN][self._MAIN_THEME],
+                            general_advice)]
+                elif self._MAIN_TAGS_COLUMN_SIZE not in self._config[self._MAIN] or \
+                     not self._config[self._MAIN][self._MAIN_TAGS_COLUMN_SIZE].isdigit():
+                    self._checkError = [None, "%s must be a percentage between 0 and 50, current value: '%s'%%. %s" % \
+                            (self._MAIN_TAGS_COLUMN_SIZE,
+                             self._config[self._MAIN][self._MAIN_TAGS_COLUMN_SIZE],
+                             general_advice)]
+                else:
+                     return True
+            except KeyError as err:
+                self._checkError = [None, "error in configuration file with key: " + str(err) + ". " + general_advice]
+
+            except:
+                self._checkError = [None, "generic error with configuration file. " + general_advice]
         return False
 
     def get_error_msg(self):
