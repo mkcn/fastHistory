@@ -61,7 +61,6 @@ def handle_add_request(logger_console, input_cmd_str, project_directory, error_f
 	from fastHistory.parser.inputParser import InputParser
 
 	# define log class
-	logger_console.log_on_console_info("add request: '" + input_cmd_str + "'")
 	logging.debug("add request: '" + input_cmd_str + "'")
 
 	# parse tags and store the cmd
@@ -185,6 +184,8 @@ def f():
 		logger_console.log_on_console_error("error: HOME variable cannot be found")
 
 	# get execution folder
+	# TODO rename current_path with folder_code
+	# TODO rename project_dir with folder_data
 	current_path = os.path.dirname(os.path.realpath(__file__))
 
 	# load config file

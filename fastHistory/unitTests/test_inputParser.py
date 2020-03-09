@@ -4,25 +4,17 @@ from unittest import TestCase
 import os
 
 from fastHistory.parser.inputParser import InputParser
+from fastHistory.unitTests.loggerTest import LoggerTest
 
 
 class TestInputParser(TestCase):
 
-    TEST_FOLDER = "../../data_test/"
-    TEST_LOG_FILENAME = "test_inputParser.log"
+    @classmethod
+    def setUpClass(cls):
+        cls.logger_test = LoggerTest()
 
     def setUp(self):
-        """
-        setup absolute log path and log level
-        :return:
-        """
-        output_test_path = os.path.dirname(os.path.realpath(__file__)) + "/" + self.TEST_FOLDER
-        if not os.path.exists(output_test_path):
-            os.makedirs(output_test_path)
-
-        self.log_path = output_test_path + self.TEST_LOG_FILENAME
-
-        logging.basicConfig(filename=self.log_path, level=logging.DEBUG)
+        self.logger_test.log_test_function_name(self.id())
 
     def test_parse_cmd(self):
         """

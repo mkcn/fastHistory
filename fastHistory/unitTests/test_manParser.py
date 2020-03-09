@@ -5,6 +5,7 @@ from unittest import TestCase
 import os
 
 from fastHistory.parser.manParser import ManParser
+from fastHistory.unitTests.loggerTest import LoggerTest
 
 
 class TestManParser(TestCase):
@@ -12,28 +13,18 @@ class TestManParser(TestCase):
     test class for the man parser
     """
 
-    TEST_FOLDER = "../../data_test/"
-    TEST_LOG_FILENAME = "test_manParser.log"
+    @classmethod
+    def setUpClass(cls):
+        cls.logger_test = LoggerTest()
 
     def setUp(self):
-        """
-        setup absolute log path and log level
-        :return:
-        """
-        output_test_path = os.path.dirname(os.path.realpath(__file__)) + "/" + self.TEST_FOLDER
-        if not os.path.exists(output_test_path):
-            os.makedirs(output_test_path)
-
-        self.log_path = output_test_path + self.TEST_LOG_FILENAME
-
-        logging.basicConfig(filename=self.log_path, level=logging.DEBUG)
+        self.logger_test.log_test_function_name(self.id())
 
     def test_load_man_page(self):
         """
         get the meaning ('name' field) from the man page
         :return:
         """
-        self._set_text_logger()
         parser = ManParser()
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -58,7 +49,6 @@ class TestManParser(TestCase):
                 self.assertIsNone(meaning)
 
     def test_get_cmd_meaning(self):
-        self._set_text_logger()
         parser = ManParser()
 
         test_string = [
@@ -82,7 +72,6 @@ class TestManParser(TestCase):
 
         :return:
         """
-        self._set_text_logger()
         parser = ManParser()
 
         test_string = [
@@ -110,11 +99,4 @@ class TestManParser(TestCase):
                 logging.warning("warning! program not found in your system:" + t[0])
                 self.assertTrue(False)
 
-    def _set_text_logger(self):
-        """
-        set global setting of the logging class and print (dynamically) the name of the running test
-        :return:
-        """
-        logging.info("*" * 30)
-        # 0 is the current function, 1 is the caller
-        logging.info("Start test '" + str(inspect.stack()[1][3]) + "'")
+

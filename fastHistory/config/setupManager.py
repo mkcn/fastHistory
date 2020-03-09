@@ -6,19 +6,19 @@ from shutil import copyfile, move
 
 class SetupManager:
 
-	def __init__(self, logger_console, project_directory, current_path, configuration_file, version_file="version.txt", home_path=None):
+	def __init__(self, logger_console, project_directory, folder_code, configuration_file, version_file="version.txt", home_path=None):
 		self.logger_console = logger_console
 		self.project_directory = project_directory	
-		self.configuration_file =  configuration_file
+		self.configuration_file = configuration_file
 		self.version_file = version_file 
 		self.default_prefix = "default_"
-		self.current_script_path = current_path
+		self.folder_code = folder_code
 		if home_path is None:
 			self.home_path = os.environ['HOME'] + "/"
 		else:
 			self.home_path = home_path
 
-		hook_bash_path = self.current_script_path + "/bash/f.sh"
+		hook_bash_path = self.folder_code + "/bash/f.sh"
 		self.hook_updated_str = "source \"" + hook_bash_path + "\""
 
 	def handle_setup(self):
@@ -29,10 +29,10 @@ class SetupManager:
 		if not self.setup_rc_file():
 			return False
 		
-		if not self.copy_default_file(self.current_script_path + "/config/" + self.default_prefix + self.configuration_file , self.project_directory + self.configuration_file):
+		if not self.copy_default_file(self.folder_code + "/config/" + self.default_prefix + self.configuration_file, self.project_directory + self.configuration_file):
 			return False
 	
-		if not self.copy_default_file(self.current_script_path + "/config/" + self.default_prefix + self.version_file , self.project_directory + self.version_file):
+		if not self.copy_default_file(self.folder_code + "/config/" + self.default_prefix + self.version_file, self.project_directory + self.version_file):
 			return False
 
 		return True
@@ -46,7 +46,7 @@ class SetupManager:
 				self.logger_console.log_on_console_info("copy file from: " + file_default)
 				copyfile(file_default, file_output)
 			else:
-				self.logger_console.log_on_console_error("default file not found: "+ file_default)
+				self.logger_console.log_on_console_error("default file not found: " + file_default)
 				return False
 		return True
 

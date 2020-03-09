@@ -1,13 +1,24 @@
+import logging
+import os
+
 import bashlex
 
 from unittest import TestCase
 from fastHistory.parser import bashParser
+from fastHistory.unitTests.loggerTest import LoggerTest
 
 
 class TestBashParser(TestCase):
     """
     test class for the bash parser
     """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.logger_test = LoggerTest()
+
+    def setUp(self):
+        self.logger_test.log_test_function_name(self.id())
 
     def test_parse(self):
         self.parser = bashParser.BashParser()

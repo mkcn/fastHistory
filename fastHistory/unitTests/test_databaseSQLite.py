@@ -7,27 +7,22 @@ from fastHistory.database.databaseSQLite import DatabaseSQLite
 import sqlite3
 from datetime import datetime
 
+from fastHistory.unitTests.loggerTest import LoggerTest
+
 
 class TestDatabaseSQLite(unittest.TestCase):
 
-    TEST_FOLDER = "../../data_test/"
-    TEST_LOG_FILENAME = "test_databaseSQLite.log"
     TEST_DB_FILENAME = "test_databaseSQLite.db"
     TEST_DB_FILENAME_OLD = "test_databaseSQLite_old.db"
 
+    @classmethod
+    def setUpClass(cls):
+        cls.logger_test = LoggerTest()
+        cls.output_test_path = cls.logger_test.get_test_folder()
+        cls.db_path = cls.logger_test.get_test_folder() + cls.TEST_DB_FILENAME
+
     def setUp(self):
-        """
-        initial set for logging and current path
-
-        :return:
-        """
-        self.output_test_path = os.path.dirname(os.path.realpath(__file__)) + "/" + self.TEST_FOLDER
-        if not os.path.exists(self.output_test_path):
-            os.makedirs(self.output_test_path)
-        self.db_path = self.output_test_path + self.TEST_DB_FILENAME
-        self.log_path = self.output_test_path + self.TEST_LOG_FILENAME
-
-        logging.basicConfig(filename=self.log_path, level=logging.DEBUG)
+        self.logger_test.log_test_function_name(self.id())
 
     def test_get_first_20_filtered_elements(self):
         """
@@ -35,7 +30,6 @@ class TestDatabaseSQLite(unittest.TestCase):
 
         :return:
         """
-        self._set_text_logger()
         db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
         for i in range(25):
             self.assertTrue(db.add_element("ls " + str(i), "test " + str(i), ["sec" + str(i)]))
@@ -53,7 +47,6 @@ class TestDatabaseSQLite(unittest.TestCase):
         test command edit feature with merging conflicts
         :return:
         """
-        self._set_text_logger()
         db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
         self.assertTrue(db.add_element("t1", "test1", ["t1", "f1", "common"]))  # id 1
         self.assertTrue(db.add_element("t2", "test2", ["t2", "f2", "common"]))  # id 2
@@ -93,7 +86,6 @@ class TestDatabaseSQLite(unittest.TestCase):
         test searches with special set of chars
         :return:
         """
-        self._set_text_logger()
         db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
         self.assertTrue(db.add_element("1234", "1234", ["1234", "1234"]))
 
@@ -128,7 +120,6 @@ class TestDatabaseSQLite(unittest.TestCase):
         fill db with 100 different entries and then check if db contain 100 entries
         :return:
         """
-        self._set_text_logger()
         db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
         tot_line = 100
         for i in range(tot_line):
@@ -146,7 +137,6 @@ class TestDatabaseSQLite(unittest.TestCase):
         the test is successful if the result is returned within 2 seconds
         :return:
         """
-        self._set_text_logger()
         db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
 
         element = "a" * 40
@@ -169,7 +159,6 @@ class TestDatabaseSQLite(unittest.TestCase):
         store same command multiple times with different description and tags
         try then to retrieve it
         """
-        self._set_text_logger()
         db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
         # insert case 1
         self.assertTrue(db.add_element("ls -la", "test1", ["security"]))
@@ -218,7 +207,6 @@ class TestDatabaseSQLite(unittest.TestCase):
         store same command multiple times with different description and tags
         try then to retrieve it
         """
-        self._set_text_logger()
         db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
         # illegal @ char
         self.assertFalse(db.add_element("test 1", "@test", ["test"]))
@@ -235,7 +223,6 @@ class TestDatabaseSQLite(unittest.TestCase):
 
         :return:
         """
-        self._set_text_logger()
 
         db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
         db.add_element("ls", "test", ["sec"])
@@ -251,7 +238,6 @@ class TestDatabaseSQLite(unittest.TestCase):
 
         :return:
         """
-        self._set_text_logger()
 
         # clean test directory
         if os.path.exists(self.output_test_path + self.TEST_DB_FILENAME_OLD):
@@ -318,7 +304,6 @@ class TestDatabaseSQLite(unittest.TestCase):
 
         :return:
         """
-        self._set_text_logger()
 
         # clean test directory
         if os.path.exists(self.output_test_path + self.TEST_DB_FILENAME_OLD):
@@ -382,7 +367,6 @@ class TestDatabaseSQLite(unittest.TestCase):
 
         :return:
         """
-        self._set_text_logger()
 
         # clean test directory
         if os.path.exists(self.output_test_path + self.TEST_DB_FILENAME_OLD):
@@ -495,11 +479,3 @@ class TestDatabaseSQLite(unittest.TestCase):
         result_import = db.import_external_database(self.output_test_path + self.TEST_DB_FILENAME_OLD + "")
         self.assertEqual(result_import, -1)
 
-    def _set_text_logger(self):
-        """
-        set global setting of the logging class and print (dynamically) the name of the running test
-        :return:
-        """
-        logging.info("*" * 60)
-        # 0 is the current function, 1 is the caller
-        logging.info("Start test '" + str(inspect.stack()[1][3]) + "'")
