@@ -559,9 +559,9 @@ class Picker(object):
             # open man page
             elif c == 109:  # char 'm'
                 # TODO fix and show description in help line
-                from fastHistory.console import consoleUtils
-                cmd = data_from_man_page[0][BashParser.INDEX_CMD][BashParser.INDEX_VALUE]
-                consoleUtils.ConsoleUtils.open_interactive_man_page(cmd)
+                # from fastHistory.console import consoleUtils
+                #cmd = data_from_man_page[0][BashParser.INDEX_CMD][BashParser.INDEX_VALUE]
+                #consoleUtils.ConsoleUtils.open_interactive_man_page(cmd)
                 return ""
             # -> command
             elif c == KEY_RIGHT:

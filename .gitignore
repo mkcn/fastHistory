@@ -16,9 +16,7 @@ pip/build-env/
 data/
 data_test/
 
-# Ignored file for bashlex
-fastHistory/parser/bashlex/parsetab.py
-fastHistory/parser/bashlex/parser.out
+# general
 *.pyc
 *.swp
 .coverage
