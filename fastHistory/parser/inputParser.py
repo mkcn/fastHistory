@@ -60,7 +60,7 @@ class InputParser(object):
 
         tags = []
 
-        if tags_str is InputParser.EMTPY_STRING:
+        if tags_str == InputParser.EMTPY_STRING:
             return []
 
         if tags_str is not None:
@@ -91,7 +91,7 @@ class InputParser(object):
         :return:            if the input is valid -> the description text (e.g. "description for a command")
                             otherwise None
         """
-        if description is InputParser.EMTPY_STRING:
+        if description == InputParser.EMTPY_STRING:
             return InputParser.EMTPY_STRING
 
         match = re.search(InputParser.REGEXP_INPUT_DESCRIPTION, description, flags=re.UNICODE)
@@ -189,7 +189,7 @@ class InputParser(object):
 
         # tags
         tags = []
-        if tags_str is not None and tags_str is not InputParser.EMTPY_STRING:
+        if tags_str is not None and tags_str != InputParser.EMTPY_STRING:
             logging.debug("tags_str: " + str(tags_str))
             tags_tmp = tags_str.split(InputParser.TAG_SIGN)
             if len(tags_tmp) >= 2:
@@ -231,7 +231,7 @@ class InputParser(object):
     def get_list_words(string):
         if string is None:
             return []
-        elif string is "":
+        elif string == "":
             return ['']
         else:
             # split string

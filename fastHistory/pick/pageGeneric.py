@@ -73,7 +73,7 @@ class PageGeneric(object):
                 color_marked = self.drawer.color_search
             len_sub_str = len(sub_str)
 
-            if index_sub_str is not -1:
+            if index_sub_str != -1:
                 self.drawer.set_x(len_text)
                 self.drawer.draw_row(x=text[index_sub_str:index_sub_str + len_sub_str], color=color_marked)
 

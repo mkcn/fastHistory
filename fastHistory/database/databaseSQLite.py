@@ -466,8 +466,8 @@ class DatabaseSQLite(object):
         old_date = int(old_element[4])
 
         # set new description
-        if new_description is not None and new_description is not "" and new_description != old_description:
-            if old_description is "":
+        if new_description is not None and new_description != "" and new_description != old_description:
+            if old_description == "":
                 description = new_description
             else:
                 # concatenate old and new description
@@ -547,7 +547,7 @@ class DatabaseSQLite(object):
         :return:            True   if update is successful. False otherwise
         """
         try:
-            if new_cmd is None or new_cmd is "":
+            if new_cmd is None or new_cmd == "":
                 logging.error("database - update_command_field: new command is null")
                 return False
             if old_cmd == new_cmd:
@@ -822,7 +822,7 @@ class DatabaseSQLite(object):
         :param tags_string:     ǁtag1ǁtag2ǁtag3
         :return:                ["tag1","tag2","tag3"]
         """
-        if type(tags_string) is not str:
+        if type(tags_string) != str:
             logging.error("database - _tags_string_to_array - wrong type")
             return None
         if tags_string == "":
