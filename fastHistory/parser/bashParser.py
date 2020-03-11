@@ -144,7 +144,6 @@ class BashParser(object):
             elif bash_node.kind in self.CMD_NODE_TYPE_PIPE:
                 logging.debug("PIPE: " + str(bash_node.pipe))
             else:
-                print("unknown: " + bash_node.kind + "\n")
                 logging.debug("unknown: " + bash_node.kind + "\n")
 
     @staticmethod

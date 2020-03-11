@@ -95,7 +95,7 @@ class TestManParser(TestCase):
                 self.assertTrue(flag_meaning)
                 logging.info("flag meaning: " + str(flag_meaning))
             else:
-                print("warning! program not found in your system:" + t[0])
+                print("warning! this command may not be available in your system:" + t[0])
                 logging.warning("warning! program not found in your system:" + t[0])
                 self.assertTrue(False)
 

@@ -25,7 +25,7 @@ class LoggerTest:
 
     def log_test_function_name(self, function_id):
         logging.info("#"*100)
-        logging.info("##" + str(function_id))
+        logging.info("## " + str(function_id))
 
 
 class LoggerBashTest(LoggerBash):
