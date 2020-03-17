@@ -106,7 +106,7 @@ class SetupManager:
 			zsh_found = True
 			zsh_result = self.check_for_source_string(zshrc_path)
 		
-		if not bash_found and not bash_found:
+		if not bash_found and not zsh_found:
 			self.logger_console.log_on_console_error("neither" + bashrc_path + " nor " + zshrc_path + " have been found. Please check your system")
 			return False
 		else:
