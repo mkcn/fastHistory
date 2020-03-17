@@ -111,7 +111,7 @@ class SetupManager:
 			return False
 		else:
 			# if a file exists the result must be true 
-			return (not bash_found or bash_result) and (not zsh_found or bash_result)
+			return (not bash_found or bash_result) and (not zsh_found or zsh_result)
 
 	def check_for_source_string(self, file_path_in):
 		self.logger_console.log_on_console_info("setup: " + file_path_in)
