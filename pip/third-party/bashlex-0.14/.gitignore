@@ -1,0 +1,10 @@
+*.pyc
+*.swp
+.coverage
+.vagrant
+bashlex/parser.out
+bashlex/parsetab.py
+
+build/
+dist/
+bashlex.egg-info/

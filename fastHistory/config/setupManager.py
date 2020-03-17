@@ -43,7 +43,6 @@ class SetupManager:
 	def copy_default_file(self, file_default, file_output):
 		if not os.path.isfile(file_output):
 			if os.path.isfile(file_default):
-				self.logger_console.log_on_console_info("copy file from: " + file_default)
 				copyfile(file_default, file_output)
 			else:
 				self.logger_console.log_on_console_error("default file not found: " + file_default)
@@ -85,7 +84,7 @@ class SetupManager:
 		if answer:
 			if self.handle_setup():
 				self.logger_console.log_on_console_info("setup completed")
-				self.logger_console.log_on_console_warn("Please restart your terminal and then use 'f' to start. ")
+				self.logger_console.log_on_console_warn("please restart your terminal and then use 'f' to start")
 			else:
 				self.logger_console.log_on_console_error("setup failed")
 		else:
@@ -94,76 +93,85 @@ class SetupManager:
 	def setup_rc_file(self):
 		bashrc_path = self.home_path + ".bashrc"
 		zshrc_path = self.home_path + ".zshrc"
+		bash_found = False
+		bash_result = False
+		zsh_found = False
+		zsh_result = False
+
+		if os.path.isfile(bashrc_path):
+			bash_found = True
+			bash_result = self.check_for_source_string(bashrc_path)
+
+		if os.path.isfile(zshrc_path):
+			zsh_found = True
+			zsh_result = self.check_for_source_string(zshrc_path)
 		
-		if not self.check_for_source_string(bashrc_path) and not self.check_for_source_string(zshrc_path):
-			self.logger_console.log_on_console_error("neither .bashrc nor .zshrc have been found") # TODO change
+		if not bash_found and not bash_found:
+			self.logger_console.log_on_console_error("neither" + bashrc_path + " nor " + zshrc_path + " have been found. Please check your system")
 			return False
 		else:
-			self.logger_console.log_on_console_info("hook setup correctly for current user") # TODO change
-			return True
+			# if a file exists the result must be true 
+			return (not bash_found or bash_result) and (not zsh_found or bash_result)
 
 	def check_for_source_string(self, file_path_in):
 		self.logger_console.log_on_console_info("setup: " + file_path_in)
-		if os.path.isfile(file_path_in):
-			self.logger_console.log_on_console_info("rc file found")
-			file_path_out = file_path_in + ".fastHistory.tmp"
-			fin = open(file_path_in, "r")
-			# TODO , remove tmp file or make sure it is not opened in append mode
-			fout = open(file_path_out, "w")
+		file_path_out = file_path_in + ".fastHistory.tmp"
+		fin = open(file_path_in, "r")
+		# TODO remove tmp file or make sure it is not opened in append mode
+		fout = open(file_path_out, "w")
 
-			pattern = re.compile("^source .*/fastHistory.*/bash/f.sh.*")
-			found_hook_updated = False
-			found_hook_old = False
-			for line in fin:
-				res = pattern.match(line)
-				if res is not None:
-					if res.group() == self.hook_updated_str:
-						found_hook_updated = True
-					else:
-						found_hook_old = True
+		pattern = re.compile("^source .*/fastHistory.*/bash/f.sh.*")
+		found_hook_updated = False
+		found_hook_old = False
+		for line in fin:
+			res = pattern.match(line)
+			if res is not None:
+				if res.group() == self.hook_updated_str:
+					found_hook_updated = True
 				else:
-					fout.write(line)
-			fout.write("\n")
-			fout.write(self.hook_updated_str)
-			fout.truncate()
-			fout.close()
-			fin.close()
-
-			if found_hook_updated and not found_hook_old:
-				self.logger_console.log_on_console_info("hook setup already setup")
-				if os.path.isfile(file_path_out):
-					os.remove(file_path_out)
-				return True
+					found_hook_old = True
 			else:
-				self.logger_console.log_on_console_info("hook need to be setup/update")
-				dt = datetime.datetime.now()
-				nowms = str(dt.microsecond)
+				fout.write(line)
+		fout.write("\n")
+		fout.write(self.hook_updated_str)
+		fout.truncate()
+		fout.close()
+		fin.close()
 
-				file_path_in_tmp = file_path_in + "-" + nowms + ".fastHistory.backup"
-				if os.path.isfile(file_path_in_tmp):
-					self.logger_console.log_on_console_error("cannot overwrite backup file, try again")
-					return False
-				move(file_path_in, file_path_in_tmp)
-				move(file_path_out, file_path_in)
-
-				with open(file_path_in, 'r') as f:
-					lines = f.read().splitlines()
-					last_line = lines[-1]
-					if last_line == self.hook_updated_str:
-						self.logger_console.log_on_console_info("bash hook set correctly")
-						if os.path.isfile(file_path_in_tmp):
-							os.remove(file_path_in_tmp)
-						if os.path.isfile(file_path_out):
-							os.remove(file_path_out)
-						return True
-					else:
-						self.logger_console.log_on_console_error("something went wrong and bash hook has not been set")
-						self.logger_console.log_on_console_error("a backup file can be found here: " + file_path_in_tmp)
-						# TODO explain better
-						return False
-			return False
+		if found_hook_updated and not found_hook_old:
+			self.logger_console.log_on_console_info("hook already present")
+			if os.path.isfile(file_path_out):
+				os.remove(file_path_out)
+			return True
 		else:
-			return False
+			dt = datetime.datetime.now()
+			nowms = str(dt.microsecond)
+
+			file_path_in_tmp = file_path_in + "-" + nowms + ".fastHistory.backup"
+			if os.path.isfile(file_path_in_tmp):
+				self.logger_console.log_on_console_error("cannot overwrite backup file, try again")
+				return False
+			move(file_path_in, file_path_in_tmp)
+			move(file_path_out, file_path_in)
+
+			with open(file_path_in, 'r') as f:
+				lines = f.read().splitlines()
+				last_line = lines[-1]
+				if last_line == self.hook_updated_str:
+					if found_hook_old:
+						self.logger_console.log_on_console_info("hook updated")
+					else:
+						self.logger_console.log_on_console_info("hook added")
+					if os.path.isfile(file_path_in_tmp):
+						os.remove(file_path_in_tmp)
+					if os.path.isfile(file_path_out):
+						os.remove(file_path_out)
+					return True
+				else:
+					self.logger_console.log_on_console_error("something went wrong and hook has not been set in " + file_path_in)
+					self.logger_console.log_on_console_error("a backup file can be found here: " + file_path_in_tmp)
+					return False
+		return False
 
 
 
