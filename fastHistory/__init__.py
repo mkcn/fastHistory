@@ -183,13 +183,19 @@ def f():
 	else:
 		logger_console.log_on_console_error("error: HOME variable cannot be found")
 
+	if sys.argv[-1] == "--from-installer":
+		is_from_installer=True
+		del sys.argv[-1]
+	else:
+		is_from_installer=False
+
 	# get execution folder
 	# TODO rename current_path with folder_code
 	# TODO rename project_dir with folder_data
 	current_path = os.path.dirname(os.path.realpath(__file__))
 
 	# load config file
-	configReader = ConfigReader(project_dir, current_path, PATH_CONFIGURATION_FILE)
+	configReader = ConfigReader(project_dir, current_path, is_from_installer, PATH_CONFIGURATION_FILE)
 	if configReader.check_config():
 		# set color for console logs
 		logger_console.set_theme(configReader.get_theme())

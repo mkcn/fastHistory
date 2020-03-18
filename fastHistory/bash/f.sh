@@ -19,14 +19,14 @@ _fast_history_executable="f"
 # define internal log function 
 _fast_history_log() {
 	if [ "$1" = "error" ]; then
-		printf "[\033[0;31mfastHistory\033[0m][BASH][ERROR] $2\n";
+		printf "[\033[0;31mfastHistory\033[0m][bash] $2\n";
 	elif [ "$1" = "debug" ] && $_fast_history_bash_debug ; then
-		printf "[\033[0;36mfastHistory\033[0m][BASH][DEBUG] $2\n";
+		printf "[\033[0;36mfastHistory\033[0m][bash] $2\n";
 	fi
 }
 
 # start message
-_fast_history_log "debug" "loading fastHistory start..";
+_fast_history_log "debug" "loading bash hook..";
 
 # check if bash or zsh
 if [ -n "$BASH_VERSION" ]; then
@@ -36,13 +36,13 @@ elif [ -n "$ZSH_VERSION" ]; then
 	_fast_history_log "debug" "zsh detected";
 	_fast_history_project_directory="$0:a:h/../";
 else
-	_fast_history_log "error" "your shell is not supported";
+	_fast_history_log "error" "shell not supported, only bash and zsh are allowed";
 	return 1;
 fi
 
 # check environment
 if [ -s "$_fast_history_project_directory"../fastHistory/__init__.py ]; then
-	_fast_history_log "debug" "installation folder: $_fast_history_project_directory";
+	_fast_history_log "debug" "folder: $_fast_history_project_directory";
 else
 	_fast_history_log "error" "cannot find installation folder";
 	return 1;
@@ -65,11 +65,13 @@ fi
 _fast_history_local_bin=$HOME/.local/bin
 if [ -f $_fast_history_local_bin/$_fast_history_executable ]; then
 	if echo "$PATH" | grep -q -F $_fast_history_local_bin; then 
-		_fast_history_log "debug" "$_fast_history_local_bin is already in your PATH variable";
+		_fast_history_log "debug" "$_fast_history_local_bin already in PATH variable";
 	else
 		export PATH=$PATH:$_fast_history_local_bin
-		_fast_history_log "debug" "$_fast_history_local_bin has been added to your PATH variable";
+		_fast_history_log "debug" "$_fast_history_local_bin added to PATH variable";
 	fi
+else
+	_fast_history_log "debug" "$_fast_history_local_bin/$_fast_history_executable does not exist (this may be an issue)";
 fi
 
 # "preexec" is executed just after a command has been read and is about to be executed
@@ -107,5 +109,5 @@ precmd() {
 	fi;
      }
 
-_fast_history_log "debug" "loading fastHistory completed. Use 'f' to start"; 
+_fast_history_log "debug" "loading fastHistory completed, use 'f' to start"; 
 

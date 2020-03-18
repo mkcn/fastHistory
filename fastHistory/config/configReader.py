@@ -30,12 +30,13 @@ class ConfigReader:
     _config = None
     _checkError = [False, ""]
 
-    def __init__(self, project_dir, current_path, config_file):
+    def __init__(self, project_dir, current_path, is_from_installer, config_file):
         
         self._config = configparser.ConfigParser()
         self.project_dir = project_dir
         self.current_path = current_path
         self.config_path_file = project_dir + config_file
+        self.is_from_installer = is_from_installer
 
     def check_config(self):
         """
@@ -50,10 +51,10 @@ class ConfigReader:
 
         if not os.path.isdir(self.project_dir):
             self._checkError = [True, "installation folder not found"]
-        elif self._BASH_SHARED_VALUE not in os.environ:
+        elif not self.is_from_installer and self._BASH_SHARED_VALUE not in os.environ:
             self._checkError = [False, "bash hook not set or loaded (you may have forgot to restart your terminal)"]
-        elif os.environ[self._BASH_SHARED_VALUE] != self.current_path + "/bash/../":
-            self._checkError = [True, "old bash hook found (reconfiguration needed)"]
+        elif not self.is_from_installer and os.environ[self._BASH_SHARED_VALUE] != self.current_path + "/bash/../":
+            self._checkError = [True, "old bash hook found (reconfiguration needed)- "]
         else:
             try:
                 self._config.read(self.config_path_file)
