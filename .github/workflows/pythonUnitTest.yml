@@ -41,8 +41,6 @@ jobs:
     - name: Test with terminal commands
       run: |
           echo $PATH
-          source /home/runner/.profile
-          echo $PATH
           f --setup
           source /home/runner/.profile
           ls -ls #tag

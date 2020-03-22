@@ -51,7 +51,7 @@ class SetupManager:
 
 	def create_folder(self):
 		if not os.path.isdir(self.project_directory):
-			os.mkdir(self.project_directory)
+			os.makedirs(self.project_directory)
 			if os.path.isdir(self.project_directory):
 				self.logger_console.log_on_console_info("created project folder: " + self.project_directory)
 			else:
