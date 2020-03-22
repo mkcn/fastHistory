@@ -6,8 +6,8 @@ jobs:
   build:
     strategy:
         matrix:
-            os: [ubuntu-18.04] # macos-10.15
-            python-version: [3.6, 3.7, 3.8] #
+            os: [ubuntu-18.04] # ubuntu-16.04, macos-10.15
+            python-version: [3.6] # 3.7, 3.8
 
     runs-on: ${{ matrix.os }}
 
@@ -24,18 +24,31 @@ jobs:
 
           if [[ "$OSTYPE" == "linux-gnu" ]]; then
               echo "OS: Linux"
-              pip3 install bashlex
-              pip3 install pyperclip
               sudo apt-get install nmap # nmap is needed for the man parser in UnitTest
           elif [[ "$OSTYPE" == "darwin"* ]]; then
               echo "OS: Mac OSX"
-              pip3 install bashlex
-              pip3 install pyperclip
               brew install nmap
           else
               echo "unknown: " $OSTYPE
               exit 1
           fi
+
+          pip3 install bashlex
+          pip3 install pyperclip
+          # bashlex is not present in the test pypi, therefore it must installed separately
+          pip install --index-url https://test.pypi.org/simple/ --no-deps fastHistory
+
+
+    - name: Test with terminal commands
+        run: |
+          echo $PATH
+          source .profile
+          echo $PATH
+          f --setup
+          source .profile
+          ls -ls #tag
+          f --export
+
     - name: Test with UnitTest
       run: |
         if [[ "$OSTYPE" == "linux-gnu" ]]; then
