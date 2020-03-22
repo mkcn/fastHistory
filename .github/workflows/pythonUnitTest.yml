@@ -41,10 +41,10 @@ jobs:
     - name: Test with terminal commands
       run: |
           echo $PATH
-          source .profile
+          source /home/runner/.profile
           echo $PATH
           f --setup
-          source .profile
+          source /home/runner/.profile
           ls -ls #tag
           f --export
 
