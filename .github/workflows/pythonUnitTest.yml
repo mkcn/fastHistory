@@ -38,9 +38,8 @@ jobs:
           # bashlex is not present in the test pypi, therefore it must installed separately
           pip install --index-url https://test.pypi.org/simple/ --no-deps fastHistory
 
-
     - name: Test with terminal commands
-        run: |
+      run: |
           echo $PATH
           source .profile
           echo $PATH
