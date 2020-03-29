@@ -24,28 +24,28 @@ class ManParser(object):
                   " (?:-|—|--) " \
                   "(.*\n( +.*\n)*)$"
     # regex notes
-    #   - (?:OPTIONS)?    means that the previous line can be empty or with the 'OPTIONS' string
-    #   - "%s" is a dynamic field of the regex and it is replaced with the flag to search
+    #   - "%s" is a dynamic field of the string and it is replaced with the flag to search
     #   - the flag can be at the beginning or as secondary item ("-a" or "--all, -a" or "-a\n     --all")
     #       - each item must start with "-"
+    # - the line before the flag(s) must have a shorter indentation than the flag's line:
+    #                       - a new line ("\n       --help")
+    #                       - a title ("OPTIONS\n      --help")
+    #                       - a title with index ("   Subcategory\n      --help")  # 3 spaces < 6 spaces
     #   - after a flag we can found:
     #                       - comma     -a, --other
     #                       - equal     -a=PATTERN
     #                       - bracket   -a[=WHEN]
-    # - the flag is always preceded by a new line ("\n       -a")
+    # - the regex groups are two:
+    #                       - the first one is used to count the indentation
+    #                       - the second one is used to get only the flag and meaning text
     # Examples:
     #       "OPTIONS\n       -o outputfile\n               Specify where the output is to be written.
+    #       "OPTIONS\n   Subcategory\n       -o outputfile\n               Specify where the output is to be written.
     #       "\n      -a, --all\n        do not ignore entries starting with ."
     #       "\n      -q\n--quiet     Turn off Wget's output."
-
-    _regexp_flag = r"^(?:OPTIONS)?((\n {2,7}-.+)?" \
-                   r"\n {2,7}(-.+[,;] )*" \
-                   r"%s" \
-                   r"((\[)?[,;=].+(\])?)?" \
-                   r"( .*)?" \
-                   r"\n" \
-                   r"( +.*\n)*)$"
-    _regex_name_no_group = "^ {7}ls - .*"
+    # Final note:
+    #                       this may be improved in the future using an external parser of the man page
+    _regexp_flag = r"^( {0,7})(?:\S.*)?((\n\1 {3,7}-.+)?\n\1 {3,7}(-.+[,;] )*%s(?:(?:\[)?[,;=].+(\])?)?(?: .*)?\n(?: +.*\n)*)$"
 
     INDEX_IS_FIRST_LINE = 0
     INDEX_MEANING_VALUE = 1
@@ -115,11 +115,9 @@ class ManParser(object):
             try:
                 result = re.search(self._regexp_flag % flag, self.man_page, re.MULTILINE)
                 if result is not None:
-                    # get group (1) and not the all string
-                    result = result.group(1)
+                    result = result.group(2)
                 else:
                     logging.error("get_flag_meaning: regex does not match")
-                    logging.error("get_flag_meaning:" + str(self.man_page))
                     return None
             except sre_constants.error:
                 logging.error("flag meaning parser: ", sys.exc_info()[0])
@@ -175,3 +173,5 @@ class ManParser(object):
 
         return final_result
 
+    def get_man_page(self):
+        return self.man_page
