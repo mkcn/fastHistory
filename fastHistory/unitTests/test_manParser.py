@@ -69,11 +69,15 @@ class TestManParser(TestCase):
 
     def test_get_flag_meaning(self):
         """
-        to run this test check if all commands are available in your system
+        to run this test check if the command's flag are retrieved correctly from the man page
 
-        [[linux-only], [command, flag], [possible_result1, possible_result2, ..]]
+        input:
+            [[linux-only], [command, flag], [possible_result1, possible_result2, ..]]
 
         possible_result_x is needed because different system may have different man pages
+
+        note: in the github action the following system have been tested:
+            Ubuntu-16.04, Ubuntu-18.04, macOS-10.15
 
         :return:
         """
