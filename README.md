@@ -1,19 +1,26 @@
-# fastHistory
 
-A python tool connected to your terminal to store important commands and search them in a new and faster way
+# fastHistory 2.0 - speed up the usage of your terminal!
 
-![Search sample](images/search.gif)
+A python tool connected to your terminal to store important commands, search them in a fast way and automatically paste them into your terminal
 
+![](images/search.gif)
+
+- [Intro](#Intro)
+- [How to install](#How-to-install)
+- [Commands and syntax](#Commands-and-syntax)
+- [License](#License)
+
+# Intro
 ### Why you need it?
 
 How often do you need to reuse a command but you cannot remember it (or all the needed options/flags)?
 
 ```sh
-# example of an 'intuitive' and 'obvious' bash command from my bash history
-$ srm -lrvz f1 f2 d1/
+# example of a common but not so 'easy-to-remember' bash command from my bash history
+$ tar -xvf archive.tar.gz
 ```
 
-How many times do you search the same command on Google, over and over? 
+How many times do you search the same commands on Google, over and over? 
 
 > 42 times..  yes..  based on my experience the answer is [42](https://www.independent.co.uk/life-style/history/42-the-answer-to-life-the-universe-and-everything-2205734.html)
 
@@ -25,83 +32,89 @@ And how many times have you told yourself to store this *super* useful command b
 if you know what I am talking about, **fastHistory** is the tool you are looking for!
 
 
-### The tool
+### Usage sample
 
 **fastHistory** can save your commands directly from your terminal, all you need is a **#**
 
 ```sh
-$ srm -lrvz f1 f2 d1/ #
-                     /\
-                      \------- fastHistory will store "srm -lrvz f1 f2 d1/" in its internal database
+$ tar -xvf file.tar.gz #
+                      /\
+                       \------- fastHistory will store "tar -xvf archive.tar.gz" in its internal database
 ```
 
 You can specify one or more **tags**
 
 
 ```sh
-$ srm -lrvz f1 f2 d1/ #secure #remove #file #directory
+$ tar -xvf file.tar.gz #extract #archive #untar
 ```
 
 or a **description**
 
 ```sh
-$ srm -lrvz f1 f2 d1/ #@delete file and overwrite it 2 times
+$ tar -xvf file.tar.gz #@extract compressed files from archive
 ```
 
 or **both**
 
 ```sh
-$ srm -lrvz f1 f2 d1/ #secure #remove #file #directory @delete file and overwrite it 2 times
+$ tar -xvf archive.tar.gz #untar @extract compressed files from archive
 ```
 
-Finally, to search your saved commands, all you need is **f**
+To search the saved commands, all you need is **f**
 
 ```sh
-$ f secure
+$ f extract
 ```
 
-**fastHistory** will then inject the selected command in your terminal input
+Finally, you only need to press 'enter' to directly paste it into your terminal to be ready to go!
 
 ![Search sample](images/sample.gif)
 
 
-For each saved command you can get a fast summary from the man page with details of the used options/flags
-
-**Warning**: this feature currently does not cover the syntax of all commands
+For each saved command you can also get a quick summary of the used options/flags (extracted from the man page) 
 
 ![Info ls sample](images/show.info.srm.png)
+
+**Warning**: this feature currently does not cover the syntax of all commands
 
 Furthermore, you can easily export/import all data to make __backups__ and to share your commands with a different machine
 
 ```sh
-$ f-export
-
-$ f-import fastHistory_2019-03-23.db
+$ f --export
+$ f --import fastHistory_2019-03-23.db
 ```
-
 
 # How to install
 
-- Download this repository
+### Requirements
 
-  - `cd $HOME`
-  - `git clone https://github.com/mkcn/fastHistory.git`
+- `python3`
+- `python3-pip` (not needed for offline mode)
+    
+### Install with pip3
 
-- Enable fastHistory for bash
+1. `pip3 install fasthistory` *
+2. `f` **
 
-  - `echo 'source "$HOME/fastHistory/bash/f.sh"' >> .bashrc`
+\* *do not use `pip` or `sudo`*
 
-- Enable fastHistory for zsh (**only if** zsh is installed)
-  
-  - `echo 'source "$HOME/fastHistory/bash/f.sh"' >> .zshrc`
+\*\* *if command not found, the first time you need to use `~./local/bin/f` instead*
 
-- Close and reopen your shell
+### Install in offline mode
 
+ 1.  download the latest release with this *easy-to-type* link or  manually download [it](https://github.com/mkcn/fastHistory/releases)
+	 - `wget mkcn.me/f`
+ 2. (if needed) move it to the remote/offline machine
+ 3. unzip it
+	 -  `tar -xf archive.tar.gz` 
+ 4. run installed with the target user
+	 - `./install.sh`
 
-### How to update ###
+### Update from old git clone
 
  - `git pull`
-
+ - `./install.sh`
 
 # Commands and syntax
 
@@ -111,10 +124,10 @@ $ f-import fastHistory_2019-03-23.db
 <command_to_save> #[<tag> [#<tag> ...]][@<description>]
 ```
 
-#### Explicit adding without execution
+#### Adding without execution
 
 ```
-f-add <command_to_save> #[<tag> [#<tag> ...]][@<description>]
+# <command_to_save> #[<tag> [#<tag> ...]][@<description>]
 ```
 
 #### Simple search 
@@ -142,17 +155,26 @@ f [<filter>] [#<tag_filter> ...] [@<description_filter>]
 
 #### Export database
 ```
-f-export [<output_name>]
+f --export [<output_name>]
 ```
 * the __output__ is the file name of the output database (this parameter is optional)
 
 #### Import external database
 ```
-f-import <input_name>
+f --import <input_name>
 ```
 
-
 * the __input_name__ is the file name of the input database (e.g. fastHistory_2019-03-23.db)
+
+#### Change fastHistory configuration
+```
+f --config
+```
+
+#### Force a fastHistory setup to fix possible issues
+```
+f --setup
+```
 
 License
 ----
@@ -176,7 +198,6 @@ The following external projects have been used as part of **fastHistory**:
     *  **goal**: this Python module has been used to select the option from the menu
     *  **code section**: ```fastHistory/pick```
     *  **changes**: all code has been restructured and adapted with a different UI
-
 
 
 
