@@ -1,5 +1,6 @@
 import inspect
 import logging
+import sys
 from unittest import TestCase
 
 import os
@@ -70,7 +71,7 @@ class TestManParser(TestCase):
         """
         to run this test check if all commands are available in your system
 
-        [[command, flag], [possible_result1, possible_result2, ..]]
+        [[linux-only], [command, flag], [possible_result1, possible_result2, ..]]
 
         possible_result_x is needed because different system may have different man pages
 
@@ -80,48 +81,51 @@ class TestManParser(TestCase):
         all_true = True
 
         test_string = [
-            [["tar", "-C"], ["-C, --directory=DIR", "-C directory"]],
-            [["tar", "-z"], ["-z, --gzip, --gunzip, --ungzip",  "-z  (c mode only) Compress the resulting archive with gzip(1)."]],
-            [["tar", "-f"], ["-f, --file=ARCHIVE", "-f file"]],  # flag with special indexing
-            [["tar", "-v"], ["-v, --verbose", "-v  Produce verbose output.  In create and extract modes, tar will list each file name as"]],
-            [["tar", "--check-device"], ["--check-device"]],
-            [["ls", "-l"], ["-l     use a long listing format"]],
-            [["netstat", "-a"], ["-a, --all"]],  # this has a shorter space in front of the command
-            [["netstat", "-n"], ["--numeric, -n"]],
-            [["netstat", "-v"], ["--verbose, -v"]],
-            [["netstat", "--interfaces"], ["--interfaces, -i"]],  # outside the options chapter
-            [["netstat", "--verbose"], ["--verbose, -v"]],
-            [["lsof", "-i"], ["-i [i]   selects  the  listing  of  files any of whose Internet address"]],  # this man page contains 2 sentences which start with '-i'
-            [["wget", "--quiet"], ["-q"]],  # -q\n--quite
-            [["git", "--help"], ["--help"]],
-            [["git", "--version"], ["--version"]],
-            [["nmap", "-p"], ["-p port ranges (Only scan specified ports)"]],
-            [["nmap", "-sC"], ["-sC"]],
-            [["nmap", "-sN"], ["-sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)"]],  # -sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)
-            [["nmap", "-sF"], ["-sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)"]],  # -sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)
+            [False, ["tar", "-C"], ["-C, --directory=DIR", "-C directory, --cd directory, --directory directory"]],
+            [False, ["tar", "-z"], ["-z, --gzip, --gunzip, --ungzip",  "-z, --gunzip, --gzip"]],
+            [False, ["tar", "-f"], ["-f, --file=ARCHIVE", "-f file, --file file"]],  # flag with special indexing
+            [False, ["tar", "-v"], ["-v, --verbose", "-v  Produce verbose output.  In create and extract modes, tar will list each file name as"]],
+            [True, ["tar", "--check-device"], ["--check-device"]],
+            [False, ["ls", "-l"], ["-l     use a long listing format", "-l      (The lowercase letter ``ell''.)  List in long format.  (See"]],
+            [False, ["netstat", "-a"], ["-a, --all", "-a    With the default display, show the state of all sockets; normally"]],  # this has a shorter space in front of the command
+            [False, ["netstat", "-n"], ["--numeric, -n", "-n    Show network addresses as numbers (normally netstat interprets"]],
+            [False, ["netstat", "-v"], ["--verbose, -v", "-v    Increase verbosity level."]],
+            [True, ["netstat", "--verbose"], ["--verbose, -v"]],
+            [True, ["netstat", "--interfaces"], ["--interfaces, -i"]],  # outside the options chapter
+            [False, ["lsof", "-i"], ["-i [i]   selects  the  listing  of  files any of whose Internet address"]],  # this man page contains 2 sentences which start with '-i'
+            [False, ["wget", "--quiet"], ["-q"]],  # -q\n--quite
+            [False, ["git", "--help"], ["--help"]],
+            [False, ["git", "--version"], ["--version"]],
+            [False, ["nmap", "-p"], ["-p port ranges (Only scan specified ports)"]],
+            [False, ["nmap", "-sC"], ["-sC"]],
+            [False, ["nmap", "-sN"], ["-sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)"]],  # -sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)
+            [False, ["nmap", "-sF"], ["-sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)"]],  # -sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)
         ]
         for t in test_string:
-            logging.info("test input: " + str(t[0]))
-            if parser.load_man_page(t[0][0]):
-                flag_meaning = parser.get_flag_meaning(t[0][1])
-                if flag_meaning != None:
-                    found = False
-                    for meaning in t[1]:
-                        if flag_meaning[0][1] == meaning:
-                            found = True
-                            break
-                    if not found:
-                        logging.info("flag meaning does not match any possible solution: '%s'" % flag_meaning[0][1])
-                        logging.info("full flag: '%s'" % flag_meaning)
+            logging.info("input: " + str(t[1]))
+            if not t[0] or sys.platform.startswith('linux'):
+                if parser.load_man_page(t[1][0]):
+                    flag_meaning = parser.get_flag_meaning(t[1][1])
+                    if flag_meaning != None:
+                        found = False
+                        for meaning in t[2]:
+                            if flag_meaning[0][1] == meaning:
+                                found = True
+                                break
+                        if not found:
+                            logging.info("flag meaning does not match any possible solution: '%s'" % flag_meaning[0][1])
+                            logging.info("full flag: '%s'" % flag_meaning)
+                            all_true = False
+                    else:
+                        logging.error("flag not found, please investigate with the following man output")
+                        logging.debug(parser.get_man_page())
                         all_true = False
                 else:
-                    logging.error("flag not found, please investigate with the following man output")
-                    logging.debug(parser.get_man_page())
+                    print("warning! this command may not be available in your system:" + t[1])
+                    logging.warning("warning! program not found in your system:" + t[1])
                     all_true = False
             else:
-                print("warning! this command may not be available in your system:" + t[0])
-                logging.warning("warning! program not found in your system:" + t[0])
-                all_true = False
+                logging.info("check skipped")
 
         if all_true:
             self.assertTrue(True)
