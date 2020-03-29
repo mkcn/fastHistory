@@ -37,18 +37,8 @@ jobs:
           pip3 install pyperclip
           # bashlex is not present in the test pypi, therefore it must installed separately
           pip install --index-url https://test.pypi.org/simple/ --no-deps fastHistory
-
-    - name: fastHistory installation setup
-      run: |
-          echo $PATH
+          # setup environment
           f --setup
-
-    - name: Test with terminal commands
-      if: always()
-      run: |
-          source /home/runner/.profile
-          ls -ls #tag
-          f --export
 
     - name: Test with UnitTest
       run: |
@@ -62,6 +52,7 @@ jobs:
           echo "unknown: " $OSTYPE
           exit 1
         fi
+
     - name: Read UnitTest output logs
       if: always()
       run: |
@@ -71,6 +62,20 @@ jobs:
         elif [[ "$OSTYPE" == "darwin"* ]]; then
           echo "OS: Mac OSX"
           for i in /Users/runner/runners/*/work/fastHistory/fastHistory/data_test/*.txt; do printf "\n\n## $i ## \n\n" ; cat "$i"; printf "\n" ; done ;
+        else
+          echo "unknown: " $OSTYPE
+          exit 1
+        fi
+
+    - name: Test manual installation
+      if: always()
+      run: |
+        if [[ "$OSTYPE" == "linux-gnu" ]]; then
+          echo "OS: Linux"
+          . /home/runner/work/fastHistory/fastHistory/installer.sh
+        elif [[ "$OSTYPE" == "darwin"* ]]; then
+          echo "OS: Mac OSX"
+          . /Users/runner/runners/*/work/fastHistory/fastHistory/installer.sh
         else
           echo "unknown: " $OSTYPE
           exit 1
