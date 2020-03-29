@@ -81,25 +81,43 @@ class TestManParser(TestCase):
         all_true = True
 
         test_string = [
-            [False, ["tar", "-C"], ["-C, --directory=DIR", "-C directory, --cd directory, --directory directory"]],
-            [False, ["tar", "-z"], ["-z, --gzip, --gunzip, --ungzip",  "-z, --gunzip, --gzip"]],
-            [False, ["tar", "-f"], ["-f, --file=ARCHIVE", "-f file, --file file"]],  # flag with special indexing
-            [False, ["tar", "-v"], ["-v, --verbose", "-v  Produce verbose output.  In create and extract modes, tar will list each file name as"]],
+            [False, ["tar", "-C"], ["-C, --directory=DIR",
+                                    "-C, --directory DIR",
+                                    "-C directory, --cd directory, --directory directory"]],
+            [False, ["tar", "-z"], ["-z, --gzip, --gunzip, --ungzip",
+                                    "-z, --gzip, --gunzip --ungzip",
+                                    "-z, --gunzip, --gzip"]],
+            [False, ["tar", "-f"], ["-f, --file=ARCHIVE",
+                                    "-f, --file ARCHIVE",
+                                    "-f file, --file file"]],  # flag with special indexing
+            [False, ["tar", "-v"], ["-v, --verbose",
+                                    "-v  Produce verbose output.  In create and extract modes, tar will list each file name as"]],
             [True, ["tar", "--check-device"], ["--check-device"]],
-            [False, ["ls", "-l"], ["-l     use a long listing format", "-l      (The lowercase letter ``ell''.)  List in long format.  (See"]],
-            [False, ["netstat", "-a"], ["-a, --all", "-a    With the default display, show the state of all sockets; normally"]],  # this has a shorter space in front of the command
-            [False, ["netstat", "-n"], ["--numeric, -n", "-n    Show network addresses as numbers (normally netstat interprets"]],
-            [False, ["netstat", "-v"], ["--verbose, -v", "-v    Increase verbosity level."]],
-            [True, ["netstat", "--verbose"], ["--verbose, -v"]],
+            [False, ["ls", "-l"], ["-l     use a long listing format",
+                                   "-l      (The lowercase letter ``ell''.)  List in long format.  (See"]],
+            [False, ["netstat", "-a"], ["-a, --all",
+                                        "-a    With the default display, show the state of all sockets; normally"]],  # this has a shorter space in front of the command
+            [False, ["netstat", "-n"], ["--numeric, -n",
+                                        "--numeric , -n",
+                                        "-n    Show network addresses as numbers (normally netstat interprets"]],
+            [False, ["netstat", "-v"], ["--verbose, -v",
+                                        "--verbose , -v",
+                                        "-v    Increase verbosity level."]],
+            [True, ["netstat", "--verbose"], ["--verbose, -v",
+                                              "--verbose , -v"]],
             [True, ["netstat", "--interfaces"], ["--interfaces, -i"]],  # outside the options chapter
             [False, ["lsof", "-i"], ["-i [i]   selects  the  listing  of  files any of whose Internet address"]],  # this man page contains 2 sentences which start with '-i'
             [False, ["wget", "--quiet"], ["-q"]],  # -q\n--quite
             [False, ["git", "--help"], ["--help"]],
             [False, ["git", "--version"], ["--version"]],
-            [False, ["nmap", "-p"], ["-p port ranges (Only scan specified ports)"]],
-            [False, ["nmap", "-sC"], ["-sC"]],
-            [False, ["nmap", "-sN"], ["-sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)"]],  # -sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)
-            [False, ["nmap", "-sF"], ["-sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)"]],  # -sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)
+            [False, ["nmap", "-p"], ["-p port ranges (Only scan specified ports)",
+                                     "-p port ranges (Only scan specified ports) ."]],
+            [False, ["nmap", "-sC"], ["-sC",
+                                      "-sC ."]],
+            [False, ["nmap", "-sN"], ["-sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)",
+                                      "-sN; -sF; -sX (TCP NULL, FIN, and Xmas scans) ."]],  # -sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)
+            [False, ["nmap", "-sF"], ["-sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)",
+                                      "-sN; -sF; -sX (TCP NULL, FIN, and Xmas scans) ."]],  # -sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)
         ]
         for t in test_string:
             logging.info("input: " + str(t[1]))
