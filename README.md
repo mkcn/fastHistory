@@ -1,5 +1,5 @@
 
-# fastHistory 2.0 - speed up the usage of your terminal!
+# fastHistory 2.0 - speed up your terminal!
 
 A python tool connected to your terminal to store important commands, search them in a fast way and automatically paste them into your terminal
 
