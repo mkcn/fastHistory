@@ -61,11 +61,11 @@ fi
 _fast_history_install_log "info" "installation starts"  
 rm -f -r $FASTHISTORY_FOLDER_CODE && \
 mkdir -p $FASTHISTORY_FOLDER_CODE && \
-cp --parents fastHistory/*.py $FASTHISTORY_FOLDER_CODE && \
-cp --parents fastHistory/*/*.py $FASTHISTORY_FOLDER_CODE && \
-cp --parents fastHistory/bash/*.sh $FASTHISTORY_FOLDER_CODE && \
-cp --parents fastHistory/config/default_fastHistory.conf $FASTHISTORY_FOLDER_CODE && \
-cp --parents fastHistory/config/default_version.txt $FASTHISTORY_FOLDER_CODE
+rsync -R fastHistory/*.py $FASTHISTORY_FOLDER_CODE && \
+rsync -R fastHistory/*/*.py $FASTHISTORY_FOLDER_CODE && \
+rsync -R fastHistory/bash/*.sh $FASTHISTORY_FOLDER_CODE && \
+rsync -R fastHistory/config/default_fastHistory.conf $FASTHISTORY_FOLDER_CODE && \
+rsync -R fastHistory/config/default_version.txt $FASTHISTORY_FOLDER_CODE
 # check if all files have been copied
 if [ $? -eq 0 ]; then
 	_fast_history_install_log "info" "files copied in $FASTHISTORY_FOLDER_CODE" 
