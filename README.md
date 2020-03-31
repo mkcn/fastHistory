@@ -6,7 +6,7 @@ A python tool connected to your terminal to store important commands, search the
 ![](images/search.gif)
 
 - [Intro](#Intro)
-- [Supported OS](#Supported-OS)
+- [Supported OSs](#Supported-OSs)
 - [How to install](#How-to-install)
 - [Commands and syntax](#Commands-and-syntax)
 - [License](#License)
@@ -87,25 +87,25 @@ $ f --export
 $ f --import fastHistory_2019-03-23.db
 ```
 
-# Supported OS
+# Supported OSs
 
 fastHistory can work in any OS with `python3` and a `bash` terminal
 
 note: `zsh` is also supported!
 
-### List of tested OS:
+### List of tested OSs:
 
-| OS         | OS Version | Shell  | Python versions | fasHistory version | Test mode | Result | Comment   |
+| OS         | OS Version | Shell | Python versions | fastHistory version | Test mode | Result | Comment   |
 | ---------- |:----------:| ------:|-------------:| -------------------:|----------:| ---------:| ---------:| 
 | Ubuntu     | 16.04      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | :heavy_check_mark: |    |
 | Ubuntu     | 18.04      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | :heavy_check_mark: |    |
-| macOS      | 10.15      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | :heavy_check_mark: |    |
-| Windows*   | 10         | bash   | 3.6           | 2.0.0  | manual          | :heavy_check_mark: | *Using the [Ubuntu terminal for Windows](https://ubuntu.com/tutorials/tutorial-ubuntu-on-windows) |
-| Kali       | 2020.1b    | bash   | 3.7           | 1.1.0   | manual          | :heavy_check_mark:  |    |
-| Debian     | 9          | bash   | 3.7           | 1.1.0   | manual          | :heavy_check_mark:  |    |
-| Fedora     | 29         | bash   | 3.7           | 1.1.0   | manual          | :heavy_check_mark:  |    |
-| Ubuntu     | 16.04      | zsh    | 3.7           | 2.0.0   | manual          | :heavy_check_mark: |    |
-| Kali       | 2020.1b    | zsh    | 3.7           | 1.1.0   | manual          | :white_check_mark:  | not fully tested |
+| macOS      | 10.15      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | :heavy_check_mark: | python3 needs to be [installed](https://docs.python-guide.org/starting/install3/osx/)  |
+| Windows*   | 10 (1809)  | bash   | 3.6           | 2.0.0  | manual          | :heavy_check_mark: | *using the [Ubuntu terminal for Windows](https://ubuntu.com/tutorials/tutorial-ubuntu-on-windows) |
+| Debian     | 9          | bash   | 3.5           | 2.0.0   | manual          | :heavy_check_mark:  |    |
+| Fedora     | 29         | bash   | 3.5           | 2.0.0   | manual          | :heavy_check_mark:  |    |
+| Kali       | 2020.1b    | bash   | 3.?           | 1.1.0   | manual          | :heavy_check_mark:  |    |
+| Ubuntu     | 16.04      | zsh    | 3.7           | 1.1.0   | manual          | :heavy_check_mark:  |    |
+| Kali       | 2020.1b    | zsh    | 3.?           | 1.1.0   | manual          | :white_check_mark:  | partially tested |
 
 # How to install
 
