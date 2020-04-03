@@ -11,6 +11,7 @@ PATH_DATA_FOLDER = "/.local/share/fastHistory/"
 PATH_LOG_FILE = "fh.log"
 PATH_DATABASE_FILE = "fh_v1.db"
 PATH_CONFIGURATION_FILE = "fastHistory.conf"
+PATH_VERSION_FILE = "version.txt"
 PATH_OLD_DATABASE_FILES = ["history.db"]
 
 DATABASE_MODE = DataManager.DATABASE_MODE_SQLITE
@@ -224,7 +225,7 @@ def f():
 				edit_config_file(logger_console,project_dir)
 			elif (arg1 == "--setup") and args_len == 2:
 				from fastHistory.config.setupManager import SetupManager
-				setupManager = SetupManager(logger_console, project_dir, current_path, PATH_CONFIGURATION_FILE)
+				setupManager = SetupManager(logger_console, project_dir, current_path, PATH_CONFIGURATION_FILE, PATH_VERSION_FILE)
 				setupManager.auto_setup(force=True)
 			elif arg1 == "--import" and args_len == 3:
 				import_file = sys.argv[2]
@@ -235,8 +236,10 @@ def f():
 			elif arg1 == "--export" and args_len == 2:
 				handle_export_db(logger_console, None, project_dir)
 			elif (arg1 == "-h" or arg1 == "--help") and args_len == 2:
-				# TODO print help
-				logger_console.log_on_console_error("help not yet implemented")
+				from fastHistory.console.consoleHelp import HELP_STR
+				logger_console.log_on_console(HELP_STR)
+			elif (arg1 == "-v" or arg1 == "--version") and args_len == 2:
+				logger_console.log_on_console(ConsoleUtils.open_file(project_dir + PATH_VERSION_FILE))
 			else:
 				input_cmd = " ".join(sys.argv[1:])
 				handle_search_request(logger_console, input_cmd, project_dir, configReader.get_theme(), configReader.get_last_column_size())
@@ -245,13 +248,13 @@ def f():
 			edit_config_file(logger_console, project_dir)
 		elif sys.argv[1] == "--setup":
 			from fastHistory.config.setupManager import SetupManager
-			setupManager = SetupManager(logger_console, project_dir, current_path, PATH_CONFIGURATION_FILE)
+			setupManager = SetupManager(logger_console, project_dir, current_path, PATH_CONFIGURATION_FILE, PATH_VERSION_FILE)
 			setupManager.auto_setup(force=True)
 		else:
 			logger_console.log_on_console_error("corner case not handled")
 	else:
 		from fastHistory.config.setupManager import SetupManager
-		setupManager = SetupManager(logger_console, project_dir, current_path, PATH_CONFIGURATION_FILE)
+		setupManager = SetupManager(logger_console, project_dir, current_path, PATH_CONFIGURATION_FILE,  PATH_VERSION_FILE)
 		setupManager.auto_setup(reason=configReader.get_error_msg(), force=False)
 
 

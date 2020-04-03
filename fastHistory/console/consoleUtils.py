@@ -66,3 +66,14 @@ class ConsoleUtils:
 			else:
 				return False
 		return None
+
+	@staticmethod
+	def open_file(file_path):
+		try:
+			f = open(file_path, "r")
+			text = f.read().rstrip("\n")
+		except IOError:
+			text = "error reading file:" + file_path
+		finally:
+			f.close()
+		return text

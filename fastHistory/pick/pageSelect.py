@@ -9,8 +9,8 @@ class PageSelector(PageGeneric):
     Class to draw the page with the commands to select
     """
 
-    TITLE_DEFAULT = "Fast History search"
-    TITLE_ADVANCE_SEARCH = " Advanced search   "
+    TITLE_DEFAULT = "fastHistory search"
+    TITLE_ADVANCE_SEARCH = " Advanced  search "
 
     CMD_COLUMN_NAME = "Commands"
     TAG_AND_DESCRIPTION_COLUMN_NAME = "Tags & Description"

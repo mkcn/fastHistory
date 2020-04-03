@@ -6,7 +6,7 @@ from shutil import copyfile, move
 
 class SetupManager:
 
-	def __init__(self, logger_console, project_directory, folder_code, configuration_file, version_file="version.txt", home_path=None):
+	def __init__(self, logger_console, project_directory, folder_code, configuration_file, version_file, home_path=None):
 		self.logger_console = logger_console
 		self.project_directory = project_directory	
 		self.configuration_file = configuration_file
@@ -32,7 +32,7 @@ class SetupManager:
 		if not self.copy_default_file(self.folder_code + "/config/" + self.default_prefix + self.configuration_file, self.project_directory + self.configuration_file):
 			return False
 	
-		if not self.copy_default_file(self.folder_code + "/config/" + self.default_prefix + self.version_file, self.project_directory + self.version_file):
+		if not self.copy_default_file(self.folder_code + "/config/" + self.default_prefix + self.version_file, self.project_directory + self.version_file, overwrite=True):
 			return False
 
 		return True
@@ -40,9 +40,14 @@ class SetupManager:
 	def get_hook_str(self):
 		return self.hook_updated_str
 
-	def copy_default_file(self, file_default, file_output):
-		if not os.path.isfile(file_output):
-			if os.path.isfile(file_default):
+	def copy_default_file(self, file_default, file_output, overwrite=False):
+		file_output_exits = os.path.isfile(file_output)
+		file_default_exits = os.path.isfile(file_default)
+
+		if overwrite or not file_output_exits:
+			if file_default_exits:
+				if file_output_exits:
+					os.remove(file_output)
 				copyfile(file_default, file_output)
 			else:
 				self.logger_console.log_on_console_error("default file not found: " + file_default)
@@ -90,6 +95,7 @@ class SetupManager:
 		else:
 			self.logger_console.log_on_console_error("nothing done")
 
+
 	def setup_rc_file(self):
 		bashrc_path = self.home_path + ".bashrc"
 		zshrc_path = self.home_path + ".zshrc"
@@ -110,14 +116,13 @@ class SetupManager:
 			self.logger_console.log_on_console_error("neither" + bashrc_path + " nor " + zshrc_path + " have been found. Please check your system")
 			return False
 		else:
-			# if a file exists the result must be true 
+			# if a file exists the result must be true
 			return (not bash_found or bash_result) and (not zsh_found or zsh_result)
 
 	def check_for_source_string(self, file_path_in):
 		self.logger_console.log_on_console_info("setup: " + file_path_in)
 		file_path_out = file_path_in + ".fastHistory.tmp"
 		fin = open(file_path_in, "r")
-		# TODO remove tmp file or make sure it is not opened in append mode
 		fout = open(file_path_out, "w")
 
 		pattern = re.compile("^source .*/fastHistory.*/bash/f.sh.*")
@@ -149,7 +154,9 @@ class SetupManager:
 
 			file_path_in_tmp = file_path_in + "-" + nowms + ".fastHistory.backup"
 			if os.path.isfile(file_path_in_tmp):
-				self.logger_console.log_on_console_error("cannot overwrite backup file, try again")
+				self.logger_console.log_on_console_error("backup file already exist '%s', try again" % file_path_in_tmp)
+				if os.path.isfile(file_path_out):
+					os.remove(file_path_out)
 				return False
 			move(file_path_in, file_path_in_tmp)
 			move(file_path_out, file_path_in)
