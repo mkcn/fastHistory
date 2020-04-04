@@ -49,7 +49,9 @@ class ConfigReader:
         """
         general_advice = "Please use the '--config' option to fix it manually"
 
-        if not os.path.isdir(self.project_dir):
+        if self.project_dir is None:
+            self._checkError = [True, "$HOME variable cannot be found"]
+        elif not os.path.isdir(self.project_dir):
             self._checkError = [True, "installation folder not found"]
         elif not self.is_from_installer and self._BASH_SHARED_VALUE not in os.environ:
             self._checkError = [False, "bash hook not set or loaded (you may have forgot to restart your terminal)"]

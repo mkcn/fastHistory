@@ -29,24 +29,27 @@ def handle_search_request(logger_console, input_cmd_str, project_directory, them
 	"""
 	# local import to load this module only in case of a search command
 	from fastHistory.pick.picker import Picker
-	logging.debug("search request: '" + input_cmd_str + "'")
-	# create data manger obj
-	data_manager = DataManager(project_directory, PATH_DATABASE_FILE, PATH_OLD_DATABASE_FILES, DATABASE_MODE)
+	if input_cmd_str is None:
+		logger_console.log_on_console_error("cannot read parameters from bash, please try to restart your terminal")
+	else:
+		logging.debug("search request parameters: '" + str(input_cmd_str) + "'")
+		# create data manger obj
+		data_manager = DataManager(project_directory, PATH_DATABASE_FILE, PATH_OLD_DATABASE_FILES, DATABASE_MODE)
 
-	# open picker to select from history
-	picker = Picker(data_manager, theme=theme, last_column_size=last_column_size, search_text=input_cmd_str)
-	selected_option = picker.start()
+		# open picker to select from history
+		picker = Picker(data_manager, theme=theme, last_column_size=last_column_size, search_text=input_cmd_str)
+		selected_option = picker.start()
 
-	# inject into the terminal the selected command
-	try:
-		ConsoleUtils.fill_terminal_input(selected_option)
-	except:
-		logging.debug("your terminal does not support automatic input injection")
-		logger_console.log_on_console_error("your terminal does not support automatic input injection")
-		logger_console.log_on_console_error("please manually copy and paste the selected command")
-		logger_console.log_on_console("")
-		logger_console.log_on_console(selected_option)
-		logger_console.log_on_console("")
+		# inject into the terminal the selected command
+		try:
+			ConsoleUtils.fill_terminal_input(selected_option)
+		except:
+			logging.debug("your terminal does not support automatic input injection")
+			logger_console.log_on_console_error("your terminal does not support automatic input injection")
+			logger_console.log_on_console_error("please manually copy and paste the selected command")
+			logger_console.log_on_console("")
+			logger_console.log_on_console(selected_option)
+			logger_console.log_on_console("")
 
 
 def handle_add_request(logger_console, input_cmd_str, project_directory, error_feedback=False):
@@ -169,6 +172,25 @@ def edit_config_file(logger_console, project_dir):
 		logger_console.log_on_console(config_file)
 
 
+def retrieve_parameters_from_bash_hook():
+	"""
+	this variable is set by the bash hook (f.sh) and with this trick we can read also any comment as a parameter
+	e.g. "f text #tag @desc" -> "text #tag @desc" (instead of only 'text')
+	"""
+	if "_fast_history_hooked_cmd" in os.environ:
+		var_len = len(os.environ["_fast_history_hooked_cmd"])
+		if var_len == 1:
+			return ""
+		elif var_len > 1:
+			return str(os.environ["_fast_history_hooked_cmd"][1:]).strip()
+		else:
+			logging.error("$_fast_history_hooked_cmd too short")
+			return None
+	else:
+		logging.error("$_fast_history_hooked_cmd not found")
+		return None
+
+
 def f():
 	"""
 	entry point from bash
@@ -179,11 +201,9 @@ def f():
 	ConsoleUtils.handle_close_signal()
 
 	# get execution path
-	if 'HOME' in os.environ:
-		project_dir = os.environ['HOME'] + PATH_DATA_FOLDER
-	else:
-		logger_console.log_on_console_error("error: HOME variable cannot be found")
+	project_dir = ConsoleUtils.path_compose(PATH_DATA_FOLDER)
 
+	# check source
 	if sys.argv[-1] == "--from-installer":
 		is_from_installer=True
 		del sys.argv[-1]
@@ -196,37 +216,31 @@ def f():
 	current_path = os.path.dirname(os.path.realpath(__file__))
 
 	# load config file
-	configReader = ConfigReader(project_dir, current_path, is_from_installer, PATH_CONFIGURATION_FILE)
-	if configReader.check_config():
+	config_reader = ConfigReader(project_dir, current_path, is_from_installer, PATH_CONFIGURATION_FILE)
+	if config_reader.check_config():
 		# set color for console logs
-		logger_console.set_theme(configReader.get_theme())
+		logger_console.set_theme(config_reader.get_theme())
 
 		# set logging (this setting is applied globally for all logging calls from now on)
-		logging.basicConfig(filename=project_dir + PATH_LOG_FILE, level=configReader.get_log_level())
+		logging.basicConfig(filename=project_dir + PATH_LOG_FILE, level=config_reader.get_log_level())
 		logging.debug("bash input: %s" % str(sys.argv))
-				
+
 		args_len = len(sys.argv)
 		# check number of parameters
 		if args_len == 1:
-			input_cmd = ""
-			handle_search_request(logger_console, input_cmd, project_dir, configReader.get_theme(), configReader.get_last_column_size())
+			input_cmd = retrieve_parameters_from_bash_hook()
+			handle_search_request(logger_console, input_cmd, project_dir, config_reader.get_theme(), config_reader.get_last_column_size())
 		elif args_len >= 2:
 			arg1 = str(sys.argv[1])
-			if (arg1 == "--add-from-bash") and args_len == 3:
+			if (arg1 == "--add-explicit") and args_len == 3:
 				input_cmd = " ".join(sys.argv[2:]).strip()
 				handle_add_request(logger_console, input_cmd, project_dir)
-			elif (arg1 == "--add-from-bash-explicit") and args_len == 3:
-				input_cmd = " ".join(sys.argv[2:]).strip()
-				handle_add_request(logger_console, input_cmd, project_dir, error_feedback=True)
-			elif (arg1 == "--search-from-bash") and args_len == 3:
-				input_cmd = " ".join(sys.argv[2:]).strip()
-				handle_search_request(logger_console, input_cmd, project_dir, configReader.get_theme(), configReader.get_last_column_size())
 			elif (arg1 == "--config") and args_len == 2:
 				edit_config_file(logger_console,project_dir)
 			elif (arg1 == "--setup") and args_len == 2:
 				from fastHistory.config.setupManager import SetupManager
-				setupManager = SetupManager(logger_console, project_dir, current_path, PATH_CONFIGURATION_FILE, PATH_VERSION_FILE)
-				setupManager.auto_setup(force=True)
+				setup_manager = SetupManager(logger_console, project_dir, current_path, PATH_CONFIGURATION_FILE, PATH_VERSION_FILE)
+				setup_manager.auto_setup(force=True)
 			elif arg1 == "--import" and args_len == 3:
 				import_file = sys.argv[2]
 				handle_import_db(logger_console, import_file, project_dir)
@@ -241,8 +255,8 @@ def f():
 			elif (arg1 == "-v" or arg1 == "--version") and args_len == 2:
 				logger_console.log_on_console(ConsoleUtils.open_file(project_dir + PATH_VERSION_FILE))
 			else:
-				input_cmd = " ".join(sys.argv[1:])
-				handle_search_request(logger_console, input_cmd, project_dir, configReader.get_theme(), configReader.get_last_column_size())
+				input_cmd = retrieve_parameters_from_bash_hook()
+				handle_search_request(logger_console, input_cmd, project_dir, config_reader.get_theme(), config_reader.get_last_column_size())
 	elif len(sys.argv) >= 2 and (sys.argv[1] == "--config" or sys.argv[1] == "--setup"):
 		if sys.argv[1] == "--config":
 			edit_config_file(logger_console, project_dir)
@@ -255,7 +269,7 @@ def f():
 	else:
 		from fastHistory.config.setupManager import SetupManager
 		setupManager = SetupManager(logger_console, project_dir, current_path, PATH_CONFIGURATION_FILE,  PATH_VERSION_FILE)
-		setupManager.auto_setup(reason=configReader.get_error_msg(), force=False)
+		setupManager.auto_setup(reason=config_reader.get_error_msg(), force=False)
 
 
 if __name__ == "__main__":

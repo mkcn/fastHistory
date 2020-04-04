@@ -68,6 +68,13 @@ class ConsoleUtils:
 		return None
 
 	@staticmethod
+	def path_compose(relative_project_path):
+		if 'HOME' in os.environ:
+			return os.environ['HOME'] + relative_project_path
+		else:
+			return None
+
+	@staticmethod
 	def open_file(file_path):
 		try:
 			f = open(file_path, "r")

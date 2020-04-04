@@ -76,10 +76,13 @@ fi
 
 # "preexec" is executed just after a command has been read and is about to be executed
 # we store the hooked command in a bash variable
+
+export _fast_history_hooked_cmd
+
 preexec() {
 	_fast_history_hooked_cmd="$1";
 	if [[ "$_fast_history_hooked_cmd" == "#"* ]]; then
-		# remove the intial #
+		# remove the intial '#'
 		_fast_history_hooked_cmd="${_fast_history_hooked_cmd:1}"
 		_fast_history_log "debug" "command will not be executed!"
 	fi
@@ -97,7 +100,7 @@ precmd() {
 		    # this is just a preliminary check, in the python module a strict regex will be used
 		    # this is only done to avoid to load the python module for each command
 		    if [[ "$_fast_history_hooked_cmd" == *"#"* ]] && [[ "$_fast_history_hooked_cmd" != "$_fast_history_executable "* ]] ; then
-          $_fast_history_executable --add-from-bash "$_fast_history_hooked_cmd"
+          $_fast_history_executable --add-explicit "$_fast_history_hooked_cmd"
           # clean the cmd, this is needed because precmd can be trigged without preexec (example ctrl+c)
           unset _fast_history_hooked_cmd;
         else
