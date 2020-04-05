@@ -31,29 +31,29 @@ _fast_history_log "debug" "loading bash hook..";
 # check if bash or zsh
 if [ -n "$BASH_VERSION" ]; then
 	_fast_history_log "debug" "bash detected";
-	_fast_history_project_directory="${BASH_SOURCE[0]%/*}/../";
+	_fast_history_path_code_folder="${BASH_SOURCE[0]%/*}/../";
 elif [ -n "$ZSH_VERSION" ]; then
 	_fast_history_log "debug" "zsh detected";
-	_fast_history_project_directory="$0:a:h/../";
+	_fast_history_path_code_folder="$0:a:h/../";
 else
 	_fast_history_log "error" "shell not supported, only bash and zsh are allowed";
 	return 1;
 fi
 
 # check environment
-if [ -s "$_fast_history_project_directory"../fastHistory/__init__.py ]; then
-	_fast_history_log "debug" "folder: $_fast_history_project_directory";
+if [ -s "$_fast_history_path_code_folder"../fastHistory/__init__.py ]; then
+	_fast_history_log "debug" "folder: $_fast_history_path_code_folder";
 else
 	_fast_history_log "error" "cannot find installation folder";
 	return 1;
 fi
 
 # share variable with python to find any inconsistency between the bash hook and the installation folder
-export _fast_history_project_directory
-_fast_history_log "debug" "_fast_history_project_directory exported";
+export _fast_history_path_code_folder
+_fast_history_log "debug" "_fast_history_path_code_folder exported";
 
 # load bash hook functions (more info: https://github.com/rcaloras/bash-preexec/)
-source "$_fast_history_project_directory"bash/bash-preexec.sh;
+source "$_fast_history_path_code_folder"bash/bash-preexec.sh;
 if [ -z "$__bp_imported" ]; then
 	_fast_history_log "error" "preexec cannot be loaded";
 	return 1;
@@ -92,8 +92,8 @@ preexec() {
 # we use the previous hooked command and we store it with fastHistory
 # Note: any unsuccessful command (base on the return code '$?') is ignored
 precmd() {
-	# check if variable is set
-	if [[ $_fast_history_hooked_cmd ]]; then
+	# check if variable is not empty
+	if [ -n "$_fast_history_hooked_cmd" ]; then
 		if ! $_fast_history_check_return_code || [ $? -eq 0 ]; then
 		    # check if the hooked cmd contains the 'comment' char, any command without it will be ignored
 			  # check also if the command is fasthistory itself (e.g. 'f #test' should not be stored)
@@ -102,7 +102,7 @@ precmd() {
 		    if [[ "$_fast_history_hooked_cmd" == *"#"* ]] && [[ "$_fast_history_hooked_cmd" != "$_fast_history_executable "* ]] ; then
           $_fast_history_executable --add-explicit "$_fast_history_hooked_cmd"
           # clean the cmd, this is needed because precmd can be trigged without preexec (example ctrl+c)
-          unset _fast_history_hooked_cmd;
+          _fast_history_hooked_cmd="";
         else
           _fast_history_log "debug" "command ignored";
         fi;

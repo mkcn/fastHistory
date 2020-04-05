@@ -6,19 +6,19 @@ from shutil import copyfile, move
 
 class SetupManager:
 
-	def __init__(self, logger_console, project_directory, folder_code, configuration_file, version_file, home_path=None):
+	def __init__(self, logger_console, path_data_folder, path_code_folder, configuration_file, version_file, home_path=None):
 		self.logger_console = logger_console
-		self.project_directory = project_directory	
+		self.path_data_folder = path_data_folder
 		self.configuration_file = configuration_file
 		self.version_file = version_file 
 		self.default_prefix = "default_"
-		self.folder_code = folder_code
+		self.path_code_folder = path_code_folder
 		if home_path is None:
 			self.home_path = os.environ['HOME'] + "/"
 		else:
 			self.home_path = home_path
 
-		hook_bash_path = self.folder_code + "/bash/f.sh"
+		hook_bash_path = self.path_code_folder + "/bash/f.sh"
 		self.hook_updated_str = "source \"" + hook_bash_path + "\""
 
 	def handle_setup(self):
@@ -29,10 +29,10 @@ class SetupManager:
 		if not self.setup_rc_file():
 			return False
 		
-		if not self.copy_default_file(self.folder_code + "/config/" + self.default_prefix + self.configuration_file, self.project_directory + self.configuration_file):
+		if not self.copy_default_file(self.path_code_folder + "/config/" + self.default_prefix + self.configuration_file, self.path_data_folder + self.configuration_file):
 			return False
 	
-		if not self.copy_default_file(self.folder_code + "/config/" + self.default_prefix + self.version_file, self.project_directory + self.version_file, overwrite=True):
+		if not self.copy_default_file(self.path_code_folder + "/config/" + self.default_prefix + self.version_file, self.path_data_folder + self.version_file, overwrite=True):
 			return False
 
 		return True
@@ -55,12 +55,12 @@ class SetupManager:
 		return True
 
 	def create_folder(self):
-		if not os.path.isdir(self.project_directory):
-			os.makedirs(self.project_directory)
-			if os.path.isdir(self.project_directory):
-				self.logger_console.log_on_console_info("created project folder: " + self.project_directory)
+		if not os.path.isdir(self.path_data_folder):
+			os.makedirs(self.path_data_folder)
+			if os.path.isdir(self.path_data_folder):
+				self.logger_console.log_on_console_info("created project folder: " + self.path_data_folder)
 			else:
-				self.logger_console.log_on_console_error("it is not possible to create the folder: " + self.project_directory)
+				self.logger_console.log_on_console_error("it is not possible to create the folder: " + self.path_data_folder)
 				return False
 		return True
 

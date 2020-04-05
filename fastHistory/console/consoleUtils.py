@@ -68,9 +68,9 @@ class ConsoleUtils:
 		return None
 
 	@staticmethod
-	def path_compose(relative_project_path):
+	def compose_home_relative_path(relative_path):
 		if 'HOME' in os.environ:
-			return os.environ['HOME'] + relative_project_path
+			return os.environ['HOME'] + relative_path
 		else:
 			return None
 

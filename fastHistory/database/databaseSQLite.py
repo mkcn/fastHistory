@@ -32,48 +32,45 @@ class DatabaseSQLite(object):
     synced TINYINT
     """
 
-    def __init__(self, project_path, db_relative_path, old_db_relative_paths=None, delete_all_data_from_db=False):
+    def __init__(self, path_data_folder, name_db_file, name_old_db_files=None, delete_all_data_from_db=False):
         """
         check if database file exit, connect to it and initialize it
 
-        :param project_path:            the current path of the project
-        :param db_relative_path:        the relative path of the database file
-        :param old_db_relative_paths:    the array of relative paths of (possible) old database files to migrate
         :param delete_all_data_from_db:   if true the db file is delete (ONLY for test purposes)
         """
-        self.project_path = project_path
-        self.db_relative_path = db_relative_path
+        self.path_data_folder = path_data_folder
+        self.name_db_file = name_db_file
         if delete_all_data_from_db:
             self.reset_entire_db()
-        self._connect_db(old_db_relative_paths)
+        self._connect_db(name_old_db_files)
 
-    def _connect_db(self, old_db_relative_paths):
+    def _connect_db(self, name_old_db_files):
         """
         connect to db and create it if it does not exit
 
         :return:
         """
-        init = not os.path.isfile(self.project_path + self.db_relative_path)
+        init = not os.path.isfile(self.path_data_folder + self.name_db_file)
 
-        self.conn = sqlite3.connect(self.project_path + self.db_relative_path)
+        self.conn = sqlite3.connect(self.path_data_folder + self.name_db_file)
         self.cursor = self.conn.cursor()
         if init:
             self._create_db()
             self.save_changes()
 
-            if old_db_relative_paths is not None:
+            if name_old_db_files is not None:
                 # this will loop from the newest to the oldest db
-                for old_db in old_db_relative_paths:
-                    if self._automatic_db_import(self.project_path + old_db) >= 0:
+                for old_db in name_old_db_files:
+                    if self._automatic_db_import(self.path_data_folder + old_db) >= 0:
                         logging.info("successfully migrated data from old database (%s) to new one (%s)" %
-                                     (self.project_path + old_db[1], self.project_path + self.db_relative_path))
+                                     (self.path_data_folder + old_db[1], self.path_data_folder + self.name_db_file))
                         # delete old db
                         try:
-                            os.remove(self.project_path + old_db)
+                            os.remove(self.path_data_folder + old_db)
                             logging.info("old database file deleted")
                         except OSError or ValueError:
                             logging.error("file delete fail. please manually delete the old database file: %s" %
-                                          self.project_path + old_db)
+                                          self.path_data_folder + old_db)
 
     def _automatic_db_import(self, old_db_path):
         """
@@ -214,8 +211,8 @@ class DatabaseSQLite(object):
 
         :return:
         """
-        if os.path.exists(self.project_path + self.db_relative_path):
-            os.remove(self.project_path + self.db_relative_path)
+        if os.path.exists(self.path_data_folder + self.name_db_file):
+            os.remove(self.path_data_folder + self.name_db_file)
 
     def close(self):
         """

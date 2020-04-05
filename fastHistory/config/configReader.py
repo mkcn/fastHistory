@@ -11,7 +11,7 @@ class ConfigReader:
     _MAIN_LOG_LEVEL = "LOG_LEVEL"
     _MAIN_THEME = "THEME"
     _MAIN_TAGS_COLUMN_SIZE = "TAGS_COLUMN_SIZE"
-    _BASH_SHARED_VALUE = "_fast_history_project_directory"
+    _BASH_VAR_PATH_CODE_FOLDER = "_fast_history_path_code_folder"
 
     DB_ENABLED = "R_DB_ENABLED"
     DB_HOST = "R_DB_HOST"
@@ -30,12 +30,12 @@ class ConfigReader:
     _config = None
     _checkError = [False, ""]
 
-    def __init__(self, project_dir, current_path, is_from_installer, config_file):
+    def __init__(self, path_data_folder, path_code_folder, is_from_installer, config_file):
         
         self._config = configparser.ConfigParser()
-        self.project_dir = project_dir
-        self.current_path = current_path
-        self.config_path_file = project_dir + config_file
+        self.path_data_folder = path_data_folder
+        self.path_code_folder = path_code_folder
+        self.path_config_file = path_data_folder + config_file
         self.is_from_installer = is_from_installer
 
     def check_config(self):
@@ -49,17 +49,17 @@ class ConfigReader:
         """
         general_advice = "Please use the '--config' option to fix it manually"
 
-        if self.project_dir is None:
+        if self.path_data_folder is None:
             self._checkError = [True, "$HOME variable cannot be found"]
-        elif not os.path.isdir(self.project_dir):
+        elif not os.path.isdir(self.path_data_folder):
             self._checkError = [True, "installation folder not found"]
-        elif not self.is_from_installer and self._BASH_SHARED_VALUE not in os.environ:
+        elif not self.is_from_installer and self._BASH_VAR_PATH_CODE_FOLDER not in os.environ:
             self._checkError = [False, "bash hook not set or loaded (you may have forgot to restart your terminal)"]
-        elif not self.is_from_installer and os.environ[self._BASH_SHARED_VALUE] != self.current_path + "/bash/../":
+        elif not self.is_from_installer and os.environ[self._BASH_VAR_PATH_CODE_FOLDER] != self.path_code_folder + "/bash/../":
             self._checkError = [True, "old bash hook found (reconfiguration needed)"]
         else:
             try:
-                self._config.read(self.config_path_file)
+                self._config.read(self.path_config_file)
                 if self._config is None:
                     self._checkError = [False, "file not found or malformed"]
                 elif self._MAIN not in self._config:

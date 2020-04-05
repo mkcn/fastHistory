@@ -5,7 +5,7 @@ class DatabaseMYSQL(object):
     TODO implement
     """
 
-    def __init__(self, project_directory):
+    def __init__(self, path_data_folder):
         pass
 
     def get_all_data(self, filter=None):

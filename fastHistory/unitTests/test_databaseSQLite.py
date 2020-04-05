@@ -477,7 +477,7 @@ class TestDatabaseSQLite(unittest.TestCase):
 
         db = DatabaseSQLite(self.output_test_path,
                             self.TEST_DB_FILENAME,
-                            old_db_relative_paths=None,
+                            name_old_db_files=None,
                             delete_all_data_from_db=True)
         result_import = db.import_external_database(self.output_test_path + self.TEST_DB_FILENAME_OLD + "")
         self.assertEqual(result_import, -1)
