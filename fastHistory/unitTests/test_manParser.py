@@ -110,7 +110,8 @@ class TestManParser(TestCase):
             [True, ["netstat", "--verbose"], ["--verbose, -v",
                                               "--verbose , -v"]],
             [True, ["netstat", "--interfaces"], ["--interfaces, -i"]],  # outside the options chapter
-            [False, ["lsof", "-i"], ["-i [i]   selects  the  listing  of  files any of whose Internet address"]],  # this man page contains 2 sentences which start with '-i'
+            [False, ["lsof", "-i"], ["-i [i]   selects  the  listing  of  files any of whose Internet address",
+                                     "-i [i]   selects  the listing of files any of whose Internet address matches the address specified in i.  If no address is specified, this option selects the listing of all Internet and x.25 (HP-UX)"]],  # this man page contains 2 sentences which start with '-i'
             [False, ["wget", "--quiet"], ["-q"]],  # -q\n--quite
             [False, ["git", "--help"], ["--help"]],
             [False, ["git", "--version"], ["--version"]],
