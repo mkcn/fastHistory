@@ -86,17 +86,25 @@ class ManParser(object):
             logging.error("load man page - permission denied: " + str(cmd))
             self.man_page = None
             return False
+        except:
+            logging.warning("load man page - generic error")
+            self.man_page = None
+            return False
 
     def open_interactive_man_page(self, cmd=None):
         """
         open the real interactive man page
         :return:    return code of the man command
         """
-        if cmd is not None:
-            return subprocess.call(["man", cmd])
-        elif self.cmd is not None:
-            return subprocess.call(["man", self.cmd])
-        else:
+        try:
+            if cmd is not None:
+                return subprocess.call(["man", cmd])
+            elif self.cmd is not None:
+                return subprocess.call(["man", self.cmd])
+            else:
+                return None
+        except:
+            logging.warning("man page error: " + cmd)
             return None
 
     def get_flag_meaning(self, flag):
