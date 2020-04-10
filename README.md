@@ -3,7 +3,7 @@
 
 A python tool connected to your terminal to store important commands, search them in a fast way and automatically paste them into your terminal
 
-![](images/search.gif)
+![](https://github.com/mkcn/fastHistory/raw/pip/images/search.gif)
 
 - [Intro](#Intro)
 - [Supported OSs](#Supported-OSs)
@@ -71,12 +71,12 @@ $ f extract
 
 Finally, you only need to press 'enter' to directly paste it into your terminal to be ready to go!
 
-![Search sample](images/sample.gif)
+![Search sample](https://github.com/mkcn/fastHistory/raw/pip/images/sample.gif)
 
 
 For each saved command you can also get a quick summary of the used options/flags (extracted from the man page) 
 
-![Info ls sample](images/show.info.srm.png)
+![Info ls sample](https://github.com/mkcn/fastHistory/raw/pip/images/show.info.srm.png)
 
 **Warning**: this feature currently does not cover the syntax of all commands
 
@@ -97,15 +97,15 @@ note: `zsh` is also supported!
 
 | OS         | OS Version | Shell | Python versions | fastHistory version | Test mode | Result | Comment   |
 | ---------- |:----------:| ------:|-------------:| -------------------:|----------:| ---------:| ---------:| 
-| Ubuntu     | 16.04      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | :heavy_check_mark: |    |
-| Ubuntu     | 18.04      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | :heavy_check_mark: |    |
-| macOS      | 10.15      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | :heavy_check_mark: | python3 needs to be [installed](https://docs.python-guide.org/starting/install3/osx/)  |
-| Windows*   | 10 (1809)  | bash   | 3.6           | 2.0.0  | manual          | :heavy_check_mark: | *using the [Ubuntu terminal for Windows](https://ubuntu.com/tutorials/tutorial-ubuntu-on-windows) |
-| Debian     | 9          | bash   | 3.5           | 2.0.0   | manual          | :heavy_check_mark:  |    |
-| Fedora     | 29         | bash   | 3.5           | 2.0.0   | manual          | :heavy_check_mark:  |    |
-| Kali       | 2020.1b    | bash   | 3.?           | 1.1.0   | manual          | :heavy_check_mark:  |    |
-| Ubuntu     | 16.04      | zsh    | 3.7           | 1.1.0   | manual          | :heavy_check_mark:  |    |
-| Kali       | 2020.1b    | zsh    | 3.?           | 1.1.0   | manual          | :white_check_mark:  | partially tested |
+| Ubuntu     | 16.04      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  |    |
+| Ubuntu     | 18.04      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
+| macOS      | 10.15      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | python3 needs to be [installed](https://docs.python-guide.org/starting/install3/osx/)  |
+| Windows*   | 10 (1809)  | bash   | 3.6           | 2.0.0  | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | *using the [Ubuntu terminal for Windows](https://ubuntu.com/tutorials/tutorial-ubuntu-on-windows) |
+| Debian     | 9          | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">    |    |
+| Fedora     | 29         | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">    |    |
+| Kali       | 2020.1b    | bash   | 3.?           | 1.1.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">    |    |
+| Ubuntu     | 16.04      | zsh    | 3.7           | 1.1.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">   |    |
+| Kali       | 2020.1b    | zsh    | 3.?           | 1.1.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2705.png" width="35%">   | partially tested |
 
 # How to install
 
@@ -220,6 +220,7 @@ The following external projects have been used as part of **fastHistory**:
     *  **goal**: this Python module has been used to select the option from the menu
     *  **code section**: ```fastHistory/pick```
     *  **changes**: all code has been restructured and adapted with a different UI
+
 
 
 
