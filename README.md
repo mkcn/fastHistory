@@ -19,7 +19,7 @@ How often do you need to reuse a command but you cannot remember it (or all the 
 
 ```sh
 # example of a common but not so 'easy-to-remember' bash command from my bash history
-$ tar -xvf archive.tar.gz
+$ tar -xvfz file.tar.gz
 ```
 
 How many times do you search the same commands on Google, over and over? 
@@ -39,7 +39,7 @@ if you know what I am talking about, **fastHistory** is the tool you are looking
 **fastHistory** can save your commands directly from your terminal, all you need is a **#**
 
 ```sh
-$ tar -xvf file.tar.gz #
+$ tar -xvfz file.tar.gz #
                       /\
                        \------- fastHistory will store "tar -xvf archive.tar.gz" in its internal database
 ```
@@ -48,13 +48,13 @@ You can specify one or more **tags**
 
 
 ```sh
-$ tar -xvf file.tar.gz #extract #archive #untar
+$ tar -xvfz file.tar.gz #extract #archive #untar
 ```
 
 or a **description**
 
 ```sh
-$ tar -xvf file.tar.gz #@extract compressed files from archive
+$ tar -xvfz file.tar.gz #@extract compressed files from archive
 ```
 
 or **both**
