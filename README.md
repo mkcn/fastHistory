@@ -1,6 +1,10 @@
 
 # fastHistory 2.0 - speed up your terminal!
 
+
+| <img src="https://github.githubassets.com/images/icons/emoji/unicode/26a0.png" width="6%"> WARNING: this is a beta version |
+|:---------------------------|
+
 A python tool connected to your terminal to store important commands, search them in a fast way and automatically paste them into your terminal
 
 ![](https://github.com/mkcn/fastHistory/raw/pip/images/search.gif)
@@ -98,14 +102,14 @@ note: `zsh` is also supported!
 | OS         | OS Version | Shell | Python versions | fastHistory version | Test mode | Result | Comment   |
 | ---------- |:----------:| ------:|-------------:| -------------------:|----------:| ---------:| ---------:| 
 | Ubuntu     | 16.04      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  |    |
-| Ubuntu     | 18.04      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
+| Ubuntu     | 18.04      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  |    |
 | macOS      | 10.15      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | python3 needs to be [installed](https://docs.python-guide.org/starting/install3/osx/)  |
 | Windows*   | 10 (1809)  | bash   | 3.6           | 2.0.0  | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | *using the [Ubuntu terminal for Windows](https://ubuntu.com/tutorials/tutorial-ubuntu-on-windows) |
-| Debian     | 9          | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">    |    |
-| Fedora     | 29         | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">    |    |
-| Kali       | 2020.1b    | bash   | 3.?           | 1.1.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">    |    |
-| Ubuntu     | 16.04      | zsh    | 3.7           | 1.1.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">   |    |
-| Kali       | 2020.1b    | zsh    | 3.?           | 1.1.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2705.png" width="35%">   | partially tested |
+| Debian     | 9          | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
+| Fedora     | 29         | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
+| Kali       | 2020.1b    | bash   | 3.?           | 1.1.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
+| Ubuntu     | 16.04      | zsh    | 3.7           | 1.1.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
+| Kali       | 2020.1b    | zsh    | 3.?           | 1.1.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2705.png" width="35%"> | partially tested |
 
 # How to install
 

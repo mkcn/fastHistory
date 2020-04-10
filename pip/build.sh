@@ -1,6 +1,16 @@
 # build file used to generate and install the whl package in a test python environment
 
 installation_python_env="build-env/bin/activate"
+version_file="../fastHistory/config/default_version.txt"
+
+
+pypi_upload=false
+pypi_domain="pypi.org"
+pypi_repo="pypi" #defined in the $HOME/.pypirc file
+
+pypi_test_upload=false
+pypi_test_domain="test.pypi.org"
+pypi_test_repo="testpypi" #defined in the $HOME/.pypirc file
 
 
 if [ -f setup.py ]; then	
@@ -13,6 +23,48 @@ if [ -f setup.py ]; then
 			echo "Error: the build environment cannot be used"
 			return
 		fi
+
+		read -p "Do you wish to upload it to test.pypi.org?[y/N] " YN
+		if [[ $YN == "y" || $YN == "Y" ]]; then
+			pypi_test_upload=true
+			read -p "Upload also to pypi.org ?[y/N] " YN
+			if [[ "$YN" == "y" || $YN == "Y" ]]; then
+				pypi_upload=true
+			fi
+
+			# update version 
+			# note: we assume the test pypi always has the more updated version
+			version_pypi=$(wget -qO- https://$pypi_domain/pypi/fastHistory/json | python3 -c "import sys, json; print(json.load(sys.stdin)['info']['version'])")
+			regex="([0-9]+).([0-9]+).([0-9]+)"
+			if [[ $version_pypi =~ $regex ]]; then
+				major="${BASH_REMATCH[1]}"
+				minor="${BASH_REMATCH[2]}"
+				build="${BASH_REMATCH[3]}"
+
+			  	echo "$pypi_repo current version: ${major}.${minor}.${build}"
+				read -p "Is a [M]ajor, [F]eature or [B]UG update?[m/f/B] " C
+				if [[ "$C" == "m" || $C == "M" ]]; then
+				  major=$(echo $major+1 | bc)
+				  minor=0
+				  build=0
+				elif [[ "$C" == "f" || $C == "F" ]]; then
+				  minor=$(echo $minor + 1 | bc)
+				  build=0
+				elif [[ "$C" == "b" || $C == "B" || $C == "" ]]; then
+				  build=$(echo $build + 1 | bc)
+				else
+				  echo "wrong input"
+				  exit -1
+				fi
+				echo "new version: ${major}.${minor}.${build}"
+				echo -n ${major}.${minor}.${build} > $version_file
+			else
+				echo "$pypi_repo not found, i will try to use the following local version"
+				cat $version_file
+			fi
+			
+		fi
+		
 		# clean old dist folder
 		rm -f -r dist/*.whl
 
@@ -27,14 +79,13 @@ if [ -f setup.py ]; then
 		if [ -f dist/*.whl ]; then
 			pip3 install -I dist/*.whl
 			echo "Package installed correctly in the local test environment"
-			# exit from test env
-			#exec $SHELL -l
-			# upload 
-			# you need to have configured the ".pypirc" file
 			echo ""
-			read -p "Do you wish to upload it to the test pypi?[y/N] " YN
-			if [[ $YN == "y" || $YN == "Y" ]]; then
-				python3 -m twine upload --repository testpypi dist/*.whl
+			# upload
+			if $pypi_test_upload; then 
+				python3 -m twine upload --repository $pypi_test_repo dist/*.whl
+				if $pypi_upload; then
+					python3 -m twine upload --repository $pypi_repo dist/*.whl		
+				fi
 			else
 				echo "Upload skipped"
 			fi
