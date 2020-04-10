@@ -5,11 +5,11 @@ A python tool connected to your terminal to store important commands, search the
 
 ![](https://github.com/mkcn/fastHistory/raw/pip/images/search.gif)
 
-- [Intro](#Intro)
-- [Supported OSs](#Supported-OSs)
-- [How to install](#How-to-install)
-- [Commands and syntax](#Commands-and-syntax)
-- [License](#License)
+- [Intro](https://github.com/mkcn/fastHistory/tree/pip#Intro)
+- [Supported OSs](https://github.com/mkcn/fastHistory/tree/pip#Supported-OSs)
+- [How to install](https://github.com/mkcn/fastHistory/tree/pip#How-to-install)
+- [Commands and syntax](https://github.com/mkcn/fastHistory/tree/pip#Commands-and-syntax)
+- [License](https://github.com/mkcn/fastHistory/tree/pip#License)
 
 
 # Intro
