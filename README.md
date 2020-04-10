@@ -5,15 +5,16 @@
 | <img src="https://github.githubassets.com/images/icons/emoji/unicode/26a0.png" width="6%"> WARNING: this is a beta version |
 |:---------------------------|
 
-A python tool connected to your terminal to store important commands, search them in a fast way and automatically paste them into your terminal
-
-![](https://github.com/mkcn/fastHistory/raw/pip/images/search.gif)
-
 - [Intro](https://github.com/mkcn/fastHistory/tree/pip#Intro)
-- [Supported OSs](https://github.com/mkcn/fastHistory/tree/pip#Supported-OSs)
+- [Supported systems](https://github.com/mkcn/fastHistory/tree/pip#Supported-OSs)
 - [How to install](https://github.com/mkcn/fastHistory/tree/pip#How-to-install)
 - [Commands and syntax](https://github.com/mkcn/fastHistory/tree/pip#Commands-and-syntax)
 - [License](https://github.com/mkcn/fastHistory/tree/pip#License)
+
+
+A python tool connected to your terminal to store important commands, search them in a fast way and automatically paste them into your terminal
+
+![](https://github.com/mkcn/fastHistory/raw/pip/images/search.gif)
 
 
 # Intro
