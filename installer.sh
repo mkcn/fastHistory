@@ -150,6 +150,7 @@ if __name__ == '__main__':
 	_fast_history_install_log "info" "Installation completed"
 else
 	if [ "$1" == "-u" ] || [ "$1" == "--uninstall" ]; then
+	  default_answer=$2
 		uninstall_correct=true
 		uninstall_already_done=true
 		source_str_regex="^source\ .*\/fastHistory.*\/bash\/f.sh.*"
@@ -159,13 +160,17 @@ else
 		if [[ -d "$FASTHISTORY_PATH_DATA_FOLDER" ]]; then
 			uninstall_already_done=false
 			_fast_history_install_log "info" "data folder found: $FASTHISTORY_PATH_DATA_FOLDER"
-			_fast_history_install_log "warn" "it is strongly suggested to make a backup (e.g. using 'f --export') before proceeding further"
-			read -r -p "do you want delete NOW all stored commands and configurations? [y/N] " YN
+			if [ "$default_answer" == "-y" ]; then
+			    YN="y"
+			else
+			    _fast_history_install_log "warn" "it is strongly suggested to make a backup (e.g. using 'f --export') before proceeding further"
+			    read -r -p "do you want delete NOW all stored commands and configurations? [y/N] " YN
+			fi
 			if [[ $YN == "y" || $YN == "Y" ]]; then
-				if rm -r $FASTHISTORY_PATH_DATA_FOLDER; then
+				if rm -r "$FASTHISTORY_PATH_DATA_FOLDER"; then
 					_fast_history_install_log "info" "deleted data folder: $FASTHISTORY_PATH_DATA_FOLDER"
 				else
-					$uninstall_correct=false
+					uninstall_correct=false
 					_fast_history_install_log "error" "cannot delete data folder: $FASTHISTORY_PATH_DATA_FOLDER"
 				fi
 
@@ -184,22 +189,22 @@ else
 			fi
 		fi
 		
-		if [[ -f "$FASTHISTORY_PATH_BASHRC" ]] && ! sed -e "s/$source_str_regex//g" $FASTHISTORY_PATH_BASHRC | diff -q $FASTHISTORY_PATH_BASHRC - > /dev/null 2>&1; then
+		if [[ -f "$FASTHISTORY_PATH_BASHRC" ]] && ! sed -e "s/$source_str_regex//g" "$FASTHISTORY_PATH_BASHRC" | diff -q "$FASTHISTORY_PATH_BASHRC" - > /dev/null 2>&1; then
 			uninstall_already_done=false
-			if sed -e "s/$source_str_regex//g" -i $FASTHISTORY_PATH_BASHRC; then
+			if sed -e "s/$source_str_regex//g" -i "$FASTHISTORY_PATH_BASHRC"; then
 				_fast_history_install_log "info" "deleted bash hook: $FASTHISTORY_PATH_BASHRC"
 			else
-				$uninstall_correct=false
+				uninstall_correct=false
 				_fast_history_install_log "error" "bash hook found but not deleted: $FASTHISTORY_PATH_BASHRC"
 			fi
 		fi
 
-		if [[ -f "$FASTHISTORY_PATH_ZSHRC" ]] && ! sed -e "s/$source_str_regex//g" $FASTHISTORY_PATH_ZSHRC | diff -q $FASTHISTORY_PATH_ZSHRC - > /dev/null 2>&1; then
+		if [[ -f "$FASTHISTORY_PATH_ZSHRC" ]] && ! sed -e "s/$source_str_regex//g" "$FASTHISTORY_PATH_ZSHRC" | diff -q "$FASTHISTORY_PATH_ZSHRC" - > /dev/null 2>&1; then
 			uninstall_already_done=false
-			if sed -e "s/$source_str_regex//g" -i $FASTHISTORY_PATH_ZSHRC; then
+			if sed -e "s/$source_str_regex//g" -i "$FASTHISTORY_PATH_ZSHRC"; then
 				_fast_history_install_log "info" "deleted zsh hook: $FASTHISTORY_PATH_ZSHRC"
 			else
-				$uninstall_correct=false
+				uninstall_correct=false
 				_fast_history_install_log "error" "zsh hook found but not deleted: $FASTHISTORY_PATH_ZSHRC"
 			fi
 		fi
@@ -209,27 +214,27 @@ else
 			if pip3 uninstall -y fastHistory; then
 				_fast_history_install_log "info" "pip package 'fastHistory' found and deleted"
 			else
-				$uninstall_correct=false
+				uninstall_correct=false
 				_fast_history_install_log "error" "pip package 'fastHistory' found but not uninstalled correctly"
 			fi
 		fi
 
 		if [[ -d "$FASTHISTORY_PATH_CODE_FOLDER" ]]; then
 			uninstall_already_done=false
-			if rm -r $FASTHISTORY_PATH_CODE_FOLDER; then
+			if rm -r "$FASTHISTORY_PATH_CODE_FOLDER"; then
 				_fast_history_install_log "info" "deleted code folder: $FASTHISTORY_PATH_CODE_FOLDER"
 			else
-				$uninstall_correct=false
+				uninstall_correct=false
 				_fast_history_install_log "error" "cannot delete code folder: $FASTHISTORY_PATH_CODE_FOLDER"
 			fi	
 		fi
 
 		if [[ -f "$FASTHISTORY_PATH_LOCAL_BIN_FOLDER$FASTHISTORY_BIN_FILE" ]]; then
 			uninstall_already_done=false
-			if rm $FASTHISTORY_PATH_LOCAL_BIN_FOLDER$FASTHISTORY_BIN_FILE; then
+			if rm "$FASTHISTORY_PATH_LOCAL_BIN_FOLDER$FASTHISTORY_BIN_FILE"; then
 				_fast_history_install_log "info" "deleted bin file: $FASTHISTORY_PATH_LOCAL_BIN_FOLDER$FASTHISTORY_BIN_FILE"
 			else
-				$uninstall_correct=false
+				uninstall_correct=false
 				_fast_history_install_log "error" "cannot delete bin file: $FASTHISTORY_PATH_LOCAL_BIN_FOLDER$FASTHISTORY_BIN_FILE"
 			fi
 		fi
@@ -243,10 +248,11 @@ else
 		fi
 	else
 		echo "Usage:" 
-		echo "    ./installer [-u]"
+		echo "    ./installer [-u] [-y]"
 		echo "Sample:"
 		echo "    run './install' to install fastHistory"
 		echo "    run './install -u' to uninstall it"
+		echo "    run './install -u -y' to uninstall it without interactive questions (not recommended)"
 	fi
 fi
 

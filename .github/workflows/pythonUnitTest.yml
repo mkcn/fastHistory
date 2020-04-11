@@ -70,7 +70,7 @@ jobs:
         # setup environment
         f --setup
 
-    - name: Install and un install with manual installer
+    - name: Install with manual installer
       if: always()
       run: |
         if [[ "$OSTYPE" == "linux-gnu" ]]; then
@@ -81,6 +81,20 @@ jobs:
           echo "OS: Mac OSX"
           . /Users/runner/runners/*/work/fastHistory/fastHistory/installer.sh
           . /Users/runner/runners/*/work/fastHistory/fastHistory/installer.sh -u
+        else
+          echo "unknown: " $OSTYPE
+          exit 1
+        fi
+
+    - name: Uninstall with manual installer
+      if: always()
+      run: |
+        if [[ "$OSTYPE" == "linux-gnu" ]]; then
+          echo "OS: Linux"
+          . /home/runner/work/fastHistory/fastHistory/installer.sh -u -y
+        elif [[ "$OSTYPE" == "darwin"* ]]; then
+          echo "OS: Mac OSX"
+          . /Users/runner/runners/*/work/fastHistory/fastHistory/installer.sh -u -y
         else
           echo "unknown: " $OSTYPE
           exit 1
