@@ -14,7 +14,7 @@
 
 A python tool connected to your terminal to store important commands, search them in a fast way and automatically paste them into your terminal
 
-![](https://github.com/mkcn/fastHistory/raw/pip/images/search.gif)
+![](https://github.com/mkcn/fastHistory/raw/pip/images/search_2.0.gif)
 
 
 # Intro
