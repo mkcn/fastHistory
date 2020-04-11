@@ -24,7 +24,7 @@ How often do you need to reuse a command but you cannot remember it (or all the 
 
 ```sh
 # example of a common but not so 'easy-to-remember' bash command from my bash history
-$ tar -xvfz file.tar.gz
+$ tar -xvzf file.tar.gz
 ```
 
 How many times do you search the same commands on Google, over and over? 
@@ -44,22 +44,22 @@ if you know what I am talking about, **fastHistory** is the tool you are looking
 **fastHistory** can save your commands directly from your terminal, all you need is a **#**
 
 ```sh
-$ tar -xvfz file.tar.gz #
-                      /\
-                       \------- fastHistory will store "tar -xvf archive.tar.gz" in its internal database
+$ tar -xvzf file.tar.gz #
+                       /\
+                        \------- fastHistory will store 'tar -xvzf file.tar.gz' in its internal database
 ```
 
 You can specify one or more **tags**
 
 
 ```sh
-$ tar -xvfz file.tar.gz #extract #archive #untar
+$ tar -xvzf file.tar.gz #extract #archive #untar
 ```
 
 or a **description**
 
 ```sh
-$ tar -xvfz file.tar.gz #@extract compressed files from archive
+$ tar -xvzf file.tar.gz #@extract compressed files from archive
 ```
 
 or **both**
@@ -130,18 +130,31 @@ note: `zsh` is also supported!
 
 ### Install in offline mode
 
- 1.  download the latest release with this *easy-to-type* link or  manually download [it](https://github.com/mkcn/fastHistory/releases)
+ 1.  download the latest release with this *easy-to-type* link or manually download [it](https://github.com/mkcn/fastHistory/releases)
 	 - `wget mkcn.me/f`
  2. (if needed) move it to the remote/offline machine
  3. unzip it
-	 -  `tar -xf archive.tar.gz` 
- 4. run installed with the target user
-	 - `./install.sh`
+	 -  `tar -xzf f` 
+ 4. run the installer with the target user
+	- `cd fastHistory-master`
+	 - `./installer.sh`
+
+Note: all the downloaded files can be deleted after the installation is completed
 
 ### Update from old git clone
 
  - `git pull`
- - `./install.sh`
+ - `./installer.sh`
+
+### Uninstall fastHistory (pip3/offline mode)
+
+ 1. download the installer script 
+	- `wget https://raw.githubusercontent.com/mkcn/fastHistory/pip/installer.sh`
+ 2. make it executable and run it with the uninstall flag
+	- `chmod +x installer.sh`
+ 	- `./installer.sh -u`
+
+Note: `pip3 install fasthistory` is not sufficient to uninstall fastHistory 
 
 # Commands and syntax
 
