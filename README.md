@@ -14,7 +14,7 @@
 
 A python tool connected to your terminal to store important commands, search them in a fast way and automatically paste them into your terminal
 
-![](https://github.com/mkcn/fastHistory/raw/pip/images/search_2.0.gif)
+![](https://github.com/mkcn/fastHistory/raw/pip/images/add_and_search.gif)
 
 
 # Intro
@@ -53,7 +53,7 @@ You can specify one or more **tags**
 
 
 ```sh
-$ tar -xvzf file.tar.gz #extract #archive #untar
+$ tar -xvzf file.tar.gz #untar #extract #archive 
 ```
 
 or a **description**
@@ -68,28 +68,33 @@ or **both**
 $ tar -xvf archive.tar.gz #untar @extract compressed files from archive
 ```
 
+![](https://github.com/mkcn/fastHistory/raw/pip/images/add.gif)
+
 To search the saved commands, all you need is **f**
+and the selected command can be pasted directly into your terminal!
 
 ```sh
-$ f extract
+$ f
 ```
 
-Finally, you only need to press 'enter' to directly paste it into your terminal to be ready to go!
-
-![Search sample](https://github.com/mkcn/fastHistory/raw/pip/images/sample.gif)
+![](https://github.com/mkcn/fastHistory/raw/pip/images/advanced_search.gif)
 
 
-For each saved command you can also get a quick summary of the used options/flags (extracted from the man page) 
-
-![Info ls sample](https://github.com/mkcn/fastHistory/raw/pip/images/show.info.srm.png)
+For each command you can get a quick summary from the man page
 
 **Warning**: this feature currently does not cover the syntax of all commands
 
-Furthermore, you can easily export/import all data to make __backups__ and to share your commands with a different machine
+![](https://github.com/mkcn/fastHistory/raw/pip/images/man_page.gif)
+
+And easily edit the tag and description fields
+
+![](https://github.com/mkcn/fastHistory/raw/pip/images/edit_tag.gif)
+
+Furthermore, you can easily export/import all data to make __backups__ or to share your commands with a different machine
 
 ```sh
 $ f --export
-$ f --import fastHistory_2019-03-23.db
+$ f --import fastHistory_2020-03-02.db
 ```
 
 # Supported OSs
@@ -170,6 +175,8 @@ Note: `pip3 install fasthistory` is not sufficient to uninstall fastHistory
 # <command_to_save> #[<tag> [#<tag> ...]][@<description>]
 ```
 
+![](https://github.com/mkcn/fastHistory/raw/pip/images/add_without_execute_and_search.gif)
+
 #### Simple search 
 
 ```
@@ -192,6 +199,8 @@ f [<filter>] [#<tag_filter> ...] [@<description_filter>]
 * the __filter__ words are contained in the **command** OR **tags** OR **description**
 * the __tag_filter__ words are contained in the **tag** list
 * the __description_filter__ words contained in the **description**
+
+![](https://github.com/mkcn/fastHistory/raw/pip/images/advanced_search.gif)
 
 #### Export database
 ```
