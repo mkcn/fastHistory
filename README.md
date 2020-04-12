@@ -68,8 +68,6 @@ or **both**
 $ tar -xvf archive.tar.gz #untar @extract compressed files from archive
 ```
 
-![](https://github.com/mkcn/fastHistory/raw/pip/images/add.gif)
-
 To search the saved commands, all you need is **f**
 and the selected command can be pasted directly into your terminal!
 
@@ -84,7 +82,7 @@ For each command you can get a quick summary from the man page
 
 **Warning**: this feature currently does not cover the syntax of all commands
 
-![](https://github.com/mkcn/fastHistory/raw/pip/images/man_page.gif)
+![](https://github.com/mkcn/fastHistory/raw/pip/images/man_page.png)
 
 And easily edit the tag and description fields
 
@@ -175,7 +173,7 @@ Note: `pip3 install fasthistory` is not sufficient to uninstall fastHistory
 # <command_to_save> #[<tag> [#<tag> ...]][@<description>]
 ```
 
-![](https://github.com/mkcn/fastHistory/raw/pip/images/add_without_execute_and_search.gif)
+![](https://github.com/mkcn/fastHistory/raw/pip/images/add_without_execute_and_search_cut.gif)
 
 #### Simple search 
 
@@ -200,7 +198,7 @@ f [<filter>] [#<tag_filter> ...] [@<description_filter>]
 * the __tag_filter__ words are contained in the **tag** list
 * the __description_filter__ words contained in the **description**
 
-![](https://github.com/mkcn/fastHistory/raw/pip/images/advanced_search.gif)
+![](https://github.com/mkcn/fastHistory/raw/pip/images/f_advanced_search_cut.gif)
 
 #### Export database
 ```
