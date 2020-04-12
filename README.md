@@ -46,7 +46,7 @@ if you know what I am talking about, **fastHistory** is the tool you are looking
 ```sh
 $ tar -xvzf file.tar.gz #
                        /\
-                        \------- fastHistory will store 'tar -xvzf file.tar.gz' in its internal database
+                        \-- fastHistory will store 'tar -xvzf file.tar.gz' in its internal database
 ```
 
 You can specify one or more **tags**
@@ -69,7 +69,7 @@ $ tar -xvf archive.tar.gz #untar @extract compressed files from archive
 ```
 
 To search the saved commands, all you need is **f**
-and the selected command can be pasted directly into your terminal!
+and the selected command wiil be **automatically pasted** into your terminal!
 
 ```sh
 $ f
@@ -137,9 +137,9 @@ note: `zsh` is also supported!
 	 - `wget mkcn.me/f`
  2. (if needed) move it to the remote/offline machine
  3. unzip it
-	 -  `tar -xzf f` 
+	 -  `tar -xvzf f` 
  4. run the installer with the target user
-	- `cd fastHistory-master`
+	- `cd fastHistory-X.X`
 	 - `./installer.sh`
 
 Note: all the downloaded files can be deleted after the installation is completed

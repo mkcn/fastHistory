@@ -192,20 +192,20 @@ else
 		if [[ -f "$FASTHISTORY_PATH_BASHRC" ]] && ! sed -e "s/$source_str_regex//g" "$FASTHISTORY_PATH_BASHRC" | diff -q "$FASTHISTORY_PATH_BASHRC" - > /dev/null 2>&1; then
 			uninstall_already_done=false
 			if sed -e "s/$source_str_regex//g" -i "$FASTHISTORY_PATH_BASHRC"; then
-				_fast_history_install_log "info" "deleted bash hook: $FASTHISTORY_PATH_BASHRC"
+				_fast_history_install_log "info" "deleted bash hook from: $FASTHISTORY_PATH_BASHRC"
 			else
 				uninstall_correct=false
-				_fast_history_install_log "error" "bash hook found but not deleted: $FASTHISTORY_PATH_BASHRC"
+				_fast_history_install_log "error" "bash hook found but not deleted from: $FASTHISTORY_PATH_BASHRC"
 			fi
 		fi
 
 		if [[ -f "$FASTHISTORY_PATH_ZSHRC" ]] && ! sed -e "s/$source_str_regex//g" "$FASTHISTORY_PATH_ZSHRC" | diff -q "$FASTHISTORY_PATH_ZSHRC" - > /dev/null 2>&1; then
 			uninstall_already_done=false
 			if sed -e "s/$source_str_regex//g" -i "$FASTHISTORY_PATH_ZSHRC"; then
-				_fast_history_install_log "info" "deleted zsh hook: $FASTHISTORY_PATH_ZSHRC"
+				_fast_history_install_log "info" "deleted zsh hook from: $FASTHISTORY_PATH_ZSHRC"
 			else
 				uninstall_correct=false
-				_fast_history_install_log "error" "zsh hook found but not deleted: $FASTHISTORY_PATH_ZSHRC"
+				_fast_history_install_log "error" "zsh hook found but not deleted from: $FASTHISTORY_PATH_ZSHRC"
 			fi
 		fi
 		
