@@ -128,6 +128,7 @@ class SetupManager:
 		pattern = re.compile("^source .*/fastHistory.*/bash/f.sh.*")
 		found_hook_updated = False
 		found_hook_old = False
+		is_last_line_empty = False
 		for line in fin:
 			res = pattern.match(line)
 			if res is not None:
@@ -137,7 +138,12 @@ class SetupManager:
 					found_hook_old = True
 			else:
 				fout.write(line)
-		fout.write("\n")
+				if len(line.strip()) == 0:
+					is_last_line_empty = True
+				else:
+					is_last_line_empty = False
+		if not is_last_line_empty:
+			fout.write("\n")
 		fout.write(self.hook_updated_str)
 		fout.truncate()
 		fout.close()
