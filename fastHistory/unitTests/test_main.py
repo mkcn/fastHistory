@@ -8,6 +8,9 @@ from fastHistory.unitTests.loggerTest import LoggerBashTest, LoggerTest
 
 
 class TestMain(unittest.TestCase):
+    """
+    note: some of these tests need a successful installation and setup of fastHistory
+    """
 
     @classmethod
     def setUpClass(cls):
