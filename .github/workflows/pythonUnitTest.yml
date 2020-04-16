@@ -35,18 +35,27 @@ jobs:
           pip3 install bashlex
           pip3 install pyperclip
 
+          pip3 install coverage
+
     - name: Test with UnitTest
       run: |
         if [[ "$OSTYPE" == "linux-gnu" ]]; then
           echo "OS: Linux"
-          python3 -m unittest discover -s /home/runner/work/fastHistory/fastHistory/
+          path_fh=/home/runner/work/fastHistory/fastHistory/
         elif [[ "$OSTYPE" == "darwin"* ]]; then
           echo "OS: Mac OSX"
-          python3 -m unittest discover -s /Users/runner/runners/*/work/fastHistory/fastHistory
+          path_fh=/Users/runner/runners/*/work/fastHistory/fastHistory
         else
           echo "unknown: " $OSTYPE
           exit 1
         fi
+        # same as 'python3 -m unittest discover -s' but with test coverage
+        coverage run --source=$path_fh --omit=$path_fh/fastHistory/unitTests/*,$path_fh/fastHistory/pick/* -m unittest discover -s $path_fh;
+
+    - name: Read Coverage report
+      if: always()
+      run: |
+        coverage report -m
 
     - name: Read UnitTest output logs
       if: always()

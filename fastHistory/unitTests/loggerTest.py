@@ -33,17 +33,36 @@ class LoggerBashTest(LoggerBash):
     class used to redirect the terminal output into the log file
     """
 
+    ERROR = 0
+    INFO = 1
+    WARN = 2
+    NONE = -1
+
+    INDEX_TYPE = 0
+    INDEX_VALUE = 1
+
+    def __init__(self):
+        LoggerBash.__init__(self)
+        self.msgs = []
+
     def set_theme(self, theme):
         pass
 
     def log_on_console_info(self, msg):
         logging.info(str(msg))
+        self.msgs.append([LoggerBashTest.INFO, msg])
 
     def log_on_console_warn(self, msg):
         logging.warning(str(msg))
+        self.msgs.append([LoggerBashTest.WARN, msg])
 
     def log_on_console_error(self, msg):
         logging.error(str(msg))
+        self.msgs.append([LoggerBashTest.ERROR, msg])
 
     def log_on_console(self, msg):
         logging.info(str(msg))
+        self.msgs.append([LoggerBashTest.NONE, msg])
+
+    def get_console_logs(self):
+        return self.msgs

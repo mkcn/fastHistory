@@ -85,67 +85,6 @@ class BashParser(object):
         else:
             logging.debug("unknown obj: " + str(bash_node) + "\n")
 
-    def get_flags(self, bash_node, result, cmd_main=None, first_cmd=False):
-
-        if type(bash_node) == list:
-            for i in bash_node:
-                self.get_flags(i, result)
-        else:
-            logging.debug("kind: " + bash_node.kind)
-            if bash_node.kind == self.CMD_NODE_TYPE_LIST:
-                for i in bash_node.parts:
-                    self.get_flags(i, result)
-            elif bash_node.kind == self.CMD_NODE_TYPE_COMPOUND:
-                for i in bash_node.list:
-                    self.get_flags(i, result)
-            elif bash_node.kind == self.CMD_NODE_TYPE_PIPELINE:
-                logging.debug("pipeline: " + str(bash_node))
-                for i in bash_node.parts:
-                    self.get_flags(i, result)
-            elif bash_node.kind == self.CMD_NODE_TYPE_CMD:
-                items_len = len(bash_node.parts)
-                if items_len > 0 and bash_node.parts[0].kind == self.CMD_NODE_TYPE_WORD and bash_node.parts[0].word in self.WORD_TO_IGNORE:
-                    logging.debug("ignore word: " + bash_node.parts[0].word)
-                    bash_node.parts = bash_node.parts[1:]
-
-                for i in range(len(bash_node.parts)):
-                    if i == 0:
-                        cmd_main = self.get_flags(bash_node.parts[i], result, first_cmd=True)
-                    else:
-                        self.get_flags(bash_node.parts[i], result, cmd_main=cmd_main, first_cmd=False)
-            elif bash_node.kind == self.CMD_NODE_TYPE_WORD:
-                if first_cmd:
-                    found = False
-                    for item in result:
-                        if item[0] == bash_node.word:
-                            found = True
-                            break
-                    if not found:
-                        result.append([bash_node.word, []])
-                    return bash_node.word
-                else:
-                    if cmd_main is not None:
-                            for item in result:
-                                if item[0] == cmd_main:
-                                    found = False
-                                    for flag in item[1]:
-                                        if flag == bash_node.word:
-                                            found = True
-                                            break
-                                    if not found:
-                                        item[1].append(bash_node.word)
-                                    break
-                    else:
-                        logging.error("error cmd main null")
-
-                logging.debug("word value: " + bash_node.word)
-            elif bash_node.kind in self.CMD_NODE_TYPE_OPERATOR:
-                logging.debug("OP: " + str(bash_node.op))
-            elif bash_node.kind in self.CMD_NODE_TYPE_PIPE:
-                logging.debug("PIPE: " + str(bash_node.pipe))
-            else:
-                logging.debug("unknown: " + bash_node.kind + "\n")
-
     @staticmethod
     def decompose_possible_concatenated_flags(flag_string):
         """

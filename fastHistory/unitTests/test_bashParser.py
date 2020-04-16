@@ -36,17 +36,6 @@ class TestBashParser(TestCase):
             self.parser.get_flags_from_bash_node(cmd_parsed, result)
             self.assertEqual(result, test[1])
 
-    def test_parse_quote_cmd(self):
-        self.parser = bashParser.BashParser()
-        test_list = [
-            "sudo blkid -trv | grep swap -r",
-            "echo 'sdsd'"
-        ]
-
-        for res in test_list:
-            # TODO complete
-            pass
-
     def test_decompose_possible_concatenated_flags(self):
         res = bashParser.BashParser.decompose_possible_concatenated_flags("-lsv")
         self.assertEqual(res, ['-l', '-s', '-v'])
@@ -67,4 +56,14 @@ class TestBashParser(TestCase):
         res = bashParser.BashParser.decompose_possible_concatenated_flags("notAFlag")
         self.assertEqual(res, [])
 
+    def test_parse_load_data(self):
+        self.parser = bashParser.BashParser()
+        test_list = [
+            ["ls -ls", True],
+            ["sudo blkid -trv | grep swap -r", True]
+        ]
 
+        for res in test_list:
+            data = self.parser.load_data_for_info_from_man_page(res[0])
+            self.assertNotEqual(data, None)
+            self.assertEqual(data[0], res[1])

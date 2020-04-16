@@ -126,7 +126,7 @@ def handle_export_db(logger_console, output_path, path_data_folder):
 		
 		if output_path is None:
 			current_date = date.today()
-			output_path = os.getcwd() + "/fastHistory_" +  current_date.strftime("%Y-%m-%d") + ".db"
+			output_path = os.getcwd() + "/fastHistory_" + current_date.strftime("%Y-%m-%d") + ".db"
 
 		logging.info("export output: %s " % str(output_path))
 		logger_console.log_on_console_info("export output: %s " % str(output_path))
@@ -198,12 +198,13 @@ def retrieve_parameters_from_bash_hook():
 		return None
 
 
-def f():
+def f(logger_console=None):
 	"""
 	entry point
 	"""
+	if logger_console is None:
+		logger_console = loggerBash.LoggerBash()
 	ConsoleUtils.handle_close_signal()
-	logger_console = loggerBash.LoggerBash()
 	path_code_folder = os.path.dirname(os.path.realpath(__file__))
 	path_data_folder = ConsoleUtils.compose_home_relative_path(PATH_DATA_FOLDER)
 	is_from_installer = is_called_from_installer()
