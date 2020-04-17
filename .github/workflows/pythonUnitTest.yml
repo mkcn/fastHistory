@@ -52,19 +52,21 @@ jobs:
 
     - name: Test with UnitTest
       run: |
+        # some of these tests need a successful installation and setup of fastHistory
         if [[ "$OSTYPE" == "linux-gnu" ]]; then
           echo "OS: Linux"
           path_fh=/home/runner/work/fastHistory/fastHistory/
+          # same as 'python3 -m unittest discover -s' but with test coverage
+          coverage run --source=$path_fh/fastHistory/ --omit=$path_fh/fastHistory/unitTests/*,$path_fh/fastHistory/pick/* -m unittest discover -s $path_fh;
         elif [[ "$OSTYPE" == "darwin"* ]]; then
           echo "OS: Mac OSX"
+          # on mac, we run only the unittest without coverage
           path_fh=/Users/runner/runners/*/work/fastHistory/fastHistory/
+          python3 -m unittest discover -s $path_fh
         else
           echo "unknown: " $OSTYPE
           exit 1
         fi
-        # same as 'python3 -m unittest discover -s' but with test coverage
-        # some of these tests need a successful installation and setup of fastHistory
-        coverage run --source=$path_fh/fastHistory/ --omit=$path_fh/fastHistory/unitTests/*,$path_fh/fastHistory/pick/* -m unittest discover -s $path_fh;
 
     - name: Read Coverage report
       if: always()
