@@ -57,7 +57,7 @@ jobs:
           path_fh=/home/runner/work/fastHistory/fastHistory/
         elif [[ "$OSTYPE" == "darwin"* ]]; then
           echo "OS: Mac OSX"
-          path_fh=/Users/runner/runners/*/work/fastHistory/fastHistory
+          path_fh=/Users/runner/runners/*/work/fastHistory/fastHistory/
         else
           echo "unknown: " $OSTYPE
           exit 1
