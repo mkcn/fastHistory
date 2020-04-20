@@ -12,6 +12,7 @@ class SetupManager:
 		self.configuration_file = configuration_file
 		self.version_file = version_file 
 		self.default_prefix = "default_"
+
 		self.path_code_folder = path_code_folder
 		if home_path is None:
 			self.home_path = os.environ['HOME'] + "/"
@@ -66,19 +67,20 @@ class SetupManager:
 
 	def auto_setup(self, reason=None, force=False):
 		if reason is None:
+			question_str = "-"
 			pass
 		elif reason[0] is True:
-			self.logger_console.log_on_console_info("environment not configured: " + reason[1])
-			question_str = "do you want to proceed with the configuration? [Y/n]: "
+			self.logger_console.log_on_console_warn(reason[1])
+			question_str = "do you want to proceed? [Y/n]: "
 		elif reason[0] is False:
-			self.logger_console.log_on_console_error("environment issue found: " + reason[1])
-			question_str = "do you want to try to fix it? [Y/n]: "
+			self.logger_console.log_on_console_error(reason[1])
+			question_str = "do you want to try to fix it automatically? [Y/n]: "
 		elif reason[0] is None:
-			self.logger_console.log_on_console_error("environment issue found: " + reason[1])
-			return
+			self.logger_console.log_on_console_error(reason[1])
+			return False
 		else:
-			self.logger_console.log_on_console_error("environment issue found: " + reason[1])
-			return
+			self.logger_console.log_on_console_error("corner case not handled")
+			return False
 
 		if force:
 			answer = True
@@ -90,11 +92,13 @@ class SetupManager:
 			if self.handle_setup():
 				self.logger_console.log_on_console_info("setup completed")
 				self.logger_console.log_on_console_warn("please restart your terminal and then use 'f' to start")
+				return True
 			else:
 				self.logger_console.log_on_console_error("setup failed")
+				return False
 		else:
 			self.logger_console.log_on_console_error("nothing done")
-
+			return False
 
 	def setup_rc_file(self):
 		bashrc_path = self.home_path + ".bashrc"

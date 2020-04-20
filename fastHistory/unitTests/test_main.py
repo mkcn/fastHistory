@@ -1,3 +1,5 @@
+import logging
+from datetime import datetime
 import os
 import unittest
 import fastHistory
@@ -46,6 +48,18 @@ class TestMain(unittest.TestCase):
         console_logs = logger_test.get_console_logs()
         self.assertEqual(console_logs[0][LoggerBashTest.INDEX_VALUE], "new command:  ls -ls")
         self.assertEqual(console_logs[1][LoggerBashTest.INDEX_VALUE], "tags:         " + colors.Cyan + "#" + colors.Color_Off + "unittest ")
+
+    def test_call_add_time(self):
+        """
+        check if add function takes longer than 0,5 seconds
+        it should takes around 0,050 - 0,100 seconds
+        """
+        tick = datetime.now()
+        self.test_call_add()
+        tock = datetime.now()
+        diff = tock - tick
+        logging.info("time for add command: %s" % diff.microseconds)
+        self.assertLess(diff.microseconds, 500 * 1000)
 
     def test_call_add_error(self):
         logger_test = LoggerBashTest()

@@ -15,6 +15,8 @@ _fast_history_short_cmd=false
 # [sperimental feature, off by default] if true the return code of the executed command is check before to store it
 _fast_history_check_return_code=false
 _fast_history_executable="f"
+_fast_history_path_preexec_file="bash/bash-preexec.sh"
+_fast_history_path_version_file="config/default_version.txt"
 
 # define internal log function 
 _fast_history_log() {
@@ -41,19 +43,24 @@ else
 fi
 
 # check environment
-if [ -s "$_fast_history_path_code_folder"../fastHistory/__init__.py ]; then
-	_fast_history_log "debug" "folder: $_fast_history_path_code_folder";
+if [ -s "$_fast_history_path_code_folder$_fast_history_path_version_file" ]; then
+  if _fast_history_version=$(cat "$_fast_history_path_code_folder$_fast_history_path_version_file"); then
+  	_fast_history_log "debug" "fastHistory version: $_fast_history_version";
+  else
+  	_fast_history_log "error" "cannot read version file: $_fast_history_path_code_folder$_fast_history_path_version_file";
+    return 1;
+  fi
 else
-	_fast_history_log "error" "cannot find installation folder";
+	_fast_history_log "error" "cannot find verion file: $_fast_history_path_code_folder$_fast_history_path_version_file";
 	return 1;
 fi
 
 # share variable with python to find any inconsistency between the bash hook and the installation folder
 export _fast_history_path_code_folder
-_fast_history_log "debug" "_fast_history_path_code_folder exported";
+export _fast_history_version
 
 # load bash hook functions (more info: https://github.com/rcaloras/bash-preexec/)
-source "$_fast_history_path_code_folder"bash/bash-preexec.sh;
+source "$_fast_history_path_code_folder$_fast_history_path_preexec_file";
 if [ -z "$__bp_imported" ]; then
 	_fast_history_log "error" "preexec cannot be loaded";
 	return 1;
@@ -63,8 +70,8 @@ fi
 
 # check if $PATH is correctly set 
 _fast_history_local_bin=$HOME/.local/bin
-if [ -f $_fast_history_local_bin/$_fast_history_executable ]; then
-	if echo "$PATH" | grep -q -F $_fast_history_local_bin; then 
+if [ -f "$_fast_history_local_bin/$_fast_history_executable" ]; then
+	if echo "$PATH" | grep -q -F "$_fast_history_local_bin"; then
 		_fast_history_log "debug" "$_fast_history_local_bin already in PATH variable";
 	else
 		export PATH=$PATH:$_fast_history_local_bin

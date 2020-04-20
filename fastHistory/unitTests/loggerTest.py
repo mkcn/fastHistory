@@ -41,6 +41,8 @@ class LoggerBashTest(LoggerBash):
     INDEX_TYPE = 0
     INDEX_VALUE = 1
 
+    STR_BASH = "[BASH]"
+
     def __init__(self):
         LoggerBash.__init__(self)
         self.msgs = []
@@ -49,19 +51,19 @@ class LoggerBashTest(LoggerBash):
         pass
 
     def log_on_console_info(self, msg):
-        logging.info(str(msg))
+        logging.info(LoggerBashTest.STR_BASH + str(msg))
         self.msgs.append([LoggerBashTest.INFO, msg])
 
     def log_on_console_warn(self, msg):
-        logging.warning(str(msg))
+        logging.warning(LoggerBashTest.STR_BASH + str(msg))
         self.msgs.append([LoggerBashTest.WARN, msg])
 
     def log_on_console_error(self, msg):
-        logging.error(str(msg))
+        logging.error(LoggerBashTest.STR_BASH + str(msg))
         self.msgs.append([LoggerBashTest.ERROR, msg])
 
     def log_on_console(self, msg):
-        logging.info(str(msg))
+        logging.info(LoggerBashTest.STR_BASH + str(msg))
         self.msgs.append([LoggerBashTest.NONE, msg])
 
     def get_console_logs(self):

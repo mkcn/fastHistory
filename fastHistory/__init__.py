@@ -210,7 +210,10 @@ def f(logger_console=None):
 	is_from_installer = is_called_from_installer()
 
 	# check for errors and load config file
-	config_reader = ConfigReader(path_data_folder, path_code_folder, is_from_installer, NAME_CONFIGURATION_FILE)
+	config_reader = ConfigReader(path_data_folder, path_code_folder,
+								 skip_bash_checks=is_from_installer,
+								 config_file=NAME_CONFIGURATION_FILE,
+								 version_file=NAME_VERSION_FILE)
 	if config_reader.check_config():
 		logger_console.set_theme(config_reader.get_theme())
 
