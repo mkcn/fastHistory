@@ -20,7 +20,7 @@ class DataManager(object):
 
 	DUMMY_INPUT_DATA = Input(False, "", [])
 
-	def __init__(self, path_data_folder, name_db_file, name_old_db_files, mode=DATABASE_MODE_SQLITE):
+	def __init__(self, path_data_folder, name_db_file, name_old_db_files=None, mode=DATABASE_MODE_SQLITE):
 		self.last_search = None
 		self.filtered_data = None
 		if mode == self.DATABASE_MODE_SQLITE:

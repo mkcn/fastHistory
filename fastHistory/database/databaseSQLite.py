@@ -13,6 +13,13 @@ class DatabaseSQLite(object):
     COLUMN_DESCRIPTION = "description"
     COLUMN_TAGS = "tags"
 
+    COLUMN_INDEX_COMMAND = 0
+    COLUMN_INDEX_DESC = 1
+    COLUMN_INDEX_TAGS = 2
+    COLUMN_INDEX_COUNTER = 3
+    COLUMN_INDEX_DATE = 4
+    COLUMN_INDEX_SYNCED = 5
+
     CHAR_TAG = "#"
     CHAR_DESCRIPTION = "@"
     EMPTY_STRING = ""
@@ -745,7 +752,7 @@ class DatabaseSQLite(object):
         :return:        true is successfully deleted, false otherwise
         """
         try:
-            logging.info("delete command: " + str(cmd))
+            logging.debug("delete command: " + str(cmd))
             if cmd is None:
                 logging.error("remove_element: cmd is None")
                 return False

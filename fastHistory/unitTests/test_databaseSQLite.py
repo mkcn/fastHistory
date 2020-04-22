@@ -81,6 +81,13 @@ class TestDatabaseSQLite(unittest.TestCase):
 
         db.close()
 
+    def test_command_update_with_error(self):
+        db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
+        self.assertFalse(db.update_command_field("test", ""))
+        self.assertFalse(db.update_command_field("same-command", "same-command"))
+        self.assertFalse(db.update_command_field("not existing command", "new command"))
+        db.close()
+
     def test_wrong_matches(self):
         """
         test searches with special set of chars
@@ -231,8 +238,8 @@ class TestDatabaseSQLite(unittest.TestCase):
         db.add_element("ls", "test", ["sec"])
         db.add_element("ls", "test 2", ["sec"])
 
-        for i in db.get_all_data():
-            logging.info(str(i))
+        arr = db.get_all_data()
+        self.assertEqual(len(arr), 1)
         db.close()
 
     def test_automatic_migration_database_type_0(self):
@@ -482,3 +489,66 @@ class TestDatabaseSQLite(unittest.TestCase):
         result_import = db.import_external_database(self.output_test_path + self.TEST_DB_FILENAME_OLD + "")
         self.assertEqual(result_import, -1)
 
+    def test_update_tags_field(self):
+        db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
+        self.assertTrue(db.add_element("ls -ls", tags=["tag1"]))
+        self.assertEqual(len(db.get_all_data()), 1)
+        self.assertTrue(db.update_tags_field("ls -ls", tags=["tag2"]))
+        self.assertTrue(db.update_tags_field("ls -ls", tags=["tag2"]))  # no change
+        res = db.get_last_n_filtered_elements(tags_filters=["tag2"])
+        self.assertEqual(len(res), 1)
+        db.close()
+
+    def test_update_description_field(self):
+        db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
+        self.assertTrue(db.add_element("ls -ls", description="desc1"))
+        self.assertEqual(len(db.get_all_data()), 1)
+        self.assertTrue(db.update_description_field("ls -ls", description="desc2"))
+        self.assertTrue(db.update_description_field("ls -ls", description="desc2"))  # no change
+        res = db.get_last_n_filtered_elements(description_filters=["desc2"])
+        self.assertEqual(len(res), 1)
+        db.close()
+
+    def test_update_position_element(self):
+        db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
+        self.assertTrue(db.add_element("ls 1", description="desc1"))
+        self.assertTrue(db.add_element("ls 2", tags=["tag1"]))
+        self.assertTrue(db.add_element("ls 3"))
+        res = db.get_all_data()
+        self.assertEqual(len(res), 3)
+        self.assertEqual(res[-1][DatabaseSQLite.COLUMN_INDEX_COMMAND], "ls 3")  # data is shown reversed in UI
+        self.assertEqual(res[2][DatabaseSQLite.COLUMN_INDEX_COUNTER], 0)
+
+        self.assertTrue(db.update_position_element("ls 1"))
+        res = db.get_all_data()
+        self.assertEqual(len(res), 3)
+        self.assertEqual(res[-1][DatabaseSQLite.COLUMN_INDEX_COMMAND], "ls 1")
+        self.assertEqual(res[2][DatabaseSQLite.COLUMN_INDEX_COUNTER], 1)
+        db.close()
+
+    def test_remove_element(self):
+        db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
+        self.assertTrue(db.add_element("ls -ls"))
+        self.assertEqual(len(db.get_all_data()), 1)
+        self.assertTrue(db.remove_element("ls -ls"))
+        self.assertEqual(len(db.get_all_data()), 0)
+        db.close()
+
+    def test_remove_element_error(self):
+        db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
+        self.assertFalse(db.remove_element(""))
+        self.assertFalse(db.remove_element(None))
+        self.assertFalse(db.remove_element("not existing command"))
+        db.close()
+
+    def test_tags_string_to_array_wrong_type(self):
+        db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
+        res = db._tags_string_to_array(1)
+        self.assertEqual(res, None)
+        db.close()
+
+    def test_tag_array_to_string_wrong_type(self):
+        db = DatabaseSQLite(self.output_test_path, self.TEST_DB_FILENAME, None, delete_all_data_from_db=True)
+        self.assertEqual(db._tag_array_to_string(1), None)
+        self.assertEqual(db._tag_array_to_string("str"), None)
+        db.close()
