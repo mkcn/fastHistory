@@ -111,9 +111,7 @@ note: `zsh` is also supported!
 | Windows*   | 10 (1809)  | bash   | 3.6           | 2.0.0  | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | *using the [Ubuntu terminal for Windows](https://ubuntu.com/tutorials/tutorial-ubuntu-on-windows) |
 | Debian     | 9          | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
 | Fedora     | 29         | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
-| Kali       | 2020.1b    | bash   | 3.?           | 1.1.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
-| Ubuntu     | 16.04      | zsh    | 3.7           | 1.1.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
-| Kali       | 2020.1b    | zsh    | 3.?           | 1.1.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2705.png" width="35%"> | partially tested |
+| Ubuntu     | 16.04      | zsh    | 3.7           | 1.1.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2705.png" width="35%"> | partially tested    |
 
 # How to install
 
