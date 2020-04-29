@@ -120,16 +120,16 @@ note: `zsh` is also supported!
 - `python3`
 - `python3-pip` (not needed for offline installation)
     
-### Install with pip3
+## Install with pip3
 
-1. `pip3 install fasthistory
+1. `pip3 install fasthistory`
 2. `f` 
 
 **Note**: be sure to not use `sudo` or `pip (version 2)`
 
-**Note**: if command not found, the first time you need to use `~./local/bin/f` instead*
+**Note**: if command not found, the first time you need to use `~./local/bin/f` instead
 
-### Install in offline mode
+## Install in offline mode
 
  1.  download the latest release with this *easy-to-type* link or manually download [it](https://github.com/mkcn/fastHistory/releases)
 	 - `wget mkcn.me/f`
