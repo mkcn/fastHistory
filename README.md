@@ -118,16 +118,16 @@ note: `zsh` is also supported!
 ### Requirements
 
 - `python3`
-- `python3-pip` (not needed for offline mode)
+- `python3-pip` (not needed for offline installation)
     
 ### Install with pip3
 
-1. `pip3 install fasthistory` *
-2. `f` **
+1. `pip3 install fasthistory
+2. `f` 
 
-\* *do not use `pip` or `sudo`*
+**Note**: be sure to not use `sudo` or `pip (version 2)`
 
-\*\* *if command not found, the first time you need to use `~./local/bin/f` instead*
+**Note**: if command not found, the first time you need to use `~./local/bin/f` instead*
 
 ### Install in offline mode
 
@@ -140,22 +140,29 @@ note: `zsh` is also supported!
 	- `cd fastHistory-X.X`
 	 - `./installer.sh`
 
-Note: all the downloaded files can be deleted after the installation is completed
+**Note**: all the downloaded files can be deleted after the installation is completed
 
-### Update from old git clone
+# How to update
 
+### Update pip3
+ - `pip3 install fasthistory`
+ 
+### Update offline mode
+ - same steps as installation 
+
+### Update old git clone
  - `git pull`
  - `./installer.sh`
+ 
+# How to uninstall
 
-### Uninstall fastHistory (pip3/offline mode)
-
- 1. download the installer script 
+ 1. download the installer script (only for pip mode)
 	- `wget https://raw.githubusercontent.com/mkcn/fastHistory/pip/installer.sh`
  2. make it executable and run it with the uninstall flag
 	- `chmod +x installer.sh`
  	- `./installer.sh -u`
 
-Note: `pip3 install fasthistory` is not sufficient to uninstall fastHistory 
+**Note**: `pip3 install fasthistory` is not sufficient to uninstall fastHistory 
 
 # Commands and syntax
 
