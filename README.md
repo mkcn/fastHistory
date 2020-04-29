@@ -125,9 +125,9 @@ note: `zsh` is also supported!
 1. `pip3 install fasthistory`
 2. `f` 
 
-**Note**: be sure to not use `sudo` or `pip (version 2)`
+**Note**: be sure to not use `sudo` nor `pip (version 2)`
 
-**Note**: if command not found, the first time you need to use `~./local/bin/f` instead
+**Note**: if `f` command is not found, the first time you need to use `~./local/bin/f` instead
 
 ## Install in offline mode
 
