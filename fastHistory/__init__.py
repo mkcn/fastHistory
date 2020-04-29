@@ -189,7 +189,7 @@ def retrieve_parameters_from_bash_hook(arg1=None):
 		if var_value == FAST_HISTORY_EXECUTABLE:
 			return ""
 		elif var_len > 1:
-			if arg1:
+			if arg1 is not None:
 				index = var_value.index(arg1)
 				return str(var_value[index+len(arg1):]).strip()
 			elif var_value[0:2] == FAST_HISTORY_EXECUTABLE + " ":

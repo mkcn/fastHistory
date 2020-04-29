@@ -41,15 +41,15 @@ class TestMain(unittest.TestCase):
         console_logs = logger_test.get_console_logs()
         self.assertRegex(console_logs[0][LoggerBashTest.INDEX_VALUE], "^Usage:")
 
-    def test_call_add(self):
+    def test_call_add_explicit(self):
         logger_test = LoggerBashTest()
         sys.argv = ["", "--add-explicit", "ls -ls #unittest", "--from-installer"]
         fastHistory.f(logger_console=logger_test)
         console_logs = logger_test.get_console_logs()
-        self.assertEqual(console_logs[0][LoggerBashTest.INDEX_VALUE], "new command:  ls -ls")
-        self.assertEqual(console_logs[1][LoggerBashTest.INDEX_VALUE], "tags:         " + colors.Cyan + "#" + colors.Color_Off + "unittest ")
+        self.assertEqual(console_logs[0][LoggerBashTest.INDEX_VALUE], "command:    'ls -ls'")
+        self.assertEqual(console_logs[1][LoggerBashTest.INDEX_VALUE], "tags:        " + colors.Cyan + "#" + colors.Color_Off + "unittest ")
 
-    def test_call_add_time(self):
+    def test_call_add_explicit_time(self):
         """
         check if add function takes longer than 0,5 seconds
         it should takes around 0,050 - 0,100 seconds
@@ -60,6 +60,41 @@ class TestMain(unittest.TestCase):
         diff = tock - tick
         logging.info("time for add command: %s" % diff.microseconds)
         self.assertLess(diff.microseconds, 500 * 1000)
+
+    def test_call_add(self):
+        logger_test = LoggerBashTest()
+        os.environ["_fast_history_hooked_cmd"] = "f --add ls -ls #test_call_add"  # emulate f.sh behavior
+        sys.argv = ["", "--add", "ls -ls #unittest", "--from-installer"]
+        fastHistory.f(logger_console=logger_test)
+        console_logs = logger_test.get_console_logs()
+        self.assertEqual(console_logs[0][LoggerBashTest.INDEX_VALUE], "command:    'ls -ls'")
+        self.assertEqual(console_logs[1][LoggerBashTest.INDEX_VALUE], "tags:        " + colors.Cyan + "#" + colors.Color_Off + "test_call_add ")
+
+    def test_call_add_with_spaces(self):
+        logger_test = LoggerBashTest()
+        os.environ["_fast_history_hooked_cmd"] = "  f   --add   ls -ls #test_call_add"  # emulate f.sh behavior
+        sys.argv = ["", "--add", "ls -ls #unittest", "--from-installer"]
+        fastHistory.f(logger_console=logger_test)
+        console_logs = logger_test.get_console_logs()
+        self.assertEqual(console_logs[0][LoggerBashTest.INDEX_VALUE], "command:    'ls -ls'")
+        self.assertEqual(console_logs[1][LoggerBashTest.INDEX_VALUE], "tags:        " + colors.Cyan + "#" + colors.Color_Off + "test_call_add ")
+
+    def test_call_add_with_wrong_syntax(self):
+        logger_test = LoggerBashTest()
+        os.environ["_fast_history_hooked_cmd"] = "  f --add ls -ls"  # emulate f.sh behavior
+        sys.argv = ["", "--add", "ls -ls", "--from-installer"]
+        fastHistory.f(logger_console=logger_test)
+        console_logs = logger_test.get_console_logs()
+        self.assertEqual(console_logs[0][LoggerBashTest.INDEX_VALUE], "wrong input")
+
+    def test_call_add_short(self):
+        logger_test = LoggerBashTest()
+        os.environ["_fast_history_hooked_cmd"] = "f -a ls -ls #test_call_add_short"  # emulate f.sh behavior
+        sys.argv = ["", "-a", "ls -ls #unittest", "--from-installer"]
+        fastHistory.f(logger_console=logger_test)
+        console_logs = logger_test.get_console_logs()
+        self.assertEqual(console_logs[0][LoggerBashTest.INDEX_VALUE], "command:    'ls -ls'")
+        self.assertEqual(console_logs[1][LoggerBashTest.INDEX_VALUE], "tags:        " + colors.Cyan + "#" + colors.Color_Off + "test_call_add_short ")
 
     def test_call_add_error(self):
         logger_test = LoggerBashTest()
