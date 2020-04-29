@@ -105,13 +105,13 @@ note: `zsh` is also supported!
 
 | OS         | OS Version | Shell | Python versions | fastHistory version | Test mode | Result | Comment   |
 | ---------- |:----------:| ------:|-------------:| -------------------:|----------:| ---------:| ---------:| 
-| Ubuntu     | 16.04      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  |    |
-| Ubuntu     | 18.04      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  |    |
-| macOS      | 10.15      | bash   | 3.6, 3.7, 3.8 | latest | auto + unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | python3 needs to be [installed](https://docs.python-guide.org/starting/install3/osx/)  |
-| Windows*   | 10 (1809)  | bash   | 3.6           | 2.0.0  | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | *using the [Ubuntu terminal for Windows](https://ubuntu.com/tutorials/tutorial-ubuntu-on-windows) |
-| Debian     | 9          | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
+| Ubuntu     | 16.04      | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  |    |
+| Ubuntu     | 18.04      | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  |    |
+| macOS      | 10.15      | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | python3 needs to be [installed](https://docs.python-guide.org/starting/install3/osx/)  |
 | Fedora     | 29         | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
-| Ubuntu     | 16.04      | zsh    | 3.7           | 1.1.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2705.png" width="35%"> | partially tested    |
+| Debian     | 9          | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
+| Debian     | 10         | zsh*   | 3.7           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> | *[syntax limitation](https://github.com/mkcn/fastHistory/tree/pip#Commands-and-syntax))   |
+| Windows*   | 10 (1809)  | bash   | 3.6           | 2.0.0  | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | *using the [Ubuntu terminal for Windows](https://ubuntu.com/tutorials/tutorial-ubuntu-on-windows) |
 
 # How to install
 
@@ -168,8 +168,14 @@ Note: `pip3 install fasthistory` is not sufficient to uninstall fastHistory
 #### Adding without execution
 
 ```
+f --add <command> #[<tag> [#<tag> ...]][@<description>]
+```
+or 
+```
 # <command_to_save> #[<tag> [#<tag> ...]][@<description>]
 ```
+
+Note: the latter is not available with `zsh`
 
 ![](https://github.com/mkcn/fastHistory/raw/pip/images/add_without_execute_and_search_cut.gif)
 

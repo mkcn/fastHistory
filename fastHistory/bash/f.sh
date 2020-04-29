@@ -59,13 +59,26 @@ fi
 export _fast_history_path_code_folder
 export _fast_history_version
 
-# load bash hook functions (more info: https://github.com/rcaloras/bash-preexec/)
 source "$_fast_history_path_code_folder$_fast_history_path_preexec_file";
 if [ -z "$__bp_imported" ]; then
 	_fast_history_log "error" "preexec cannot be loaded";
 	return 1;
 else
 	_fast_history_log "debug" "preexec loaded correctly";
+fi
+
+# load bash hook functions
+if [ -n "$ZSH_VERSION" ]; then
+	_fast_history_log "debug" "preexec already provided by zsh";
+else
+	# more info: https://github.com/rcaloras/bash-preexec/
+	source "$_fast_history_path_code_folder$_fast_history_path_preexec_file";
+	if [ -z "$__bp_imported" ]; then
+		_fast_history_log "error" "preexec cannot be loaded";
+		return 1;
+	else
+		_fast_history_log "debug" "preexec loaded correctly";
+	fi
 fi
 
 # check if $PATH is correctly set 
@@ -87,7 +100,7 @@ fi
 export _fast_history_hooked_cmd
 
 preexec() {
-	_fast_history_hooked_cmd="$1";
+	_fast_history_hooked_cmd=$(echo "$1" | xargs);
 	if [[ "$_fast_history_hooked_cmd" == "#"* ]]; then
 		# remove the intial '#'
 		_fast_history_hooked_cmd="${_fast_history_hooked_cmd:1}"
@@ -108,14 +121,15 @@ precmd() {
 		    # this is only done to avoid to load the python module for each command
 		    if [[ "$_fast_history_hooked_cmd" == *"#"* ]] && [[ "$_fast_history_hooked_cmd" != "$_fast_history_executable "* ]] ; then
           $_fast_history_executable --add-explicit "$_fast_history_hooked_cmd"
-          # clean the cmd, this is needed because precmd can be trigged without preexec (example ctrl+c)
-          _fast_history_hooked_cmd="";
         else
           _fast_history_log "debug" "command ignored";
         fi;
 		else
 			_fast_history_log "debug" "error code detected: command ignored";
 		fi;
+
+		 # clean the cmd, this is needed because precmd can be trigged without preexec (e.g. ctrl+c)
+    _fast_history_hooked_cmd="";
 	fi;
      }
 

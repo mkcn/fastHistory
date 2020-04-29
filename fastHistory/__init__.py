@@ -67,8 +67,12 @@ def handle_add_request(logger_console, input_cmd_str, path_data_folder, error_fe
 	if parser_res is None:
 		if error_feedback:
 			logger_console.log_on_console_error("wrong input")
-			logger_console.log_on_console_info("syntax : f-add <command> #[<tag> [#<tag> ...]][@<description>]")
-			logger_console.log_on_console_info("example: f-add ls -la #tag1 #tag2 #tag2 @a long description")
+			logger_console.log_on_console_info("syntax  :  f --add <command> #[<tag> [#<tag> ...]][@<description>]")
+			logger_console.log_on_console_info("examples:  f --add ls -la #")
+			logger_console.log_on_console_info("           f --add ls -la #list @show files")
+			logger_console.log_on_console_info("syntax 2:  #<command> #[<tag> [#<tag> ...]][@<description>]")
+			logger_console.log_on_console_info("examples:  #ls -la #")
+			logger_console.log_on_console_info("           #ls -la #list @show files")
 	else:
 		cmd = parser_res.get_main_str()
 		description = parser_res.get_description_str()
@@ -78,14 +82,14 @@ def handle_add_request(logger_console, input_cmd_str, path_data_folder, error_fe
 		stored = data_manager.add_new_element(cmd, description, tags)
 		if stored:
 			logging.info("command added")
-			logger_console.log_on_console_info("new command:  " + cmd)
+			logger_console.log_on_console_info("command:    '%s'" % cmd)
 			if tags and len(tags) > 0 and tags[0] != "":
 				str_tags = ""
 				for tag in tags:
 					str_tags += logger_console.tag_colored + tag + " "
-				logger_console.log_on_console_info("tags:         " + str_tags)
+				logger_console.log_on_console_info("tags:        %s" % str_tags)
 			if description and len(description) > 0:
-				logger_console.log_on_console_info("description:  %s%s" % (logger_console.desc_colored, description))
+				logger_console.log_on_console_info("description: %s%s" % (logger_console.desc_colored, description))
 		else:
 			logging.error("store command failed")
 			logger_console.log_on_console_info("store command failed, please check your log file: %s" %
@@ -171,7 +175,7 @@ def is_called_from_installer():
 		return False
 
 
-def retrieve_parameters_from_bash_hook():
+def retrieve_parameters_from_bash_hook(arg1=None):
 	"""
 	this variable is set by the bash hook (f.sh) and with this trick we can read also any comment as a parameter
 	e.g. "f text #tag @desc" -> "text #tag @desc" (instead of only 'text')
@@ -185,7 +189,10 @@ def retrieve_parameters_from_bash_hook():
 		if var_value == FAST_HISTORY_EXECUTABLE:
 			return ""
 		elif var_len > 1:
-			if var_value[0:2] == FAST_HISTORY_EXECUTABLE + " ":
+			if arg1:
+				index = var_value.index(arg1)
+				return str(var_value[index+len(arg1):]).strip()
+			elif var_value[0:2] == FAST_HISTORY_EXECUTABLE + " ":
 				return str(var_value[2:]).strip()
 			else:
 				logging.debug("$_fast_history_hooked_cmd belongs to other command: %s" % var_value)
@@ -228,9 +235,12 @@ def f(logger_console=None):
 			handle_search_request(logger_console, input_cmd, path_data_folder, config_reader.get_theme(), config_reader.get_last_column_size())
 		elif args_len >= 2:
 			arg1 = str(sys.argv[1])
-			if (arg1 == "--add-explicit") and args_len == 3:
-				input_cmd = " ".join(sys.argv[2:]).strip()
-				handle_add_request(logger_console, input_cmd, path_data_folder)
+			if arg1 == "-a" or arg1 == "--add":
+				input_cmd = retrieve_parameters_from_bash_hook(arg1=arg1)
+				handle_add_request(logger_console, input_cmd, path_data_folder, error_feedback=True)
+			elif (arg1 == "--add-explicit") and args_len == 3:
+				input_cmd = str(sys.argv[2]).strip()
+				handle_add_request(logger_console, input_cmd, path_data_folder, error_feedback=False)
 			elif (arg1 == "--config") and args_len == 2:
 				edit_config_file(logger_console,path_data_folder)
 			elif (arg1 == "--setup") and args_len == 2:

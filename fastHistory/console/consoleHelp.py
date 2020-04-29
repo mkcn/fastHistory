@@ -23,17 +23,13 @@ Search examples:
 
 OPTIONS
   -v, --version                show current version
-
   -h, --help                   show this help message
-    
+  -a, --add <command> #        add command (same as '# <command_to_save> #')
   --export [<output_name>]     export database with all stored commands
-    
   --import <input_name>        import commands from exported database
-                               the commands will be imported only if not already present
-                               if same command has different tag or description they will be merged
-    
+                                the commands will be imported only if not already present
+                                if same command has different tag or description they will be merged 
   --config                     change configuration file
-    
   --setup                      re-run the setup, possibly to repair fastHistory
 
 """
