@@ -18,13 +18,20 @@ _fast_history_executable="f"
 _fast_history_path_preexec_file="bash/bash-preexec.sh"
 _fast_history_path_version_file="config/default_version.txt"
 
-# define internal log function 
+# define internal functions
 _fast_history_log() {
 	if [ "$1" = "error" ]; then
 		printf "[\033[0;31mfastHistory\033[0m][bash] $2\n";
 	elif [ "$1" = "debug" ] && $_fast_history_bash_debug ; then
 		printf "[\033[0;36mfastHistory\033[0m][bash] $2\n";
 	fi
+}
+
+_fast_history_trim() {
+    local var="$*"
+    var="${var#"${var%%[![:space:]]*}"}"
+    var="${var%"${var##*[![:space:]]}"}"   
+    printf '%s' "$var"
 }
 
 # start message
@@ -100,7 +107,7 @@ fi
 export _fast_history_hooked_cmd
 
 preexec() {
-	_fast_history_hooked_cmd=$(echo "$1" | xargs);
+	_fast_history_hooked_cmd=$(_fast_history_trim "$1");
 	if [[ "$_fast_history_hooked_cmd" == "#"* ]]; then
 		# remove the intial '#'
 		_fast_history_hooked_cmd="${_fast_history_hooked_cmd:1}"

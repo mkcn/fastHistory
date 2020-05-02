@@ -183,6 +183,7 @@ class InputParser(object):
 
             if char_to_cut != 0:
                 cmd = cmd[:-char_to_cut]
+            cmd = cmd.strip()
         else:
             logging.debug("input parser: regex does NOT match")
             return None
