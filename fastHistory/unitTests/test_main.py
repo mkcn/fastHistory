@@ -147,7 +147,7 @@ class TestMain(unittest.TestCase):
         for log in console_logs:
             self.assertNotEqual(console_logs[0][LoggerBashTest.INDEX_TYPE], LoggerBashTest.ERROR)
         # last message value
-        self.assertRegex(console_logs[-1][LoggerBashTest.INDEX_VALUE], "^please restart your terminal")
+        self.assertRegex(console_logs[-1][LoggerBashTest.INDEX_VALUE], "^setup completed")
 
     def test_call_setup_with_config_reader_error(self):
         logger_test = LoggerBashTest()
