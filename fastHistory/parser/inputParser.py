@@ -142,6 +142,19 @@ class InputParser(object):
             return True
 
     @staticmethod
+    def adjust_multi_line_input(input):
+        """
+        return [True, new value] if input is multi-line
+        """
+        one_line_input = input
+        for char in ['\\\n', '\n', '\r']:
+            one_line_input = one_line_input.replace(char, '')
+        if one_line_input == input:
+            return [False, one_line_input]
+        else:
+            return [True, one_line_input]
+
+    @staticmethod
     def parse_input(cmd, is_search_cmd=False):
         """
         parse the input cmd and retrieve the cmd, tags and description

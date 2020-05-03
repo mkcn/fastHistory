@@ -58,11 +58,13 @@ def handle_add_request(logger_console, input_cmd_str, path_data_folder, error_fe
 	# local import to load this module only in case of an 'add' commands
 	from fastHistory.parser.inputParser import InputParser
 
+	input = InputParser.adjust_multi_line_input(input_cmd_str)
+
 	# define log class
-	logging.debug("add request: '" + input_cmd_str + "'")
+	logging.debug("add request: '" + input[1] + "'")
 
 	# parse tags and store the cmd
-	parser_res = InputParser.parse_input(input_cmd_str)
+	parser_res = InputParser.parse_input(input[1])
 
 	if parser_res is None:
 		if error_feedback:
@@ -81,7 +83,10 @@ def handle_add_request(logger_console, input_cmd_str, path_data_folder, error_fe
 		data_manager = DataManager(path_data_folder, NAME_DATABASE_FILE, NAME_OLD_DATABASE_FILES, DATABASE_MODE)
 		stored = data_manager.add_new_element(cmd, description, tags)
 		if stored:
-			logging.info("command added")
+			logging.debug("command added")
+			if input[0]:
+				logger_console.log_on_console_warn("command has been adjusted")
+				logger_console.log_on_console_warn("multi-line commands are not fully supported")
 			logger_console.log_on_console_info("command:    '%s'" % cmd)
 			if tags and len(tags) > 0 and tags[0] != "":
 				str_tags = ""

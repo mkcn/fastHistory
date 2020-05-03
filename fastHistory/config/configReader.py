@@ -70,7 +70,7 @@ class ConfigReader:
             if data_version is None:
                 self._checkError = [False, "data version file cannot be read"]
             elif data_version != code_version:
-                self._checkError = [True, "fastHistory was updated, data folder needs to be updated (%s -> %s)" %
+                self._checkError = [True, "update detected, data folder needs to be updated (%s -> %s)" %
                                     (data_version, code_version)]
             elif not self.skip_bash_checks and (
                     self._BASH_VAR_PATH_CODE_FOLDER not in os.environ or self._BASH_VAR_VERSION not in os.environ):
@@ -78,7 +78,7 @@ class ConfigReader:
             elif not self.skip_bash_checks and os.environ[self._BASH_VAR_PATH_CODE_FOLDER] != self.path_code_folder + "/bash/../":
                 self._checkError = [False, "wrong bash hook loaded (maybe from an old installation)"]
             elif not self.skip_bash_checks and str(os.environ[self._BASH_VAR_VERSION]) != code_version:
-                self._checkError = [None, "Please restart your terminal! old bash is still used (%s -> %s)" %
+                self._checkError = [None, "restart your terminal, old bash is still used (%s -> %s)" %
                                     (os.environ[self._BASH_VAR_VERSION], code_version)]
             else:
                 try:
