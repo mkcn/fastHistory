@@ -91,7 +91,6 @@ class SetupManager:
 		if answer:
 			if self.handle_setup():
 				self.logger_console.log_on_console_info("setup completed")
-				self.logger_console.log_on_console_warn("please restart your terminal and then use 'f' to start")
 				return True
 			else:
 				self.logger_console.log_on_console_error("setup failed")

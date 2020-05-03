@@ -132,12 +132,12 @@ def handle_export_db(logger_console, output_path, path_data_folder):
 	try:
 		from shutil import copyfile
 		from datetime import date
-		
+
 		if output_path is None:
 			current_date = date.today()
 			output_path = os.getcwd() + "/fastHistory_" + current_date.strftime("%Y-%m-%d") + ".db"
 
-		logging.info("export output: %s " % str(output_path))
+		logging.info("output: %s " % str(output_path))
 		logger_console.log_on_console_info("export output: %s " % str(output_path))
 		if os.path.isfile(output_path):
 			answer = input("output file already exits, overwrite it? [y/N] ")
@@ -158,7 +158,20 @@ def handle_export_db(logger_console, output_path, path_data_folder):
 		logger_console.log_on_console_info("example: f-export fastHistory_virtual_machine.db")
 
 
-def edit_config_file(logger_console, path_data_folder):
+def handle_setup(logger_console, path_data_folder, path_code_folder, config_reader, reason=None, force=False):
+	from fastHistory.config.setupManager import SetupManager
+	setup_manager = SetupManager(logger_console, path_data_folder, path_code_folder, NAME_CONFIGURATION_FILE, NAME_VERSION_FILE)
+	if setup_manager.auto_setup(reason=reason, force=force):
+		if config_reader.check_config():
+			return True
+		else:
+			logger_console.log_on_console_warn("please restart your terminal and then use 'f' to start")
+			return False
+	else:
+		return False
+
+
+def handle_config_file(logger_console, path_data_folder):
 	config_file= path_data_folder + NAME_CONFIGURATION_FILE
 	logger_console.log_on_console_info("to change the config file use the following injected command")
 	try:
@@ -167,6 +180,11 @@ def edit_config_file(logger_console, path_data_folder):
 		logger_console.log_on_console_error("your terminal does not support automatic input injection")
 		logger_console.log_on_console_error("please edit the configuration file manually")
 		logger_console.log_on_console(config_file)
+
+
+def handle_helper(logger_console):
+	from fastHistory.console.consoleHelp import HELP_STR
+	logger_console.log_on_console(HELP_STR)
 
 
 def is_called_from_installer():
@@ -210,6 +228,51 @@ def retrieve_parameters_from_bash_hook(arg1=None):
 		return None
 
 
+def handle_arguments(logger_console, config_reader, path_data_folder, path_code_folder):
+	# set logging (this setting is applied globally for all logging calls from now on)
+	logging.basicConfig(filename=path_data_folder + NAME_LOG_FILE, level=config_reader.get_log_level())
+	logging.debug("bash input: %s" % str(sys.argv))
+
+	logger_console.set_theme(config_reader.get_theme())
+
+	args_len = len(sys.argv)
+	# check number of parameters
+	if args_len == 1:
+		input_cmd = retrieve_parameters_from_bash_hook()
+		handle_search_request(logger_console, input_cmd, path_data_folder, config_reader.get_theme(),
+							  config_reader.get_last_column_size())
+	elif args_len >= 2:
+		arg1 = str(sys.argv[1])
+		if arg1 == "-a" or arg1 == "--add":
+			input_cmd = retrieve_parameters_from_bash_hook(arg1=arg1)
+			handle_add_request(logger_console, input_cmd, path_data_folder, error_feedback=True)
+		elif (arg1 == "--add-explicit") and args_len == 3:
+			input_cmd = str(sys.argv[2]).strip()
+			handle_add_request(logger_console, input_cmd, path_data_folder, error_feedback=False)
+		elif (arg1 == "--config") and args_len == 2:
+			handle_config_file(logger_console, path_data_folder)
+		elif (arg1 == "--setup") and args_len == 2:
+			handle_setup(logger_console, path_data_folder, path_code_folder, config_reader, force=True)
+		elif arg1 == "--import" and args_len == 3:
+			import_file = sys.argv[2]
+			handle_import_db(logger_console, import_file, path_data_folder)
+		elif arg1 == "--export" and args_len == 3:
+			output_path = sys.argv[2]
+			handle_export_db(logger_console, output_path, path_data_folder)
+		elif arg1 == "--export" and args_len == 2:
+			handle_export_db(logger_console, None, path_data_folder)
+		elif (arg1 == "-h" or arg1 == "--help") and args_len == 2:
+			handle_helper(logger_console)
+		elif (arg1 == "-v" or arg1 == "--version") and args_len == 2:
+			logger_console.log_on_console(ConsoleUtils.open_file(path_data_folder + NAME_VERSION_FILE))
+		else:
+			input_cmd = retrieve_parameters_from_bash_hook()
+			handle_search_request(logger_console, input_cmd, path_data_folder, config_reader.get_theme(),
+								config_reader.get_last_column_size())
+	else:
+		logger_console.log_on_console_error("wrong number of args")
+
+
 def f(logger_console=None):
 	"""
 	entry point
@@ -227,60 +290,17 @@ def f(logger_console=None):
 								 config_file=NAME_CONFIGURATION_FILE,
 								 version_file=NAME_VERSION_FILE)
 	if config_reader.check_config():
-		logger_console.set_theme(config_reader.get_theme())
-
-		# set logging (this setting is applied globally for all logging calls from now on)
-		logging.basicConfig(filename=path_data_folder + NAME_LOG_FILE, level=config_reader.get_log_level())
-		logging.debug("bash input: %s" % str(sys.argv))
-
-		args_len = len(sys.argv)
-		# check number of parameters
-		if args_len == 1:
-			input_cmd = retrieve_parameters_from_bash_hook()
-			handle_search_request(logger_console, input_cmd, path_data_folder, config_reader.get_theme(), config_reader.get_last_column_size())
-		elif args_len >= 2:
-			arg1 = str(sys.argv[1])
-			if arg1 == "-a" or arg1 == "--add":
-				input_cmd = retrieve_parameters_from_bash_hook(arg1=arg1)
-				handle_add_request(logger_console, input_cmd, path_data_folder, error_feedback=True)
-			elif (arg1 == "--add-explicit") and args_len == 3:
-				input_cmd = str(sys.argv[2]).strip()
-				handle_add_request(logger_console, input_cmd, path_data_folder, error_feedback=False)
-			elif (arg1 == "--config") and args_len == 2:
-				edit_config_file(logger_console,path_data_folder)
-			elif (arg1 == "--setup") and args_len == 2:
-				from fastHistory.config.setupManager import SetupManager
-				setup_manager = SetupManager(logger_console, path_data_folder, path_code_folder, NAME_CONFIGURATION_FILE, NAME_VERSION_FILE)
-				setup_manager.auto_setup(force=True)
-			elif arg1 == "--import" and args_len == 3:
-				import_file = sys.argv[2]
-				handle_import_db(logger_console, import_file, path_data_folder)
-			elif arg1 == "--export" and args_len == 3:
-				output_path = sys.argv[2]
-				handle_export_db(logger_console, output_path, path_data_folder)
-			elif arg1 == "--export" and args_len == 2:
-				handle_export_db(logger_console, None, path_data_folder)
-			elif (arg1 == "-h" or arg1 == "--help") and args_len == 2:
-				from fastHistory.console.consoleHelp import HELP_STR
-				logger_console.log_on_console(HELP_STR)
-			elif (arg1 == "-v" or arg1 == "--version") and args_len == 2:
-				logger_console.log_on_console(ConsoleUtils.open_file(path_data_folder + NAME_VERSION_FILE))
-			else:
-				input_cmd = retrieve_parameters_from_bash_hook()
-				handle_search_request(logger_console, input_cmd, path_data_folder, config_reader.get_theme(), config_reader.get_last_column_size())
-	elif len(sys.argv) >= 2 and (sys.argv[1] == "--config" or sys.argv[1] == "--setup"):
+		handle_arguments(logger_console, config_reader, path_data_folder, path_code_folder)
+	elif len(sys.argv) >= 2 and (sys.argv[1] in ["--config", "-h", "--help", "--setup"]):
 		if sys.argv[1] == "--config":
-			edit_config_file(logger_console, path_data_folder)
+			handle_config_file(logger_console, path_data_folder)
+		elif sys.argv[1] == "-h" or sys.argv[1] == "--help":
+			handle_helper(logger_console)
 		elif sys.argv[1] == "--setup":
-			from fastHistory.config.setupManager import SetupManager
-			setupManager = SetupManager(logger_console, path_data_folder, path_code_folder, NAME_CONFIGURATION_FILE, NAME_VERSION_FILE)
-			setupManager.auto_setup(force=True)
-		else:
-			logger_console.log_on_console_error("corner case not handled")
+			handle_setup(logger_console, path_data_folder, path_code_folder, config_reader, force=True)
 	else:
-		from fastHistory.config.setupManager import SetupManager
-		setupManager = SetupManager(logger_console, path_data_folder, path_code_folder, NAME_CONFIGURATION_FILE, NAME_VERSION_FILE)
-		setupManager.auto_setup(reason=config_reader.get_error_msg(), force=False)
+		if handle_setup(logger_console, path_data_folder, path_code_folder, config_reader, reason=config_reader.get_error_msg()):
+			handle_arguments(logger_console, config_reader, path_data_folder, path_code_folder)
 
 
 if __name__ == "__main__":
@@ -288,4 +308,4 @@ if __name__ == "__main__":
 	main function called by the precmd hook bash command
 	"""
 	print("the main of fastHistory is not enabled, please use the 'f()' function")
-	
+

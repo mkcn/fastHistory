@@ -86,7 +86,7 @@ class ConfigReader:
                     if self._config is None:
                         self._checkError = [False, "config file not found"]
                     elif self._MAIN not in self._config:
-                        self._checkError = [False, "config file malformed"]
+                        self._checkError = [None, "config file malformed"]
                     elif self._MAIN_LOG_LEVEL not in self._config[self._MAIN] or \
                         self._config[self._MAIN][self._MAIN_LOG_LEVEL] not in self._ALLOWED_LOG_LEVELS:
                         self._checkError = [None, "%s must be chosen between: %s, current value: '%s'. %s" % \
