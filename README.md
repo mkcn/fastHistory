@@ -145,7 +145,7 @@ note: `zsh` is also supported!
 # How to update
 
 ### Update pip3
- - `pip3 install fasthistory`
+ - `pip3 install -U fasthistory`
  
 ### Update offline mode
  - same steps as installation 
