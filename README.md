@@ -99,7 +99,7 @@ $ f --import fastHistory_2020-03-02.db
 
 fastHistory can work in any OS with `python3` and a `bash` terminal
 
-note: `zsh` is also supported!
+`zsh` is also supported!
 
 ### List of tested OSs:
 
