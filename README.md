@@ -1,9 +1,9 @@
 
 # fastHistory 2.0 - speed up your terminal!
 
-
-| <img src="https://github.githubassets.com/images/icons/emoji/unicode/26a0.png" width="6%"> WARNING: this is a beta version |
-|:---------------------------|
+[![](https://img.shields.io/pypi/status/fastHistory?color=00999b&style=for-the-badge)](https://pypi.org/project/fastHistory/)
+[![](https://img.shields.io/pypi/v/fastHistory?color=00999b&style=for-the-badge)](https://pypi.org/project/fastHistory/)
+[![](https://img.shields.io/github/last-commit/mkcn/fastHistory?color=00999b&style=for-the-badge)](https://github.com/mkcn/fastHistory/commits)
 
 - [Intro](https://github.com/mkcn/fastHistory/tree/pip#Intro)
 - [Supported systems](https://github.com/mkcn/fastHistory/tree/pip#Supported-OSs)
@@ -123,11 +123,9 @@ note: `zsh` is also supported!
 ## Install with pip3
 
 1. `pip3 install fasthistory`
-2. `f` 
+2. `$HOME./local/bin/f`
 
 **Note**: be sure to not use `sudo` nor `pip (version 2)`
-
-**Note**: if `f` command is not found, the first time you need to use `~./local/bin/f` instead
 
 ## Install in offline mode
 
@@ -144,13 +142,14 @@ note: `zsh` is also supported!
 
 # How to update
 
-### Update pip3
+### Update pip3 installation
  - `pip3 install -U fasthistory`
+ - `f`
  
 ### Update offline mode
  - same steps as installation 
 
-### Update old git clone
+### Update old (< 2.0) git installations 
  - `git pull`
  - `./installer.sh`
  
@@ -232,6 +231,16 @@ f --config
 #### Force a fastHistory setup to fix possible issues
 ```
 f --setup
+```
+
+#### Check fastHistory version
+```
+f --version
+```
+
+#### Show fastHistory help
+```
+f --help
 ```
 
 License
