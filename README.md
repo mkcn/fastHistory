@@ -159,7 +159,7 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
  
 # How to uninstall
 
- 1. download the installer script (already present in the offline mode)
+ 1. download the installer script (already available in the offline mode)
 	- `wget https://raw.githubusercontent.com/mkcn/fastHistory/pip/installer.sh`
  2. make it executable and run it with the uninstall flag
 	- `chmod +x installer.sh`
