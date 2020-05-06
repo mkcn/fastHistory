@@ -145,7 +145,7 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 # How to update
 
 ### Update pip3 installation
- 1. `pip3 install --no-cache-dir fasthistory`
+ 1. `pip3 install -U --no-cache-dir fasthistory`
  2. `f`
  3.  close and reopen your terminal
  
