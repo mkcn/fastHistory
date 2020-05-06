@@ -8,7 +8,7 @@
 ############################################################
 
 # enable this to debug the bash hook of fastHistory
-_fast_history_bash_debug=false
+_fast_history_bash_debug=true
 
 _fast_history_hooked_cmd=""
 _fast_history_short_cmd=false
@@ -66,14 +66,6 @@ fi
 export _fast_history_path_code_folder
 export _fast_history_version
 
-source "$_fast_history_path_code_folder$_fast_history_path_preexec_file";
-if [ -z "$__bp_imported" ]; then
-	_fast_history_log "error" "preexec cannot be loaded";
-	return 1;
-else
-	_fast_history_log "debug" "preexec loaded correctly";
-fi
-
 # load bash hook functions
 if [ -n "$ZSH_VERSION" ]; then
 	_fast_history_log "debug" "preexec already provided by zsh";
@@ -99,6 +91,12 @@ if [ -f "$_fast_history_local_bin/$_fast_history_executable" ]; then
 	fi
 else
 	_fast_history_log "debug" "$_fast_history_local_bin/$_fast_history_executable does not exist (this may be an issue)";
+fi
+
+# if still loaded, disable old fastHistory bash functions
+if declare -f "f" >/dev/null 2>&1; then
+    unset -f "f" "f-add" "f-export" "f-import" "f-search" "fadd" "fsearch"
+    _fast_history_log "debug" "old functions found and disabled";
 fi
 
 # "preexec" is executed just after a command has been read and is about to be executed

@@ -74,7 +74,7 @@ class ConfigReader:
                                     (data_version, code_version)]
             elif not self.skip_bash_checks and (
                     self._BASH_VAR_PATH_CODE_FOLDER not in os.environ or self._BASH_VAR_VERSION not in os.environ):
-                self._checkError = [False, "bash hook not loaded (you may have forgot to restart your terminal)"]
+                self._checkError = [False, "bash hook not loaded (you may forgot to restart your terminal)"]
             elif not self.skip_bash_checks and os.environ[self._BASH_VAR_PATH_CODE_FOLDER] != self.path_code_folder + "/bash/../":
                 self._checkError = [False, "wrong bash hook loaded (maybe from an old installation)"]
             elif not self.skip_bash_checks and str(os.environ[self._BASH_VAR_VERSION]) != code_version:
