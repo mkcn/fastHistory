@@ -8,7 +8,7 @@
 ############################################################
 
 # enable this to debug the bash hook of fastHistory
-_fast_history_bash_debug=true
+_fast_history_bash_debug=false
 
 _fast_history_hooked_cmd=""
 _fast_history_short_cmd=false
