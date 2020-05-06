@@ -123,7 +123,8 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 ## Install with pip3
 
 1. `pip3 install fasthistory`
-2. `$HOME./local/bin/f`
+2. `$HOME/.local/bin/f`
+3.  close and reopen your terminal
 
 **Note**: be sure to not use `sudo` nor `pip (version 2)`
 
@@ -137,25 +138,28 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
  4. run the installer with the target user
 	- `cd fastHistory-X.X`
 	 - `./installer.sh`
+ 5. close and reopen your terminal
 
 **Note**: all the downloaded files can be deleted after the installation is completed
 
 # How to update
 
 ### Update pip3 installation
- - `pip3 install -U fasthistory`
- - `f`
+ 1. `pip3 install --no-cache-dir fasthistory`
+ 2. `f`
+ 3.  close and reopen your terminal
  
 ### Update offline mode
  - same steps as installation 
 
 ### Update old (< 2.0) git installations 
- - `git pull`
- - `./installer.sh`
+ 1. `git pull`
+ 2. `./installer.sh`
+ 3.  close and reopen your terminal
  
 # How to uninstall
 
- 1. download the installer script (only for pip mode)
+ 1. download the installer script (already present in the offline mode)
 	- `wget https://raw.githubusercontent.com/mkcn/fastHistory/pip/installer.sh`
  2. make it executable and run it with the uninstall flag
 	- `chmod +x installer.sh`
