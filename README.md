@@ -5,18 +5,17 @@
 [![](https://img.shields.io/pypi/v/fastHistory?color=00999b&style=for-the-badge)](https://pypi.org/project/fastHistory/)
 [![](https://img.shields.io/github/last-commit/mkcn/fastHistory?color=00999b&style=for-the-badge)](https://github.com/mkcn/fastHistory/commits)
 
-- [Intro](https://github.com/mkcn/fastHistory/tree/pip#Intro)
-- [Supported systems](https://github.com/mkcn/fastHistory/tree/pip#Supported-OSs)
-- [How to install](https://github.com/mkcn/fastHistory/tree/pip#How-to-install)
-- [Commands and syntax](https://github.com/mkcn/fastHistory/tree/pip#Commands-and-syntax)
-- [Troubleshooting](https://github.com/mkcn/fastHistory/tree/pip#Troubleshooting)
-- [License](https://github.com/mkcn/fastHistory/tree/pip#License)
+- [Intro](https://github.com/mkcn/fastHistory#Intro)
+- [Supported systems](https://github.com/mkcn/fastHistory#Supported-OSs)
+- [How to install](https://github.com/mkcn/fastHistory#How-to-install)
+- [Commands and syntax](https://github.com/mkcn/fastHistory#Commands-and-syntax)
+- [Troubleshooting](https://github.com/mkcn/fastHistory#Troubleshooting)
+- [License](https://github.com/mkcn/fastHistory#License)
 
 
 A python tool connected to your terminal to store important commands, search them in a fast way and automatically paste them into your terminal
 
-![](https://github.com/mkcn/fastHistory/raw/pip/images/add_and_search.gif)
-
+![](https://github.com/mkcn/fastHistory/raw/master/images/add_and_search.gif)
 
 # Intro
 ### Why you need it?
@@ -76,18 +75,18 @@ and the selected command wiil be **automatically pasted** into your terminal!
 $ f
 ```
 
-![](https://github.com/mkcn/fastHistory/raw/pip/images/advanced_search.gif)
+![](https://github.com/mkcn/fastHistory/raw/master/images/advanced_search.gif)
 
 
 For each command you can get a quick summary from the man page
 
 **Warning**: this feature currently does not cover the syntax of all commands
 
-![](https://github.com/mkcn/fastHistory/raw/pip/images/man_page.png)
+![](https://github.com/mkcn/fastHistory/raw/master/images/man_page.png)
 
 And easily edit the tag and description fields
 
-![](https://github.com/mkcn/fastHistory/raw/pip/images/edit_tag.gif)
+![](https://github.com/mkcn/fastHistory/raw/master/images/edit_tag.gif)
 
 Furthermore, you can easily export/import all data to make __backups__ or to share your commands with a different machine
 
@@ -111,7 +110,7 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 | macOS      | 10.15      | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | python3 needs to be [installed](https://docs.python-guide.org/starting/install3/osx/)  |
 | Fedora     | 29         | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
 | Debian     | 9          | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
-| Debian     | 10         | zsh*   | 3.7           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> | *[syntax limitation](https://github.com/mkcn/fastHistory/tree/pip#Commands-and-syntax)   |
+| Debian     | 10         | zsh*   | 3.7           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> | *[syntax limitation](https://github.com/mkcn/fastHistory#Commands-and-syntax)   |
 | Windows*   | 10 (1809)  | bash   | 3.6           | 2.0.0  | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | *using the [Ubuntu terminal for Windows](https://ubuntu.com/tutorials/tutorial-ubuntu-on-windows) |
 
 # How to install
@@ -161,7 +160,7 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 # How to uninstall
 
  1. download the installer script (already available in the offline mode)
-	- `wget https://raw.githubusercontent.com/mkcn/fastHistory/pip/installer.sh`
+	- `wget https://raw.githubusercontent.com/mkcn/fastHistory/master/installer.sh`
  2. make it executable and run it with the uninstall flag
 	- `chmod +x installer.sh`
  	- `./installer.sh -u`
@@ -188,7 +187,7 @@ or
 
 Note: the latter is not available with `zsh`
 
-![](https://github.com/mkcn/fastHistory/raw/pip/images/add_without_execute_and_search_cut.gif)
+![](https://github.com/mkcn/fastHistory/raw/master/images/add_without_execute_and_search_cut.gif)
 
 #### Simple search 
 
@@ -213,7 +212,7 @@ f [<filter>] [#<tag_filter> ...] [@<description_filter>]
 * the __tag_filter__ words are contained in the **tag** list
 * the __description_filter__ words contained in the **description**
 
-![](https://github.com/mkcn/fastHistory/raw/pip/images/f_advanced_search_cut.gif)
+![](https://github.com/mkcn/fastHistory/raw/master/images/f_advanced_search_cut.gif)
 
 #### Export database
 ```
