@@ -160,7 +160,7 @@ else
 		if [[ -d "$FASTHISTORY_PATH_DATA_FOLDER" ]]; then
 			uninstall_already_done=false
 			_fast_history_install_log "info" "data folder found: $FASTHISTORY_PATH_DATA_FOLDER"
-			if [ "$default_answer" == "-y" ]; then
+			if [ "$default_answer" == "--yes-delete-everything" ]; then
 			    YN="y"
 			else
 			    _fast_history_install_log "warn" "it is strongly suggested to make a backup (e.g. using 'f --export') before proceeding further"
@@ -248,11 +248,11 @@ else
 		fi
 	else
 		echo "Usage:" 
-		echo "    ./installer [-u] [-y]"
+		echo "    ./installer [-u] [--yes-delete-everything]"
 		echo "Sample:"
 		echo "    run './install' to install fastHistory"
 		echo "    run './install -u' to uninstall it"
-		echo "    run './install -u -y' to uninstall it without interactive questions (not recommended)"
+		echo "    run './install -u --yes-delete-everything' to uninstall it without interactive questions (not recommended)"
 	fi
 fi
 
