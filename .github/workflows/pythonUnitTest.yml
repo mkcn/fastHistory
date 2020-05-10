@@ -104,11 +104,22 @@ jobs:
           exit 1
         fi
 
-    - name: Install from pip
+    - name: Install from pip test
       if: always()
       run: |
         # bashlex is not present in the test pypi, therefore it must installed separately
         pip3 install --index-url https://test.pypi.org/simple/ --no-deps fastHistory
+        which f
+        # setup environment
+        f --setup
+        # try to run it explicitly
+        /home/runner/.local/bin/f --version
+
+    - name: Install from pip
+      if: always()
+      run: |
+        pip3 install --user fastHistory
+        which f
         # setup environment
         f --setup
         # try to run it explicitly
