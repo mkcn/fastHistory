@@ -111,3 +111,5 @@ jobs:
         pip3 install --index-url https://test.pypi.org/simple/ --no-deps fastHistory
         # setup environment
         f --setup
+        # try to run it explicitly
+        $HOME/.local/bin/f --version
