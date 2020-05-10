@@ -1,19 +1,33 @@
-# fastHistory
 
-A python tool connected to your terminal to store important commands and search them in a new and faster way
+# fastHistory 2.0 - speed up your terminal!
 
-![Search sample](images/search.gif)
+[![](https://img.shields.io/pypi/status/fastHistory?color=00999b&style=for-the-badge)](https://pypi.org/project/fastHistory/)
+[![](https://img.shields.io/pypi/v/fastHistory?color=00999b&style=for-the-badge)](https://pypi.org/project/fastHistory/)
+[![](https://img.shields.io/github/last-commit/mkcn/fastHistory?color=00999b&style=for-the-badge)](https://github.com/mkcn/fastHistory/commits)
 
+- [Intro](https://github.com/mkcn/fastHistory#Intro)
+- [Supported systems](https://github.com/mkcn/fastHistory#Supported-OSs)
+- [How to install](https://github.com/mkcn/fastHistory#How-to-install)
+- [Commands and syntax](https://github.com/mkcn/fastHistory#Commands-and-syntax)
+- [Troubleshooting](https://github.com/mkcn/fastHistory#Troubleshooting)
+- [License](https://github.com/mkcn/fastHistory#License)
+
+
+A python tool connected to your terminal to store important commands, search them in a fast way and automatically paste them into your terminal
+
+![](https://github.com/mkcn/fastHistory/raw/master/images/add_and_search.gif)
+
+# Intro
 ### Why you need it?
 
 How often do you need to reuse a command but you cannot remember it (or all the needed options/flags)?
 
 ```sh
-# example of an 'intuitive' and 'obvious' bash command from my bash history
-$ srm -lrvz f1 f2 d1/
+# example of a common but not so 'easy-to-remember' bash command from my bash history
+$ tar -xvzf file.tar.gz
 ```
 
-How many times do you search the same command on Google, over and over? 
+How many times do you search the same commands on Google, over and over? 
 
 > 42 times..  yes..  based on my experience the answer is [42](https://www.independent.co.uk/life-style/history/42-the-answer-to-life-the-universe-and-everything-2205734.html)
 
@@ -25,83 +39,133 @@ And how many times have you told yourself to store this *super* useful command b
 if you know what I am talking about, **fastHistory** is the tool you are looking for!
 
 
-### The tool
+### Usage sample
 
 **fastHistory** can save your commands directly from your terminal, all you need is a **#**
 
 ```sh
-$ srm -lrvz f1 f2 d1/ #
-                     /\
-                      \------- fastHistory will store "srm -lrvz f1 f2 d1/" in its internal database
+$ tar -xvzf file.tar.gz #
+                       /\
+                        \-- fastHistory will store 'tar -xvzf file.tar.gz' in its internal database
 ```
 
 You can specify one or more **tags**
 
 
 ```sh
-$ srm -lrvz f1 f2 d1/ #secure #remove #file #directory
+$ tar -xvzf file.tar.gz #untar #extract #archive 
 ```
 
 or a **description**
 
 ```sh
-$ srm -lrvz f1 f2 d1/ #@delete file and overwrite it 2 times
+$ tar -xvzf file.tar.gz #@extract compressed files from archive
 ```
 
 or **both**
 
 ```sh
-$ srm -lrvz f1 f2 d1/ #secure #remove #file #directory @delete file and overwrite it 2 times
+$ tar -xvf archive.tar.gz #untar @extract compressed files from archive
 ```
 
-Finally, to search your saved commands, all you need is **f**
+To search the saved commands, all you need is **f**
+and the selected command wiil be **automatically pasted** into your terminal!
 
 ```sh
-$ f secure
+$ f
 ```
 
-**fastHistory** will then inject the selected command in your terminal input
-
-![Search sample](images/sample.gif)
+![](https://github.com/mkcn/fastHistory/raw/master/images/advanced_search.gif)
 
 
-For each saved command you can get a fast summary from the man page with details of the used options/flags
+For each command you can get a quick summary from the man page
 
 **Warning**: this feature currently does not cover the syntax of all commands
 
-![Info ls sample](images/show.info.srm.png)
+![](https://github.com/mkcn/fastHistory/raw/master/images/man_page.png)
 
-Furthermore, you can easily export/import all data to make __backups__ and to share your commands with a different machine
+And easily edit the tag and description fields
+
+![](https://github.com/mkcn/fastHistory/raw/master/images/edit_tag.gif)
+
+Furthermore, you can easily export/import all data to make __backups__ or to share your commands with a different machine
 
 ```sh
-$ f-export
-
-$ f-import fastHistory_2019-03-23.db
+$ f --export
+$ f --import fastHistory_2020-03-02.db
 ```
 
+# Supported OSs
+
+fastHistory can work in any OS with `python3` and a `bash` terminal
+
+`zsh` is also supported!
+
+### List of tested OSs:
+
+| OS         | OS Version | Shell | Python versions | fastHistory version | Test mode | Result | Comment   |
+| ---------- |:----------:| ------:|-------------:| -------------------:|----------:| ---------:| ---------:| 
+| Ubuntu     | 16.04      | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  |    |
+| Ubuntu     | 18.04      | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  |    |
+| macOS      | 10.15      | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | python3 needs to be [installed](https://docs.python-guide.org/starting/install3/osx/)  |
+| Fedora     | 29         | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
+| Debian     | 9          | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
+| Debian     | 10         | zsh*   | 3.7           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> | *[syntax limitation](https://github.com/mkcn/fastHistory#Commands-and-syntax)   |
+| Windows*   | 10 (1809)  | bash   | 3.6           | 2.0.0  | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | *using the [Ubuntu terminal for Windows](https://ubuntu.com/tutorials/tutorial-ubuntu-on-windows) |
 
 # How to install
 
-- Download this repository
+### Requirements
 
-  - `cd $HOME`
-  - `git clone https://github.com/mkcn/fastHistory.git`
+- `python3`
+- `python3-pip` (not needed for offline installation)
+    
+## Install with pip3
 
-- Enable fastHistory for bash
+1. `pip3 install fasthistory`
+2. `$HOME/.local/bin/f`
+3.  close and reopen your terminal
 
-  - `echo 'source "$HOME/fastHistory/bash/f.sh"' >> .bashrc`
+**Note**: be sure to not use `sudo` nor `pip (version 2)`
 
-- Enable fastHistory for zsh (**only if** zsh is installed)
-  
-  - `echo 'source "$HOME/fastHistory/bash/f.sh"' >> .zshrc`
+## Install in offline mode
 
-- Close and reopen your shell
+ 1.  download the latest release with this *easy-to-type* link or manually download [it](https://github.com/mkcn/fastHistory/releases)
+	 - `wget mkcn.me/f`
+ 2. (if needed) move it to the remote/offline machine
+ 3. unzip it
+	 -  `tar -xvzf f` 
+ 4. run the installer with the target user
+	- `cd fastHistory-X.X`
+	 - `./installer.sh`
+ 5. close and reopen your terminal
 
+**Note**: all the downloaded files can be deleted after the installation is completed
 
-### How to update ###
+# How to update
 
- - `git pull`
+### Update pip3 installation
+ 1. `pip3 install -U --no-cache-dir fasthistory`
+ 2. `f`
+ 3.  close and reopen your terminal
+ 
+### Update offline mode
+ - same steps as installation 
 
+### Update old (< 2.0) git installations 
+ 1. `git pull`
+ 2. `./installer.sh`
+ 3.  close and reopen your terminal
+ 
+# How to uninstall
+
+ 1. download the installer script (already available in the offline mode)
+	- `wget https://raw.githubusercontent.com/mkcn/fastHistory/master/installer.sh`
+ 2. make it executable and run it with the uninstall flag
+	- `chmod +x installer.sh`
+ 	- `./installer.sh -u`
+
+**Note**: `pip3 install fasthistory` is not sufficient to uninstall fastHistory 
 
 # Commands and syntax
 
@@ -111,11 +175,19 @@ $ f-import fastHistory_2019-03-23.db
 <command_to_save> #[<tag> [#<tag> ...]][@<description>]
 ```
 
-#### Explicit adding without execution
+#### Adding without execution
 
 ```
-f-add <command_to_save> #[<tag> [#<tag> ...]][@<description>]
+f --add <command> #[<tag> [#<tag> ...]][@<description>]
 ```
+or 
+```
+# <command_to_save> #[<tag> [#<tag> ...]][@<description>]
+```
+
+Note: the latter is not available with `zsh`
+
+![](https://github.com/mkcn/fastHistory/raw/master/images/add_without_execute_and_search_cut.gif)
 
 #### Simple search 
 
@@ -140,28 +212,84 @@ f [<filter>] [#<tag_filter> ...] [@<description_filter>]
 * the __tag_filter__ words are contained in the **tag** list
 * the __description_filter__ words contained in the **description**
 
+![](https://github.com/mkcn/fastHistory/raw/master/images/f_advanced_search_cut.gif)
+
 #### Export database
 ```
-f-export [<output_name>]
+f --export [<output_name>]
 ```
 * the __output__ is the file name of the output database (this parameter is optional)
 
 #### Import external database
 ```
-f-import <input_name>
+f --import <input_name>
 ```
-
 
 * the __input_name__ is the file name of the input database (e.g. fastHistory_2019-03-23.db)
 
-License
-----
+#### Change fastHistory configuration
+```
+f --config
+```
+
+#### Force a fastHistory setup to fix possible issues
+```
+f --setup
+```
+
+this may be needed if you install zsh **after** fastHistory
+
+#### Check fastHistory version
+```
+f --version
+```
+
+#### Show fastHistory help
+```
+f --help
+```
+
+# Troubleshooting 
+
+To fix common issues you can:
+
+- run `f --setup` to automatically check and fix your environment
+- explicitly call `$HOME/.local/bin/f` instead of `f`
+- restart your terminal to reload the bash hook
+
+In case of persistent issues please [report](https://github.com/mkcn/fastHistory/issues) them together with the following info:
+
+- OS version
+- fastHistory version (`f --version`)
+
+### fastHistory structure
+
+#### user data folder
+
+`$HOME/.local/share/fastHistory`
+
+`$HOME/.local/share/fastHistory/fh_v1.db` (database file)
+
+`$HOME/.local/share/fastHistory/fh.log` (log file)
+
+#### code folder (pip3 mode)
+`$HOME/.local/lib/pythonX.Y/site-packages/fastHistory/` 
+
+#### code folder (offline mode)
+`$HOME/.fastHistory/` 
+
+#### Bash (zsh) hook in `$HOME/.bashrc` (`$HOME/.zsh`)
+```
+...
+source "/home/USER/.local/lib/pythonX.Y/site-packages/fastHistory/bash/f.sh"
+```
+
+# License
 
 The license for this is the same as that used by GNU bash, GNU GPL v3+.
 
 
-Copyright
-----
+# Copyright
 
 The following external projects have been used as part of **fastHistory**:
 *  https://github.com/rcaloras/bash-preexec 

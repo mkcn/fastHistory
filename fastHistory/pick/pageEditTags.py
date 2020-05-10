@@ -1,5 +1,5 @@
-from database.dataManager import DataManager
-from pick.pageInfo import PageInfo
+from fastHistory.database.dataManager import DataManager
+from fastHistory.pick.pageInfo import PageInfo
 
 
 class PageEditTags(PageInfo):

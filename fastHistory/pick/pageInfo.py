@@ -1,9 +1,9 @@
 import logging
 
-from parser.bashParser import BashParser
-from parser.manParser import ManParser
-from database.dataManager import DataManager
-from pick.pageGeneric import PageGeneric
+from fastHistory.parser.bashParser import BashParser
+from fastHistory.parser.manParser import ManParser
+from fastHistory.database.dataManager import DataManager
+from fastHistory.pick.pageGeneric import PageGeneric
 
 
 class PageInfo(PageGeneric):
@@ -177,30 +177,42 @@ class PageInfo(PageGeneric):
         info_man_shown = False
         self.drawer.new_line()
 
-        if data_from_man_page is not None:
-            for item in data_from_man_page:
-                cmd_main = item[BashParser.INDEX_CMD]
-                cmd_flags = item[BashParser.INDEX_FLAGS]
-                # cmd meaning found in the man page
-                if cmd_main[BashParser.INDEX_MEANING]:
-                    info_man_shown = True
+        if data_from_man_page is not None and len(data_from_man_page) == 2:
+            if data_from_man_page[0]:
+                for item in data_from_man_page[1]:
+                    cmd_main = item[BashParser.INDEX_CMD]
+                    cmd_flags = item[BashParser.INDEX_FLAGS]
+                    # cmd meaning found in the man page
+                    if cmd_main[BashParser.INDEX_MEANING]:
+                        info_man_shown = True
+                        self.drawer.draw_row(self.CHAR_SPACE * self.INDENT)
+                        self.drawer.draw_row(cmd_main[BashParser.INDEX_VALUE], color=self.drawer.color_selected_row)
+                        self.drawer.draw_row(": ")
+                        # the cmd meaning could be on more line
+                        self._draw_cmd_meaning(None, cmd_main[BashParser.INDEX_MEANING])
+                        # print each flag meaning
+                        for flag in cmd_flags:
+                            # if flag found in the man page
+                            if flag[BashParser.INDEX_MEANING]:
+                                self._draw_cmd_meaning([flag[BashParser.INDEX_VALUE]], flag[BashParser.INDEX_MEANING],
+                                                       is_flag=True)
+                        self.drawer.new_line()
+                if not info_man_shown:
                     self.drawer.draw_row(self.CHAR_SPACE * self.INDENT)
-                    self.drawer.draw_row(cmd_main[BashParser.INDEX_VALUE], color=self.drawer.color_selected_row)
-                    self.drawer.draw_row(": ")
-                    # the cmd meaning could be on more line
-                    self._draw_cmd_meaning(None, cmd_main[BashParser.INDEX_MEANING])
-                    # print each flag meaning
-                    for flag in cmd_flags:
-                        # if flag found in the man page
-                        if flag[BashParser.INDEX_MEANING]:
-                            self._draw_cmd_meaning([flag[BashParser.INDEX_VALUE]], flag[BashParser.INDEX_MEANING],
-                                                   is_flag=True)
-                    self.drawer.new_line()
-        if not info_man_shown:
+                    self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
+                    self.drawer.draw_row(self.MESSAGE_NO_MAN_PAGE_AVAILABLE)
+                    self.drawer.draw_row("]", color=self.drawer.color_hash_tag)
+            else:
+                self.drawer.draw_row(self.CHAR_SPACE * self.INDENT)
+                self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
+                self.drawer.draw_row(data_from_man_page[1])
+                self.drawer.draw_row("]", color=self.drawer.color_hash_tag)
+        else:
             self.drawer.draw_row(self.CHAR_SPACE * self.INDENT)
             self.drawer.draw_row("[", color=self.drawer.color_hash_tag)
             self.drawer.draw_row(self.MESSAGE_NO_MAN_PAGE_AVAILABLE)
             self.drawer.draw_row("]", color=self.drawer.color_hash_tag)
+
 
     def _draw_cmd_meaning(self, word_to_underline, meaning_obj, is_flag=False):
         """

@@ -1,7 +1,7 @@
 import logging
 
-from database.dataManager import DataManager
-from pick.pageGeneric import PageGeneric
+from fastHistory.database.dataManager import DataManager
+from fastHistory.pick.pageGeneric import PageGeneric
 
 
 class PageSelector(PageGeneric):
@@ -9,8 +9,8 @@ class PageSelector(PageGeneric):
     Class to draw the page with the commands to select
     """
 
-    TITLE_DEFAULT = "Fast History search"
-    TITLE_ADVANCE_SEARCH = " Advanced search   "
+    TITLE_DEFAULT = "fastHistory search"
+    TITLE_ADVANCE_SEARCH = " Advanced  search "
 
     CMD_COLUMN_NAME = "Commands"
     TAG_AND_DESCRIPTION_COLUMN_NAME = "Tags & Description"
@@ -148,21 +148,6 @@ class PageSelector(PageGeneric):
 
         self.drawer.new_line()
         self.drawer.new_line()
-
-        """
-        if len(search_filters[DataManager.INPUT.INDEX_CMD_WORDS]) >= 4 or \
-                (search_filters[DataManager.INPUT.INDEX_IS_ADVANCED] and
-                 len(search_filters[DataManager.INPUT.INDEX_DESC_WORDS]) >= 4):
-            msg_warning = "warning"
-            msg_word_order = ": when more that 4 words are used, the search is done only with the provided order"
-            msg_space = int(self.drawer.get_max_x() / 2 - len(msg_word_order + msg_warning) / 2 - 1)
-            self.drawer.draw_row(" " * msg_space)
-
-            self.drawer.draw_row(msg_warning, color=self.drawer.color_columns_title)
-            self.drawer.draw_row(msg_word_order)
-            self.drawer.new_line()
-            self.drawer.new_line()
-        """
 
         if search_filters.is_advanced():
             msg_help_title = " Advanced search syntax "

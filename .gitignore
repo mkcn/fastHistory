@@ -8,14 +8,15 @@ __pycache__/
 venv/
 .idea/
 notes/
+pip/dist/
+pip/build/
+pip/build-env/
 
 # Log and user data
 data/
 data_test/
 
-# Ignored file for bashlex
-fastHistory/parser/bashlex/parsetab.py
-fastHistory/parser/bashlex/parser.out
+# general
 *.pyc
 *.swp
 .coverage

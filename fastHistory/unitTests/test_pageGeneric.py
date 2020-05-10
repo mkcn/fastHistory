@@ -1,9 +1,17 @@
 from unittest import TestCase
 
-from pick.pageGeneric import PageGeneric
+from fastHistory.pick.pageGeneric import PageGeneric
+from fastHistory.unitTests.loggerTest import LoggerTest
 
 
 class TestPageGeneric(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.logger_test = LoggerTest()
+
+    def setUp(self):
+        self.logger_test.log_test_function_name(self.id())
 
     def test_find_sections_to_mark(self):
         test_cases = [
@@ -22,5 +30,4 @@ class TestPageGeneric(TestCase):
 
         for item in test_cases:
             self.assertEqual(PageGeneric.find_sections_to_mark(item[0], item[1]), item[2])
-
 

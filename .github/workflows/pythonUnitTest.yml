@@ -6,22 +6,91 @@ jobs:
   build:
     strategy:
         matrix:
-            os: [ubuntu-18.04]
+            os: [ubuntu-16.04, ubuntu-18.04, macos-10.15] # ubuntu-16.04, macos-10.15
+            python-version: [3.6, 3.7, 3.8] # 3.7, 3.8
 
     runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v1
-    - name: Set up Python 3.6
+    - name: Set up Python ${{ matrix.python-version }} on ${{ matrix.os }}
       uses: actions/setup-python@v1
       with:
-        python-version: 3.6
+        python-version: ${{ matrix.python-version }}
     - name: Check environment and install dependences 
       run: |
-          lsb_release -a
-          python --version
-          # nmap is needed for the man parser in UnitTest
-          sudo apt-get install nmap 
+          python3 --version
+          pip3 --version
+          pip3 install bashlex
+          pip3 install pyperclip
+          pip3 install coverage
+
+          if [[ "$OSTYPE" == "linux-gnu" ]]; then
+              echo "OS: Linux"
+              sudo apt-get install nmap # nmap is needed for the man parser in UnitTest
+          elif [[ "$OSTYPE" == "darwin"* ]]; then
+              echo "OS: Mac OSX"
+              brew install nmap
+          else
+              echo "unknown: " $OSTYPE
+              exit 1
+          fi
+
+    - name: Install with installer script
+      if: always()
+      run: |
+        $GITHUB_WORKSPACE/installer.sh
+
     - name: Test with UnitTest
       run: |
-          python3 -m unittest discover -s /home/runner/work/fastHistory/fastHistory/fastHistory/
+        # some of these tests need a successful installation and setup of fastHistory
+        path_fh=$GITHUB_WORKSPACE/
+        if [[ "$OSTYPE" == "linux-gnu" ]]; then
+          echo "OS: Linux"
+          # same as 'python3 -m unittest discover -s' but with test coverage
+          coverage run --source=$path_fh/fastHistory/ --omit=$path_fh/fastHistory/unitTests/*,$path_fh/fastHistory/pick/* -m unittest discover -s $path_fh;
+        elif [[ "$OSTYPE" == "darwin"* ]]; then
+          echo "OS: Mac OSX"
+          # on mac, we run only the unittest without coverage
+          python3 -m unittest discover -s $path_fh
+        else
+          echo "unknown: " $OSTYPE
+          exit 1
+        fi
+
+    - name: Read Coverage report
+      run: |
+        if [[ "$OSTYPE" == "linux-gnu" ]]; then
+          coverage report -m
+        else
+          echo "no coverage report for not linux OSs"
+        fi
+
+    - name: Read UnitTest output logs
+      if: always()
+      run: |
+        for i in $GITHUB_WORKSPACE/data_test/*.txt; do printf "\n\n## $i ## \n\n" ; cat "$i"; printf "\n" ; done ;
+
+    - name: Uninstall with installer script
+      if: always()
+      run: |
+        $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything
+
+    - name: Install from pip test
+      if: always()
+      run: |
+        # bashlex is not present in the test pypi, therefore it must installed separately
+        pip3 install --user --index-url https://test.pypi.org/simple/ --no-deps fastHistory
+        # setup environment
+        $HOME/.local/bin/f --setup
+        # uninstall it
+        $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything
+
+    - name: Install from pip
+      if: always()
+      run: |
+        pip3 install --user --ignore-installed fastHistory
+        # setup environment
+        $HOME/.local/bin/f --setup
+        # uninstall it
+        $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything

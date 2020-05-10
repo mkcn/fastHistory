@@ -1,7 +1,7 @@
 import logging
 
-from database.InputData import Input
-from parser.inputParser import InputParser
+from fastHistory.database.InputData import Input
+from fastHistory.parser.inputParser import InputParser
 
 
 class DataManager(object):
@@ -20,12 +20,12 @@ class DataManager(object):
 
 	DUMMY_INPUT_DATA = Input(False, "", [])
 
-	def __init__(self, project_path, db_relative_path, old_db_relative_paths, mode=DATABASE_MODE_SQLITE):
+	def __init__(self, path_data_folder, name_db_file, name_old_db_files=None, mode=DATABASE_MODE_SQLITE):
 		self.last_search = None
 		self.filtered_data = None
 		if mode == self.DATABASE_MODE_SQLITE:
-			from database.databaseSQLite import DatabaseSQLite
-			self.database = DatabaseSQLite(project_path, db_relative_path, old_db_relative_paths)
+			from fastHistory.database.databaseSQLite import DatabaseSQLite
+			self.database = DatabaseSQLite(path_data_folder, name_db_file, name_old_db_files)
 		else:
 			logging.error("database mode not selected")
 		# set dummy as default

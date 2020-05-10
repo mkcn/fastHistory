@@ -1,5 +1,5 @@
-from console import colors
-from config.configReader import ConfigReader
+from fastHistory.console import colors
+from fastHistory.config.configReader import ConfigReader
 
 
 class LoggerBash:
@@ -19,11 +19,13 @@ class LoggerBash:
 		self.tag_colored = colors.Cyan + "#" + colors.Color_Off
 		self.desc_colored = colors.Cyan + "@" + colors.Color_Off
 		self.log_fh_info = colors.Cyan + "fastHistory" + colors.Color_Off
+		self.log_fh_warn = colors.Yellow + "fastHistory" + colors.Color_Off
+		self.log_fh_error = colors.Red + "fastHistory" + colors.Color_Off
 		self.log_debug = colors.Cyan + "DEBUG" + colors.Color_Off
 
 		self.log_error = colors.Red + "ERROR" + colors.Color_Off
 		self.log_info = colors.White + "INFO " + colors.Color_Off
-		self.log_fh_error = colors.Red + "fastHistory" + colors.Color_Off
+		self.log_warn = colors.Yellow + "WARN " + colors.Color_Off
 
 	def set_theme(self, theme):
 		"""
@@ -45,6 +47,15 @@ class LoggerBash:
 		:return:
 		"""
 		print("[" + self.log_fh_info + "] " + str(msg))
+
+	def log_on_console_warn(self, msg):
+		"""
+		print an info message directly in the console
+		the message will show the 'fastHistory' string color in yellow
+		:param msg:
+		:return:
+		"""
+		print("[" + self.log_fh_warn + "] " + str(msg))
 
 	def log_on_console_error(self, msg):
 		"""

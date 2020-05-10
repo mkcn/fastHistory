@@ -1,5 +1,5 @@
 import curses
-from config.configReader import ConfigReader
+from fastHistory.config.configReader import ConfigReader
 
 
 class Drawer(object):

@@ -1,7 +1,7 @@
 import re
 import logging
 
-from database.InputData import Input
+from fastHistory.database.InputData import Input
 
 
 class InputParser(object):
@@ -60,7 +60,7 @@ class InputParser(object):
 
         tags = []
 
-        if tags_str is InputParser.EMTPY_STRING:
+        if tags_str == InputParser.EMTPY_STRING:
             return []
 
         if tags_str is not None:
@@ -91,7 +91,7 @@ class InputParser(object):
         :return:            if the input is valid -> the description text (e.g. "description for a command")
                             otherwise None
         """
-        if description is InputParser.EMTPY_STRING:
+        if description == InputParser.EMTPY_STRING:
             return InputParser.EMTPY_STRING
 
         match = re.search(InputParser.REGEXP_INPUT_DESCRIPTION, description, flags=re.UNICODE)
@@ -142,6 +142,19 @@ class InputParser(object):
             return True
 
     @staticmethod
+    def adjust_multi_line_input(input):
+        """
+        return [True, new value] if input is multi-line
+        """
+        one_line_input = input
+        for char in ['\\\n', '\n', '\r']:
+            one_line_input = one_line_input.replace(char, '')
+        if one_line_input == input:
+            return [False, one_line_input]
+        else:
+            return [True, one_line_input]
+
+    @staticmethod
     def parse_input(cmd, is_search_cmd=False):
         """
         parse the input cmd and retrieve the cmd, tags and description
@@ -183,13 +196,14 @@ class InputParser(object):
 
             if char_to_cut != 0:
                 cmd = cmd[:-char_to_cut]
+            cmd = cmd.strip()
         else:
             logging.debug("input parser: regex does NOT match")
             return None
 
         # tags
         tags = []
-        if tags_str is not None and tags_str is not InputParser.EMTPY_STRING:
+        if tags_str is not None and tags_str != InputParser.EMTPY_STRING:
             logging.debug("tags_str: " + str(tags_str))
             tags_tmp = tags_str.split(InputParser.TAG_SIGN)
             if len(tags_tmp) >= 2:
@@ -231,7 +245,7 @@ class InputParser(object):
     def get_list_words(string):
         if string is None:
             return []
-        elif string is "":
+        elif string == "":
             return ['']
         else:
             # split string

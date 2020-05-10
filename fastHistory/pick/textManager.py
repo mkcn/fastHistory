@@ -167,11 +167,11 @@ class ContextShifter(object):
 
     def shift_context_right(self):
         if self.context_shift < 1000:
-            self.context_shift += 1
+            self.context_shift += 5
 
     def shift_context_left(self):
-        if self.context_shift > 0:
-            self.context_shift -= 1
+        if self.context_shift >= 5:
+            self.context_shift -= 5
 
     def get_text_shifted(self, text, max_x):
         if self.context_shift > 0:
