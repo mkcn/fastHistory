@@ -39,16 +39,7 @@ jobs:
     - name: Install with installer script
       if: always()
       run: |
-        if [[ "$OSTYPE" == "linux-gnu" ]]; then
-          echo "OS: Linux"
-          . /home/runner/work/fastHistory/fastHistory/installer.sh
-        elif [[ "$OSTYPE" == "darwin"* ]]; then
-          echo "OS: Mac OSX"
-          . /Users/runner/runners/*/work/fastHistory/fastHistory/installer.sh
-        else
-          echo "unknown: " $OSTYPE
-          exit 1
-        fi
+        . $GITHUB_WORKSPACE/installer.sh
 
     - name: Test with UnitTest
       run: |
@@ -110,15 +101,15 @@ jobs:
         # bashlex is not present in the test pypi, therefore it must installed separately
         pip3 install --user --index-url https://test.pypi.org/simple/ --no-deps fastHistory
         # setup environment
-        /home/runner/.local/bin/f --setup
+        $HOME/.local/bin/f --setup
         # uninstall it
-        . /home/runner/work/fastHistory/fastHistory/installer.sh -u -y
+        $GITHUB_WORKSPACE/installer.sh -u -y
 
     - name: Install from pip
       if: always()
       run: |
         pip3 install --user --ignore-installed fastHistory
         # setup environment
-        /home/runner/.local/bin/f --setup
+        $HOME/home/runner/.local/bin/f --setup
         # uninstall it
-        . /home/runner/work/fastHistory/fastHistory/installer.sh -u -y
+        $GITHUB_WORKSPACE/installer.sh -u -y
