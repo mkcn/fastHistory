@@ -91,6 +91,6 @@ jobs:
       run: |
         pip3 install --user --ignore-installed fastHistory
         # setup environment
-        $HOME/home/.local/bin/f --setup
+        $HOME/.local/bin/f --setup
         # uninstall it
         $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything
