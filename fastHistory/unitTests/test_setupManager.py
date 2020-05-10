@@ -117,10 +117,6 @@ class TestSetupManager(TestCase):
         self.assertTrue(f.read().find(self.path_bashrc) == -1)
         f.close()
 
-    def test_backup_rc_creation(self):
-        #TODO
-        pass 
-
 
 
 
