@@ -9,6 +9,7 @@
 - [Supported systems](https://github.com/mkcn/fastHistory/tree/pip#Supported-OSs)
 - [How to install](https://github.com/mkcn/fastHistory/tree/pip#How-to-install)
 - [Commands and syntax](https://github.com/mkcn/fastHistory/tree/pip#Commands-and-syntax)
+- [Troubleshooting](https://github.com/mkcn/fastHistory/tree/pip#Troubleshooting)
 - [License](https://github.com/mkcn/fastHistory/tree/pip#License)
 
 
@@ -237,6 +238,8 @@ f --config
 f --setup
 ```
 
+this may be needed if you install zsh **after** fastHistory
+
 #### Check fastHistory version
 ```
 f --version
@@ -247,14 +250,47 @@ f --version
 f --help
 ```
 
-License
-----
+# Troubleshooting 
+
+To fix common issues you can:
+
+- run `f --setup` to automatically check and fix your environment
+- explicitly call `$HOME/.local/bin/f` instead of `f`
+- restart your terminal to reload the bash hook
+
+In case of persistent issues please [report](https://github.com/mkcn/fastHistory/issues) them together with the following info:
+
+- OS version
+- fastHistory version (`f --version`)
+
+### fastHistory structure
+
+#### user data folder
+
+`$HOME/.local/share/fastHistory`
+
+`$HOME/.local/share/fastHistory/fh_v1.db` (database file)
+
+`$HOME/.local/share/fastHistory/fh.log` (log file)
+
+#### code folder (pip3 mode)
+`$HOME/.local/lib/pythonX.Y/site-packages/fastHistory/` 
+
+#### code folder (offline mode)
+`$HOME/.fastHistory/` 
+
+#### Bash (zsh) hook in `$HOME/.bashrc` (`$HOME/.zsh`)
+```
+...
+source "/home/USER/.local/lib/pythonX.Y/site-packages/fastHistory/bash/f.sh"
+```
+
+# License
 
 The license for this is the same as that used by GNU bash, GNU GPL v3+.
 
 
-Copyright
-----
+# Copyright
 
 The following external projects have been used as part of **fastHistory**:
 *  https://github.com/rcaloras/bash-preexec 
