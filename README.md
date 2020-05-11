@@ -8,6 +8,7 @@
 - [Intro](https://github.com/mkcn/fastHistory#Intro)
 - [Supported systems](https://github.com/mkcn/fastHistory#Supported-OSs)
 - [How to install](https://github.com/mkcn/fastHistory#How-to-install)
+- [How to update](https://github.com/mkcn/fastHistory#How-to-update)
 - [Commands and syntax](https://github.com/mkcn/fastHistory#Commands-and-syntax)
 - [Troubleshooting](https://github.com/mkcn/fastHistory#Troubleshooting)
 - [License](https://github.com/mkcn/fastHistory#License)
