@@ -278,7 +278,7 @@ In case of persistent issues please [report](https://github.com/mkcn/fastHistory
 #### code folder (offline mode)
 `$HOME/.fastHistory/` 
 
-#### Bash (zsh) hook in `$HOME/.bashrc` (`$HOME/.zsh`)
+#### bash (zsh) hook in `$HOME/.bashrc` (`$HOME/.zsh`)
 ```
 ...
 source "/home/USER/.local/lib/pythonX.Y/site-packages/fastHistory/bash/f.sh"
