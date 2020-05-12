@@ -44,7 +44,7 @@ if [ -f setup.py ]; then
 			  	echo "$pypi_repo current version: ${major}.${minor}.${build}"
 				read -p "Is a [M]ajor, [F]eature or [B]UG update?[m/f/B] " C
 				if [[ "$C" == "m" || $C == "M" ]]; then
-				  major=$(echo $major+1 | bc)
+				  major=$(echo $major + 1 | bc)
 				  minor=0
 				  build=0
 				elif [[ "$C" == "f" || $C == "F" ]]; then

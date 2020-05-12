@@ -147,7 +147,9 @@ if __name__ == '__main__':
 			exit 1
 		fi
 	fi
-	_fast_history_install_log "info" "Installation completed"
+
+	_fast_history_install_log "info" "installation completed"
+	_fast_history_install_log "warn" "please restart your terminal and then use 'f' to start"
 else
 	if [ "$1" == "-u" ] || [ "$1" == "--uninstall" ]; then
 	  default_answer=$2
