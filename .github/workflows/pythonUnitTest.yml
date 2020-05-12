@@ -71,26 +71,24 @@ jobs:
       run: |
         for i in $GITHUB_WORKSPACE/data_test/*.txt; do printf "\n\n## $i ## \n\n" ; cat "$i"; printf "\n" ; done ;
 
-    - name: Uninstall with installer script
-      if: always()
+    - name: Update with installer script
       run: |
-        $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything
+        cd $(mktemp -d /tmp/f.XXXXX) && wget mkcn.me/f?pythonUnitTest && tar -xvzf f && cd fastHistory-* && ./installer.sh
+        $HOME/.local/bin/f --version --from-installer
 
-    - name: Install from pip test
-      if: always()
+    - name: Install with pip test
       run: |
         # bashlex is not present in the test pypi, therefore it must installed separately
         pip3 install --user --index-url https://test.pypi.org/simple/ --no-deps fastHistory
         # setup environment
         $HOME/.local/bin/f --setup
-        # uninstall it
-        $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything
+        $HOME/.local/bin/f --version --from-installer
 
-    - name: Install from pip
-      if: always()
+    - name: Install with pip
       run: |
-        pip3 install --user --ignore-installed fastHistory
-        # setup environment
-        $HOME/.local/bin/f --setup
-        # uninstall it
+        pip3 install -U --no-cache-dir --user fastHistory && $HOME/.local/bin/f --setup
+        $HOME/.local/bin/f --version --from-installer
+
+    - name: Uninstall pip
+      run: |
         $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything

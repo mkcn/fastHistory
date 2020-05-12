@@ -171,6 +171,24 @@ def handle_setup(logger_console, path_data_folder, path_code_folder, config_read
 		return False
 
 
+def handle_update(logger_console):
+	update_command = "pip3 install -U --no-cache-dir --user fastHistory && $HOME/.local/bin/f"
+	update_with_installer = "cd $(mktemp -d /tmp/f.XXXXX) && wget mkcn.me/f && tar -xvzf f && cd fastHistory-* && ./installer.sh"
+	try:
+		from importlib import util
+		if util.find_spec("pip") is not None:
+			update_command = update_with_installer
+	except ImportError as e:
+		update_command = update_with_installer
+	logger_console.log_on_console_info("to update fastHistory use the following injected command")
+	try:
+		ConsoleUtils.fill_terminal_input(update_command)
+	except:
+		logger_console.log_on_console_error("your terminal does not support automatic input injection")
+		logger_console.log_on_console_error("please copy and execute the following command")
+		logger_console.log_on_console(update_command)
+
+
 def handle_config_file(logger_console, path_data_folder):
 	config_file= path_data_folder + NAME_CONFIGURATION_FILE
 	logger_console.log_on_console_info("to change the config file use the following injected command")
@@ -261,6 +279,8 @@ def handle_arguments(logger_console, config_reader, path_data_folder, path_code_
 			handle_export_db(logger_console, output_path, path_data_folder)
 		elif arg1 == "--export" and args_len == 2:
 			handle_export_db(logger_console, None, path_data_folder)
+		elif arg1 == "--update" and args_len == 2:
+			handle_update(logger_console)
 		elif (arg1 == "-h" or arg1 == "--help") and args_len == 2:
 			handle_helper(logger_console)
 		elif (arg1 == "-v" or arg1 == "--version") and args_len == 2:

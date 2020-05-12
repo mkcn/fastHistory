@@ -160,6 +160,22 @@ class TestMain(unittest.TestCase):
         # last message value
         self.assertRegex(console_logs[-1][LoggerBashTest.INDEX_VALUE], "^please restart your terminal")
 
+    def test_call_update(self):
+        logger_test = LoggerBashTest()
+        sys.argv = ["", "--update", "--from-installer"]
+        fastHistory.f(logger_console=logger_test)
+        console_logs = logger_test.get_console_logs()
+        # last message value
+        if len(console_logs) == 4:
+            self.assertEqual(console_logs[1][LoggerBashTest.INDEX_TYPE], LoggerBashTest.ERROR)
+            self.assertEqual(console_logs[1][LoggerBashTest.INDEX_VALUE], "your terminal does not support automatic input injection")
+        elif len(console_logs) == 1:
+            # note: this test may be successful if executed directly from the terminal
+            # e.g. python3 -m unittest discover -s fastHistory/
+            self.assertEqual(console_logs[0][LoggerBashTest.INDEX_VALUE], "to change the config file use the following injected command")
+        else:
+            self.assertTrue(False)
+
     def test_call_config_with_error(self):
         logger_test = LoggerBashTest()
         sys.argv = ["", "--config", "--from-installer"]
