@@ -9,7 +9,7 @@
 - [Supported systems](https://github.com/mkcn/fastHistory#Supported-OSs)
 - [How to install](https://github.com/mkcn/fastHistory#How-to-install)
 - [How to update](https://github.com/mkcn/fastHistory#How-to-update)
-- [How to migrate data from 1.x.x to 2.x.x](https://github.com/mkcn/fastHistory#How-to-migrate-data-from-1.x.x-to-2.x.x) 
+- [How to migrate data from 1.x.x to 2.x.x](https://github.com/mkcn/fastHistory#how-to-migrate-data-from-1xx-to-2xx) 
 - [Commands and syntax](https://github.com/mkcn/fastHistory#Commands-and-syntax)
 - [Troubleshooting](https://github.com/mkcn/fastHistory#Troubleshooting)
 - [License](https://github.com/mkcn/fastHistory#License)
