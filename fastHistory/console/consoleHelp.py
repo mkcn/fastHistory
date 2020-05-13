@@ -22,14 +22,15 @@ Search examples:
   f --import 2019-03-23.db     # export all stored command 
 
 OPTIONS
-  -v, --version                show current version
-  -h, --help                   show this help message
   -a, --add <command> #        add command (same as '# <command_to_save> #')
+  --config                     change configuration file
   --export [<output_name>]     export database with all stored commands
+  -h, --help                   show this help message
   --import <input_name>        import commands from exported database
                                 the commands will be imported only if not already present
                                 if same command has different tag or description they will be merged 
-  --config                     change configuration file
   --setup                      re-run the setup, possibly to repair fastHistory
+  --update                     update fastHistory
+  -v, --version                show current version
 
 """

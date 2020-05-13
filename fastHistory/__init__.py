@@ -176,7 +176,7 @@ def handle_update(logger_console):
 	update_with_installer = "cd $(mktemp -d /tmp/f.XXXXX) && wget mkcn.me/f && tar -xvzf f && cd fastHistory-* && ./installer.sh"
 	try:
 		from importlib import util
-		if util.find_spec("pip") is not None:
+		if util.find_spec("pip") is None:
 			update_command = update_with_installer
 	except ImportError as e:
 		update_command = update_with_installer

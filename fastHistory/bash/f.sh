@@ -136,7 +136,7 @@ precmd() {
 		 # clean the cmd, this is needed because precmd can be trigged without preexec (e.g. ctrl+c)
     _fast_history_hooked_cmd="";
 	fi;
-     }
+}
 
 _fast_history_log "debug" "loading fastHistory completed, use 'f' to start"; 
 

@@ -145,7 +145,12 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 
 # How to update
 
-### Update pip3 installation
+### Fast generic way (available from 2.1.1)
+
+ 1. `f --update` 
+ 2. close and reopen your terminal
+
+### Update pip3 installation (2.x.x)
  1. `pip3 install -U --no-cache-dir fasthistory`
  2. `f`
  3.  close and reopen your terminal
@@ -153,10 +158,11 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 ### Update offline mode
  - same steps as installation 
 
-### Update old (< 2.0) git installations 
+### Update old git installations (< 2.0.0) 
  1. `git pull`
  2. `./installer.sh`
  3.  close and reopen your terminal
+ 4.  `f --import <old_fastHistory_folder>/data/*.db` (if not automatically imported)
  
 # How to uninstall
 
@@ -243,6 +249,11 @@ this may be needed if you install zsh **after** fastHistory
 #### Check fastHistory version
 ```
 f --version
+```
+
+#### Update fastHistory
+```
+f --update
 ```
 
 #### Show fastHistory help

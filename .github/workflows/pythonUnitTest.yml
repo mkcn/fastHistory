@@ -73,7 +73,7 @@ jobs:
 
     - name: Update with installer script
       run: |
-        cd $(mktemp -d /tmp/f.XXXXX) && wget mkcn.me/f?pythonUnitTest && tar -xvzf f && cd fastHistory-* && ./installer.sh
+        cd $(mktemp -d /tmp/f.XXXXX) && wget -O f mkcn.me/f?pythonUnitTest && tar -xvzf f && cd fastHistory-* && ./installer.sh
         $HOME/.local/bin/f --version --from-installer
 
     - name: Install with pip test
