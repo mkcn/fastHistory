@@ -9,6 +9,7 @@
 - [Supported systems](https://github.com/mkcn/fastHistory#Supported-OSs)
 - [How to install](https://github.com/mkcn/fastHistory#How-to-install)
 - [How to update](https://github.com/mkcn/fastHistory#How-to-update)
+- [How to migrate data from 1.x.x to 2.x.x](https://github.com/mkcn/fastHistory#How-to-migrate-data-from-1.x.x-to-2.x.x) 
 - [Commands and syntax](https://github.com/mkcn/fastHistory#Commands-and-syntax)
 - [Troubleshooting](https://github.com/mkcn/fastHistory#Troubleshooting)
 - [License](https://github.com/mkcn/fastHistory#License)
@@ -162,7 +163,16 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
  1. `git pull`
  2. `./installer.sh`
  3.  close and reopen your terminal
- 4.  `f --import <old_fastHistory_folder>/data/*.db` (if not automatically imported)
+ 
+# How to migrate data from 1.x.x to 2.x.x
+ 
+ With old default installation folder 
+ 
+  `f --import $HOME/fastHistory/data/fh_v1.db`
+	
+ With custom installation folder 
+ 
+  `f --import <fastHistory_folder>/data/fh_v1.db`
  
 # How to uninstall
 
