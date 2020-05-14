@@ -120,7 +120,7 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 ### Requirements
 
 - `python3`
-- `python3-pip` (not needed for offline installation)
+- `python3-pip` (only for pip3 installation)
     
 ## Install with pip3
 
@@ -130,19 +130,22 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 
 **Note**: be sure to not use `pip` (python2) nor `sudo` (install it only for the current user) 
 
-## Install in offline mode
-
+## Install with installer.sh
+ 
  1.  download the latest release with this *easy-to-type* link or manually download [it](https://github.com/mkcn/fastHistory/releases)
 	 - `wget mkcn.me/f`
- 2. (if needed) move it to the remote/offline machine
- 3. unzip it
+ 2. extract it
 	 -  `tar -xvzf f` 
- 4. run the installer with the target user
+ 3. run the installer with the target user
 	- `cd fastHistory-X.X`
-	 - `./installer.sh`
- 5. close and reopen your terminal
+	 - `./installer.sh` (this works also offline)
+ 4. close and reopen your terminal
+ 5. (optional) delete installation files
+ 	- `rm -r f fastHistory-X.X`
 
-**Note**: all the downloaded files can be deleted after the installation is completed
+#### All in one-line
+
+`cd $(mktemp -d /tmp/f.XXXXX) && wget mkcn.me/f && tar -xvzf f && cd fastHistory-* && ./installer.sh" && cd -`
 
 # How to update
 
@@ -151,13 +154,13 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
  1. `f --update` 
  2. close and reopen your terminal
 
-### Update pip3 installation (2.x.x)
+### Update with pip3 (2.x.x)
  1. `pip3 install -U --no-cache-dir fasthistory`
  2. `f`
  3.  close and reopen your terminal
  
-### Update offline mode
- - same steps as installation 
+### Update with installer.sh
+ - same steps as [installation](https://github.com/mkcn/fastHistory#Install-with-installersh) 
 
 ### Update old git installations (< 2.0.0) 
  1. `git pull`
@@ -176,10 +179,10 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
  
 # How to uninstall
 
- 1. download the installer script (already available in the offline mode)
+ 1. download the installer script and make it executable
 	- `wget https://raw.githubusercontent.com/mkcn/fastHistory/master/installer.sh`
- 2. make it executable and run it with the uninstall flag
 	- `chmod +x installer.sh`
+ 2. run it with the uninstall flag
  	- `./installer.sh -u`
 
 **Note**: `pip3 install fasthistory` is not sufficient to uninstall fastHistory 
@@ -294,10 +297,10 @@ In case of persistent issues please [report](https://github.com/mkcn/fastHistory
 
 `$HOME/.local/share/fastHistory/fh.log` (log file)
 
-#### code folder (pip3 mode)
+#### code folder (pip3)
 `$HOME/.local/lib/pythonX.Y/site-packages/fastHistory/` 
 
-#### code folder (offline mode)
+#### code folder (installer.sh)
 `$HOME/.fastHistory/` 
 
 #### bash (zsh) hook in `$HOME/.bashrc` (`$HOME/.zsh`)
