@@ -149,12 +149,12 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 
 # How to update
 
-### Fast generic way (available from 2.1.1)
+### Update with f (available from 2.1.1)
 
- 1. `f --update` 
- 2. close and reopen your terminal
+ 1. `f --update`
+ 2.  close and reopen your terminal
 
-### Update with pip3 (2.x.x)
+### Update with pip3
  1. `pip3 install -U --no-cache-dir fasthistory`
  2. `f`
  3.  close and reopen your terminal
@@ -162,7 +162,7 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 ### Update with installer.sh
  - same steps as [installation](https://github.com/mkcn/fastHistory#Install-with-installersh) 
 
-### Update old git installations (< 2.0.0) 
+### Update old (1.x.x) git installations 
  1. `git pull`
  2. `./installer.sh`
  3.  close and reopen your terminal
