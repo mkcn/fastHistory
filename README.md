@@ -145,7 +145,7 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 
 #### All in one-line
 
-`cd $(mktemp -d /tmp/f.XXXXX) && wget mkcn.me/f && tar -xvzf f && cd fastHistory-* && ./installer.sh" && cd -`
+`cd $(mktemp -d /tmp/f.XXXXX) && wget mkcn.me/f && tar -xvzf f && cd fastHistory-* && ./installer.sh && cd`
 
 # How to update
 
