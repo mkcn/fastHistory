@@ -305,8 +305,6 @@ class TestDatabaseSQLite(unittest.TestCase):
         res = db.get_last_n_filtered_elements(generic_filters=["only description"])
         self.assertEqual(len(res), 1)
 
-        # check if migration is successful (true if old file does not exist anymore)
-        self.assertFalse(os.path.exists(self.output_test_path + self.TEST_DB_FILENAME_OLD))
 
     def test_import_database_type_0(self):
         """
@@ -484,7 +482,7 @@ class TestDatabaseSQLite(unittest.TestCase):
 
         db = DatabaseSQLite(self.output_test_path,
                             self.TEST_DB_FILENAME,
-                            name_old_db_files=None,
+                            old_db_relative_paths=None,
                             delete_all_data_from_db=True)
         result_import = db.import_external_database(self.output_test_path + self.TEST_DB_FILENAME_OLD + "")
         self.assertEqual(result_import, -1)

@@ -39,7 +39,7 @@ class DatabaseSQLite(object):
     synced TINYINT
     """
 
-    def __init__(self, path_data_folder, name_db_file, name_old_db_files=None, delete_all_data_from_db=False):
+    def __init__(self, path_data_folder, name_db_file, old_db_relative_paths=None, delete_all_data_from_db=False):
         """
         check if database file exit, connect to it and initialize it
 
@@ -49,9 +49,9 @@ class DatabaseSQLite(object):
         self.name_db_file = name_db_file
         if delete_all_data_from_db:
             self.reset_entire_db()
-        self._connect_db(name_old_db_files)
+        self._connect_db(old_db_relative_paths)
 
-    def _connect_db(self, name_old_db_files):
+    def _connect_db(self, old_db_relative_paths):
         """
         connect to db and create it if it does not exit
 
@@ -64,20 +64,18 @@ class DatabaseSQLite(object):
         if init:
             self._create_db()
             self.save_changes()
-
-            if name_old_db_files is not None:
+            migrated = False
+            if old_db_relative_paths is not None:
                 # this will loop from the newest to the oldest db
-                for old_db in name_old_db_files:
-                    if self._automatic_db_import(self.path_data_folder + old_db) >= 0:
-                        logging.info("successfully migrated data from old database (%s) to new one (%s)" %
-                                     (self.path_data_folder + old_db[1], self.path_data_folder + self.name_db_file))
-                        # delete old db
-                        try:
-                            os.remove(self.path_data_folder + old_db)
-                            logging.info("old database file deleted")
-                        except OSError or ValueError:
-                            logging.error("file delete fail. please manually delete the old database file: %s" %
-                                          self.path_data_folder + old_db)
+                for old_db_relative_path in old_db_relative_paths:
+                    if self._automatic_db_import(self.path_data_folder + old_db_relative_path) >= 0:
+                        logging.info("successfully migrated data from old database '(%s)' to '(%s)'" %
+                                     (self.path_data_folder + old_db_relative_path, self.path_data_folder + self.name_db_file))
+                        # import only the most recent with at least one value imported
+                        migrated = True
+                        break
+            if not migrated:
+                logging.info("no data to migrate")
 
     def _automatic_db_import(self, old_db_path):
         """
@@ -189,7 +187,7 @@ class DatabaseSQLite(object):
                     logging.error("database migration - unknown database type: %s" % str(old_db_path))
                     return error
             else:
-                logging.error("database migration - database file not found: %s" % str(old_db_path))
+                logging.debug("database migration - database file not found: %s" % str(old_db_path))
                 return error
         except Exception as e:
             logging.error("database migration - error: %s" % str(e))

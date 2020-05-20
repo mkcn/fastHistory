@@ -6,7 +6,6 @@ FASTHISTORY_PATH_LOCAL_BIN_FOLDER=$HOME"/.local/bin/"
 FASTHISTORY_PATH_BASHRC=$HOME"/.bashrc"
 FASTHISTORY_PATH_ZSHRC=$HOME"/.zshrc"
 FASTHISTORY_BIN_FILE="f"
-FASTHISTORY_PATH_RELATIVE_OLD_DB="data/fh_v1.db"
 
 
 # define internal log function
@@ -130,22 +129,6 @@ if __name__ == '__main__':
 		_fast_history_install_log "error" "Installation failed"
 		_fast_history_install_log "error" "Please check the $FASTHISTORY_PATH_CODE_FOLDER folder permissions and try again"
 		exit 1
-	fi
-
-	# import data from old db if found
-	if [[ -f "$FASTHISTORY_PATH_RELATIVE_OLD_DB" ]]; then
-		last_modified_date=$(date -r $FASTHISTORY_PATH_RELATIVE_OLD_DB "+%Y-%m-%d %H:%M:%S")
-		_fast_history_install_log "info" "old database file: $_fast_history_current_folder$FASTHISTORY_PATH_RELATIVE_OLD_DB"
-		_fast_history_install_log "info" "old database last change: $last_modified_date" 
-		read -r -p "old fastHistory database found, do you want to import it? [Y/n] " YN
-		if [[ $YN == "y" || $YN == "Y" || $YN == "" ]]; then
-			"$FASTHISTORY_PATH_LOCAL_BIN_FOLDER$FASTHISTORY_BIN_FILE" --import $FASTHISTORY_PATH_RELATIVE_OLD_DB --from-installer
-		elif [[ $YN == "n" || $YN == "N" ]]; then
-			_fast_history_install_log "info" "proceeding without import"
-		else
-			_fast_history_install_log "error" "unknown answer, installation stopped"
-			exit 1
-		fi
 	fi
 
 	_fast_history_install_log "info" "installation completed"

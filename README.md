@@ -7,9 +7,9 @@
 
 - [Intro](https://github.com/mkcn/fastHistory#Intro)
 - [Supported systems](https://github.com/mkcn/fastHistory#Supported-OSs)
-- [How to install](https://github.com/mkcn/fastHistory#How-to-install)
-- [How to update](https://github.com/mkcn/fastHistory#How-to-update)
-- [How to migrate data from 1.x.x to 2.x.x](https://github.com/mkcn/fastHistory#how-to-migrate-data-from-1xx-to-2xx) 
+- [Install](https://github.com/mkcn/fastHistory#How-to-install)
+- [Update](https://github.com/mkcn/fastHistory#How-to-update)
+- [Migrate from 1.x to 2.x](https://github.com/mkcn/fastHistory#how-to-migrate-from-1xx-to-2xx) 
 - [Commands and syntax](https://github.com/mkcn/fastHistory#Commands-and-syntax)
 - [Troubleshooting](https://github.com/mkcn/fastHistory#Troubleshooting)
 - [License](https://github.com/mkcn/fastHistory#License)
@@ -111,7 +111,7 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 | Ubuntu     | 18.04      | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  |    |
 | macOS      | 10.15      | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | python3 needs to be [installed](https://docs.python-guide.org/starting/install3/osx/)  |
 | Fedora     | 29         | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |  pip3 requires the  [`--user` ](https://developer.fedoraproject.org/tech/languages/python/pypi-installation.html) flag |
-| Debian     | 9          | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
+| Debian     | 9          | bash   | 3.5           | 2.1.3   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
 | Debian     | 10         | zsh*   | 3.7           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> | *[syntax limitation](https://github.com/mkcn/fastHistory#Commands-and-syntax)   |
 | Windows*   | 10 (1809)  | bash   | 3.6           | 2.0.0  | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | *using the [Ubuntu terminal for Windows](https://ubuntu.com/tutorials/tutorial-ubuntu-on-windows) |
 
@@ -145,7 +145,7 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 
 #### All in one-line
 
-`cd $(mktemp -d /tmp/f.XXXXX) && wget mkcn.me/f && tar -xvzf f && cd fastHistory-* && ./installer.sh && cd`
+`cd $(mktemp -d /tmp/f.XXXXX) && wget mkcn.me/f && tar -xvzf f && ./fastHistory-*/installer.sh && cd -`
 
 # How to update
 
@@ -162,20 +162,24 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 ### Update with installer.sh
  - same steps as [installation](https://github.com/mkcn/fastHistory#Install-with-installersh) 
 
-### Update old (1.x.x) git installations 
- 1. `git pull`
- 2. `./installer.sh`
- 3.  close and reopen your terminal
+
+# How to migrate from 1.x.x to 2.x.x
  
-# How to migrate data from 1.x.x to 2.x.x
- 
- With old default installation folder 
- 
-  `f --import $HOME/fastHistory/data/fh_v1.db`
+ 1. [install fastHistory 2.0](https://github.com/mkcn/fastHistory#How-to-install) 
+ 2. check version
+
+	`f --version`
+
+ 2. import data 
+
+	- from default folder (if not already automatically imported)
+	    
+	    `f --import $HOME/fastHistory/data/fh_v1.db`
 	
- With custom installation folder 
- 
-  `f --import <fastHistory_folder>/data/fh_v1.db`
+	- from custom folder
+	 
+	   `f --import <old_fastHistory_folder>/data/fh_v1.db` 
+
  
 # How to uninstall
 

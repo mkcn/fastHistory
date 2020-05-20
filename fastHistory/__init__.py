@@ -13,7 +13,6 @@ NAME_LOG_FILE = "fh.log"
 NAME_DATABASE_FILE = "fh_v1.db"
 NAME_CONFIGURATION_FILE = "fastHistory.conf"
 NAME_VERSION_FILE = "version.txt"
-NAME_OLD_DATABASE_FILES = [""]
 
 DATABASE_MODE = DataManager.DATABASE_MODE_SQLITE
 
@@ -31,7 +30,7 @@ def handle_search_request(logger_console, input_cmd_str, path_data_folder, theme
 	else:
 		logging.debug("search request parameters: '" + str(input_cmd_str) + "'")
 		# create data manger obj
-		data_manager = DataManager(path_data_folder, NAME_DATABASE_FILE, NAME_OLD_DATABASE_FILES, DATABASE_MODE)
+		data_manager = DataManager(path_data_folder, NAME_DATABASE_FILE, DATABASE_MODE)
 
 		# open picker to select from history
 		picker = Picker(data_manager, theme=theme, last_column_size=last_column_size, search_text=input_cmd_str)
@@ -80,7 +79,7 @@ def handle_add_request(logger_console, input_cmd_str, path_data_folder, error_fe
 		description = parser_res.get_description_str()
 		tags = parser_res.get_tags(strict=True)
 
-		data_manager = DataManager(path_data_folder, NAME_DATABASE_FILE, NAME_OLD_DATABASE_FILES, DATABASE_MODE)
+		data_manager = DataManager(path_data_folder, NAME_DATABASE_FILE, DATABASE_MODE)
 		stored = data_manager.add_new_element(cmd, description, tags)
 		if stored:
 			logging.debug("command added")
@@ -107,7 +106,7 @@ def handle_import_db(logger_console, db_abs_path, path_data_folder):
 	"""
 	logging.info("import database: %s" % str(db_abs_path))
 	logger_console.log_on_console_info("import database: %s" % str(db_abs_path))
-	data_manager = DataManager(path_data_folder, NAME_DATABASE_FILE, NAME_OLD_DATABASE_FILES, DATABASE_MODE)
+	data_manager = DataManager(path_data_folder, NAME_DATABASE_FILE, DATABASE_MODE)
 	imported_items = data_manager.import_data_to_db(db_abs_path)
 	if imported_items >= 0:
 		logging.info("import database: %s elements imported" % str(imported_items))
@@ -173,7 +172,7 @@ def handle_setup(logger_console, path_data_folder, path_code_folder, config_read
 
 def handle_update(logger_console):
 	update_command = "pip3 install -U --no-cache-dir --user fastHistory && $HOME/.local/bin/f"
-	update_with_installer = "cd $(mktemp -d /tmp/f.XXXXX) && wget mkcn.me/f && tar -xvzf f && cd fastHistory-* && ./installer.sh"
+	update_with_installer = "cd $(mktemp -d /tmp/f.XXXXX) && wget mkcn.me/f && tar -xvzf f && ./fastHistory-*/installer.sh && cd -"
 	try:
 		from importlib import util
 		if util.find_spec("pip") is None:
