@@ -5,14 +5,14 @@
 [![](https://img.shields.io/pypi/v/fastHistory?color=00999b&style=for-the-badge)](https://pypi.org/project/fastHistory/)
 [![](https://img.shields.io/github/last-commit/mkcn/fastHistory?color=00999b&style=for-the-badge)](https://github.com/mkcn/fastHistory/commits)
 
-- [Intro](https://github.com/mkcn/fastHistory#Intro)
-- [Supported systems](https://github.com/mkcn/fastHistory#Supported-OSs)
-- [Install](https://github.com/mkcn/fastHistory#How-to-install)
-- [Update](https://github.com/mkcn/fastHistory#How-to-update)
-- [Migrate from 1.x to 2.x](https://github.com/mkcn/fastHistory#how-to-migrate-from-1xx-to-2xx) 
-- [Commands and syntax](https://github.com/mkcn/fastHistory#Commands-and-syntax)
-- [Troubleshooting](https://github.com/mkcn/fastHistory#Troubleshooting)
-- [License](https://github.com/mkcn/fastHistory#License)
+- [Intro](https://github.com/mkcn/fastHistory/blob/master/README.md#Intro)
+- [Supported systems](https://github.com/mkcn/fastHistory/blob/master/README.md#Supported-OSs)
+- [Install](https://github.com/mkcn/fastHistory/blob/master/README.md#How-to-install)
+- [Update](https://github.com/mkcn/fastHistory/blob/master/README.md#How-to-update)
+- [Migrate from 1.x to 2.x](https://github.com/mkcn/fastHistory/blob/master/README.md#how-to-migrate-from-1xx-to-2xx) 
+- [Commands and syntax](https://github.com/mkcn/fastHistory/blob/master/README.md#Commands-and-syntax)
+- [Troubleshooting](https://github.com/mkcn/fastHistory/blob/master/README.md#Troubleshooting)
+- [License](https://github.com/mkcn/fastHistory/blob/master/README.md#License)
 
 
 A python tool connected to your terminal to store important commands, search them in a fast way and automatically paste them into your terminal
@@ -113,7 +113,7 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 | Fedora     | 29         | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |  pip3 requires the  [`--user` ](https://developer.fedoraproject.org/tech/languages/python/pypi-installation.html) flag |
 | Debian     | 9          | bash   | 3.5           | 2.1.3   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
 | Debian     | 10         | zsh*   | 3.7           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> | *[syntax limitation](https://github.com/mkcn/fastHistory#Commands-and-syntax)   |
-| Windows*   | 10 (1809)  | bash   | 3.6           | 2.0.0  | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | *using the [Ubuntu terminal for Windows](https://ubuntu.com/tutorials/tutorial-ubuntu-on-windows) |
+| Windows*   | 10 (1809)  | bash   | 3.6           | 2.0.0  | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | *using the [Windows Subsystem for Linux](https://www.microsoft.com/en-us/p/ubuntu-2004-lts/9n6svws3rx71) (WSL) you can execute and store [Windows commands](https://docs.microsoft.com/en-us/windows/wsl/interop#run-windows-tools-from-linux) |
 
 # How to install
 
@@ -160,12 +160,12 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
  3.  close and reopen your terminal
  
 ### Update with installer.sh
- - same steps as [installation](https://github.com/mkcn/fastHistory#Install-with-installersh) 
+ - same steps as [installation](https://github.com/mkcn/fastHistory/blob/master/README.md#Install-with-installersh) 
 
 
 # How to migrate from 1.x.x to 2.x.x
  
- 1. [install fastHistory 2.0](https://github.com/mkcn/fastHistory#How-to-install) 
+ 1. [install fastHistory 2.0](https://github.com/mkcn/fastHistory/blob/master/README.md#How-to-install) 
  2. check version
 
 	`f --version`
@@ -259,7 +259,7 @@ f --config
 #### Force a fastHistory setup to fix possible issues
 ```
 f --setup
-```
+```https://docs.microsoft.com/en-us/windows/wsl/interop#run-windows-tools-from-linux
 
 this may be needed if you install zsh **after** fastHistory
 
