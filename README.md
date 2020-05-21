@@ -15,14 +15,14 @@
 - [License](https://github.com/mkcn/fastHistory/blob/master/README.md#License)
 
 
-A python tool connected to your terminal to store important commands, search them in a fast way and automatically paste them into your terminal
+fastHistory allows you to store, search and automatically paste all the important commands directly in your terminal
 
 ![](https://github.com/mkcn/fastHistory/raw/master/images/add_and_search.gif)
 
 # Intro
 ### Why you need it?
 
-How often do you need to reuse a command but you cannot remember it (or all the needed options/flags)?
+How often do you need to reuse a command but you cannot remember it (with all the needed options/flags)?
 
 ```sh
 # example of a common but not so 'easy-to-remember' bash command from my bash history
