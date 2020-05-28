@@ -259,7 +259,7 @@ f --config
 #### Force a fastHistory setup to fix possible issues
 ```
 f --setup
-```https://docs.microsoft.com/en-us/windows/wsl/interop#run-windows-tools-from-linux
+```
 
 this may be needed if you install zsh **after** fastHistory
 
