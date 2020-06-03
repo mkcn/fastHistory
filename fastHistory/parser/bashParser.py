@@ -1,4 +1,6 @@
 import logging
+import threading
+
 from fastHistory.parser.manParser import ManParser
 
 
@@ -167,3 +169,17 @@ class BashParser(object):
                     # set the updated flags as new list of flags, the old list is deleted
                     item[BashParser.INDEX_FLAGS] = cmd_flags_updated
         return [True, flags_for_info_cmd]
+
+
+class BashParserThread(threading.Thread):
+
+    def __init__(self, cmd_text):
+        threading.Thread.__init__(self)
+        self.cmd_text = cmd_text
+        self.result = [False, "Loading.."]
+
+    def run(self):
+        self.result = BashParser.load_data_for_info_from_man_page(self.cmd_text)
+
+    def get_result(self):
+        return self.result

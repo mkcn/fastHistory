@@ -20,7 +20,7 @@ class PageInfo(PageGeneric):
     MESSAGE_NO_DESC = "To add a description press "
     MESSAGE_NO_MAN_PAGE_AVAILABLE = "No info available"
 
-    def __init__(self, drawer, option, search_filters, context_shift, blocks_shift=0, data_from_man_page=None):
+    def __init__(self, drawer, option, search_filters, context_shift, blocks_shift=0):
         """
         initialize page info drawer
 
@@ -29,13 +29,11 @@ class PageInfo(PageGeneric):
         :param search_filters:          array of strings used to filter options
         :param context_shift:           context shift obj
         :param blocks_shift:            blocks shift number
-        :param data_from_man_page:      data retrieved from the man page
         """
         PageGeneric.__init__(self, drawer)
         self.option = option
         self.search_filters = search_filters
         self.context_shift = context_shift
-        self.data_from_man_page = data_from_man_page
         self.cursor_y = 0
 
         self.blocks_shift = blocks_shift
@@ -47,14 +45,6 @@ class PageInfo(PageGeneric):
         :param option:
         """
         self.option = option
-
-    def update_man_page(self, man_page):
-        """"
-        update man page info
-
-        :param man_page
-        """
-        self.data_from_man_page = man_page
 
     def shift_blocks_down(self):
         """
@@ -75,9 +65,11 @@ class PageInfo(PageGeneric):
     def get_blocks_shift(self):
         return self.blocks_shift
 
-    def draw_page(self):
+    def draw_page(self, data_from_man_page=None):
         """
         draw option line (the one of which the user want to have more info)
+
+        :param data_from_man_page:      data retrieved from the man page
 
         :return:
         """
@@ -98,7 +90,7 @@ class PageInfo(PageGeneric):
         self.draw_info_description(desc=self.option[DataManager.OPTION.INDEX_DESC],
                                    filter_desc=self.search_filters.get_description_words())
 
-        self.draw_info_man_page(data_from_man_page=self.data_from_man_page)
+        self.draw_info_man_page(data_from_man_page)
         # help line in the last line
         self._draw_help_line_info()
         # cursor set position

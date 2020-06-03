@@ -8,7 +8,7 @@ class PageEditCommand(PageInfo):
     whit this page the user can edit the current selected command
     """
 
-    def __init__(self, drawer, option, search_filters, context_shift, blocks_shift, data_from_man_page):
+    def __init__(self, drawer, option, search_filters, context_shift, blocks_shift):
         """
         initialize page command description
 
@@ -17,17 +17,17 @@ class PageEditCommand(PageInfo):
         :param search_filters:  array of strings used to filter options
         :param context_shift:   context shift obj
         :param blocks_shift:    blocks shift number
-        :param data_from_man_page:  obj with man info
         """
-        PageInfo.__init__(self, drawer, option, search_filters, context_shift, blocks_shift, data_from_man_page)
+        PageInfo.__init__(self, drawer, option, search_filters, context_shift, blocks_shift)
 
-    def draw_page_edit(self, command_text, command_cursor_index, input_error_msg=None):
+    def draw_page_edit(self, command_text, command_cursor_index, input_error_msg=None, data_from_man_page=None):
         """
         draw page to edit the command of the current selected option
 
         :param command_text:            command string
         :param command_cursor_index:    position of the cursor
         :param input_error_msg:         string error to show. None if there is no error to show
+        :param data_from_man_page:      data retrieved from the man page
         :return:
         """
         # draw colored title
@@ -42,7 +42,7 @@ class PageEditCommand(PageInfo):
         self.draw_info_description(desc=self.option[DataManager.OPTION.INDEX_DESC],
                                    filter_desc=self.search_filters.get_description_words())
 
-        self.draw_info_man_page(data_from_man_page=self.data_from_man_page)
+        self.draw_info_man_page(data_from_man_page)
 
         self.cursor_y = 1
         self.draw_input_error_msg(input_error_msg, self.cursor_y - 1)
