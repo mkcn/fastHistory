@@ -457,7 +457,6 @@ class Picker(object):
 
             if c == KEY_TIMEOUT:
                 continue
-            # save and exit
             elif c in KEYS_ENTER:
                 new_tags_array = InputParser.parse_tags_str(new_tags_t.get_text())
                 if new_tags_array is not None:
@@ -550,7 +549,6 @@ class Picker(object):
 
             if c == KEY_TIMEOUT:
                 continue
-            # select current entry
             elif c in KEYS_ENTER:
                 return self.get_selected()
             # delete current selected option
@@ -639,8 +637,9 @@ class Picker(object):
             # wait for char
             c = self.drawer.wait_next_char()
 
-            # check char and execute command
-            if c == KEY_UP:
+            if c == KEY_TIMEOUT:
+                continue
+            elif c == KEY_UP:
                 self.move_up()
             elif c == KEY_DOWN:
                 self.move_down()
