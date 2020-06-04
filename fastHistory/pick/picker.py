@@ -3,7 +3,7 @@
 import curses
 import logging
 
-from fastHistory.parser.bashParser import BashParser
+from fastHistory.parser.bashParser import BashParser, BashParserThread
 from fastHistory.database.dataManager import DataManager
 from fastHistory.parser.inputParser import InputParser
 from fastHistory.pick.drawer import Drawer
@@ -29,7 +29,7 @@ KEY_END = curses.KEY_END
 KEYS_EDIT = ('e', 'E')
 KEY_TAG = '#'
 KEY_AT = '@'
-
+KEY_TIMEOUT = curses.ERR
 
 class Picker(object):
     """
@@ -221,7 +221,7 @@ class Picker(object):
                 tmp_options.append([False, option])
         return tmp_options
 
-    def run_loop_edit_command(self,blocks_shift, data_from_man_page):
+    def run_loop_edit_command(self,blocks_shift, bash_parser_thread):
         """
         loop to capture user input keys to interact with the "edit command" page
 
@@ -229,12 +229,11 @@ class Picker(object):
         """
         # import this locally to improve performance when the program is loaded
         from fastHistory.pick.pageEditCommand import PageEditCommand
-        page_desc = PageEditCommand(self.drawer,
+        page_command = PageEditCommand(self.drawer,
                                     option=self.current_selected_option,
                                     search_filters=self.data_manager.get_search_filters(),
                                     context_shift=self.context_shift,
-                                    blocks_shift=blocks_shift,
-                                    data_from_man_page=data_from_man_page)
+                                    blocks_shift=blocks_shift)
 
         current_command = self.current_selected_option[DataManager.OPTION.INDEX_CMD]
         command_t = TextManager(self.current_selected_option[DataManager.OPTION.INDEX_CMD],
@@ -242,18 +241,21 @@ class Picker(object):
         input_error_msg = None
 
         while True:
-            if page_desc.has_minimum_size():
-                page_desc.clean_page()
-                page_desc.draw_page_edit(command_text=command_t.get_text_to_print(),
+            if page_command.has_minimum_size():
+                page_command.clean_page()
+                page_command.draw_page_edit(command_text=command_t.get_text_to_print(),
                                          command_cursor_index=command_t.get_cursor_index_to_print(),
-                                         input_error_msg=input_error_msg)
-                page_desc.refresh_page()
+                                         input_error_msg=input_error_msg,
+                                         data_from_man_page=bash_parser_thread.get_result())
+                page_command.refresh_page()
 
             # wait for char
-            c = self.drawer.wait_next_char()
+            c = self.drawer.wait_next_char(multi_threading_mode=bash_parser_thread.is_alive())
 
+            if c == KEY_TIMEOUT:
+                continue
             # save and exit
-            if c in KEYS_ENTER:
+            elif c in KEYS_ENTER:
                 if current_command == command_t.get_text():
                     return False
                 else:
@@ -319,7 +321,7 @@ class Picker(object):
             else:
                 logging.error("loop edit command - input not handled: " + repr(c))
 
-    def run_loop_edit_description(self, blocks_shift, data_from_man_page):
+    def run_loop_edit_description(self, blocks_shift, bash_parser_thread):
         """
         loop to capture user input keys to interact with the "add description" page
 
@@ -331,8 +333,7 @@ class Picker(object):
                                         option=self.current_selected_option,
                                         search_filters=self.data_manager.get_search_filters(),
                                         context_shift=self.context_shift,
-                                        blocks_shift=blocks_shift,
-                                        data_from_man_page=data_from_man_page)
+                                        blocks_shift=blocks_shift)
 
         current_command = self.current_selected_option[DataManager.OPTION.INDEX_CMD]
         description_t = TextManager(InputParser.DESCRIPTION_SIGN +
@@ -345,14 +346,17 @@ class Picker(object):
                 page_desc.clean_page()
                 page_desc.draw_page_edit(description_text=description_t.get_text_to_print(),
                                          description_cursor_index=description_t.get_cursor_index_to_print(),
-                                         input_error_msg=input_error_msg)
+                                         input_error_msg=input_error_msg,
+                                         data_from_man_page = bash_parser_thread.get_result())
                 page_desc.refresh_page()
 
             # wait for char
-            c = self.drawer.wait_next_char()
+            c = self.drawer.wait_next_char(multi_threading_mode=bash_parser_thread.is_alive())
 
+            if c == KEY_TIMEOUT:
+                continue
             # save and exit
-            if c in KEYS_ENTER:
+            elif c in KEYS_ENTER:
                 new_description = InputParser.parse_description(description_t.get_text())
                 if new_description is not None:
                     if self.data_manager.update_description(current_command, new_description):
@@ -398,7 +402,7 @@ class Picker(object):
             # move cursor to the end
             elif c == KEY_END or c == KEY_CTRL_E:
                 description_t.move_cursor_to_end()
-            elif c == KEY_RESIZE:
+            elif c == "#":  # KEY_RESIZE:
                 # this occurs when the console size changes
                 self.drawer.reset()
                 description_t.set_max_x(self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
@@ -414,7 +418,7 @@ class Picker(object):
             else:
                 logging.error("loop edit description - input not handled: " + repr(c))
 
-    def run_loop_edit_tags(self, data_from_man_page):
+    def run_loop_edit_tags(self, bash_parser_thread):
         """
         loop to capture user input keys to interact with the "add tag" page
 
@@ -425,8 +429,7 @@ class Picker(object):
         page_tags = PageEditTags(self.drawer,
                                  option=self.current_selected_option,
                                  search_filters=self.data_manager.get_search_filters(),
-                                 context_shift=self.context_shift,
-                                 data_from_man_page=data_from_man_page)
+                                 context_shift=self.context_shift)
 
         current_command = self.current_selected_option[DataManager.OPTION.INDEX_CMD]
         new_tags = self.current_selected_option[DataManager.OPTION.INDEX_TAGS]
@@ -445,14 +448,16 @@ class Picker(object):
                 page_tags.clean_page()
                 page_tags.draw_page_edit(tags_text=new_tags_t.get_text_to_print(),
                                          tags_cursor_index=new_tags_t.get_cursor_index_to_print(),
-                                         input_error_msg=input_error_msg)
+                                         input_error_msg=input_error_msg,
+                                         data_from_man_page=bash_parser_thread.get_result())
                 page_tags.refresh_page()
 
             # wait for char
-            c = self.drawer.wait_next_char()
+            c = self.drawer.wait_next_char(multi_threading_mode=bash_parser_thread.is_alive())
 
-            # save and exit
-            if c in KEYS_ENTER:
+            if c == KEY_TIMEOUT:
+                continue
+            elif c in KEYS_ENTER:
                 new_tags_array = InputParser.parse_tags_str(new_tags_t.get_text())
                 if new_tags_array is not None:
                     if self.data_manager.update_tags(current_command, new_tags_array):
@@ -526,25 +531,25 @@ class Picker(object):
         # import this locally to improve performance when the program is loaded
         from fastHistory.pick.pageInfo import PageInfo
 
-        data_from_man_page = BashParser.load_data_for_info_from_man_page(
-            cmd_text=self.current_selected_option[DataManager.OPTION.INDEX_CMD])
+        bash_parser_thread = BashParserThread(cmd_text=self.current_selected_option[DataManager.OPTION.INDEX_CMD])
+        bash_parser_thread.start()
         page_info = PageInfo(self.drawer,
                              option=self.current_selected_option,
                              search_filters=self.data_manager.get_search_filters(),
-                             context_shift=self.context_shift,
-                             data_from_man_page=data_from_man_page)
+                             context_shift=self.context_shift)
 
         while True:
             if page_info.has_minimum_size():
                 page_info.clean_page()
-                page_info.draw_page()
+                page_info.draw_page(data_from_man_page=bash_parser_thread.get_result())
                 self.page_selector.refresh_page()
 
             # wait for char
-            c = self.drawer.wait_next_char()
+            c = self.drawer.wait_next_char(multi_threading_mode=bash_parser_thread.is_alive())
 
-            # select current entry
-            if c in KEYS_ENTER:
+            if c == KEY_TIMEOUT:
+                continue
+            elif c in KEYS_ENTER:
                 return self.get_selected()
             # delete current selected option
             elif c == KEY_CANC:
@@ -574,7 +579,7 @@ class Picker(object):
             elif c == KEY_UP:
                 page_info.shift_blocks_up()
             elif c in KEYS_EDIT:
-                if self.run_loop_edit_command(page_info.get_blocks_shift(), data_from_man_page):
+                if self.run_loop_edit_command(page_info.get_blocks_shift(), bash_parser_thread):
                     # reload options from db
                     self.options = self.data_manager.filter(self.search_t.get_text_lower(),
                                                             self.index + self.get_number_options_to_draw())
@@ -584,18 +589,18 @@ class Picker(object):
                     # update option to show
                     page_info.update_option_value(self.current_selected_option)
                     # reload man page
-                    data_from_man_page = BashParser.load_data_for_info_from_man_page(
-                        self.current_selected_option[DataManager.OPTION.INDEX_CMD])
-                    page_info.update_man_page(data_from_man_page)
+                    bash_parser_thread = BashParserThread(
+                        cmd_text=self.current_selected_option[DataManager.OPTION.INDEX_CMD])
+                    bash_parser_thread.start()
             elif c == KEY_TAG:  # "#"
-                if self.run_loop_edit_tags(data_from_man_page):
+                if self.run_loop_edit_tags(bash_parser_thread):
                     self.options = self.data_manager.filter(self.search_t.get_text_lower(),
                                                             self.index + self.get_number_options_to_draw())
                     self.update_options_to_draw()
                     self.get_options()
                     page_info.update_option_value(self.current_selected_option)
             elif c == KEY_AT:  # "@"
-                if self.run_loop_edit_description(page_info.get_blocks_shift(), data_from_man_page):
+                if self.run_loop_edit_description(page_info.get_blocks_shift(), bash_parser_thread):
                     self.options = self.data_manager.filter(self.search_t.get_text_lower(),
                                                             self.index + self.get_number_options_to_draw())
                     self.update_options_to_draw()
@@ -632,8 +637,9 @@ class Picker(object):
             # wait for char
             c = self.drawer.wait_next_char()
 
-            # check char and execute command
-            if c == KEY_UP:
+            if c == KEY_TIMEOUT:
+                continue
+            elif c == KEY_UP:
                 self.move_up()
             elif c == KEY_DOWN:
                 self.move_down()
@@ -651,10 +657,8 @@ class Picker(object):
             elif c == KEY_TAB:
                 # reset index of search text (to avoid confusion when the scroll is done on the info page)
                 self.search_t.move_cursor_to_end()
-                # call the loop for the info page
                 res = self.run_loop_info()
                 if res is not None:
-                    # if return is not null then return selected result
                     return res
             # -> command
             elif c == KEY_RIGHT:

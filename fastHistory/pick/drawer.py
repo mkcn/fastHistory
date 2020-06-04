@@ -1,4 +1,5 @@
 import curses
+
 from fastHistory.config.configReader import ConfigReader
 
 
@@ -15,6 +16,7 @@ class Drawer(object):
         self.x = 0
         self.y = 0
         self.text_too_long = text_too_long
+        self.input_timeout_enabled = False
 
         # define colors
         self.color_search_input = None
@@ -26,6 +28,9 @@ class Drawer(object):
         self.color_selector = None
         self.color_columns_title = None
         self.init_colors(theme)
+
+        from sys import platform
+        self.is_mac_os = (platform == "darwin")
 
     def init_colors(self, theme):
         """
@@ -95,21 +100,50 @@ class Drawer(object):
         curses.curs_set(1)
         pass
 
-    def wait_next_char(self):
+    def wait_next_char(self, multi_threading_mode=False):
         """
         wait input from user
+
+        :param multi_threading_mode:      enabled or disabled the timeout to make the get_wch compatible with multi threading
+
+        if the timeout is enabled and no input is received -> curses.error
         :return:
         """
-        # this supports wide characters
+        if multi_threading_mode:
+            self._enable_input_timeout()
+        elif not multi_threading_mode:
+            self._disable_input_timeout()
+
         try:
+            # get_wch supports wide characters
             c = self.terminal_screen.get_wch()
         except curses.error:
-            # on macOS the resize key does not work as expected
-            # as a workaround we send the resize key when the get_wch throws an error
-            return curses.KEY_RESIZE
+            if not self.is_mac_os:
+                return curses.ERR
+            else:
+                # on macOS the resize key does not work as expected
+                # as a workaround we send the resize key when the get_wch throws an error
+                return curses.KEY_RESIZE
         except ValueError:
-            return ""
+            return curses.ERR
         return c
+
+    def _enable_input_timeout(self):
+        """
+        halfdelay set a timeout for get_wch
+        this allows to have not blocking UI that works with threads
+        """
+        if not self.input_timeout_enabled:
+            curses.halfdelay(4)  # 400 ms
+            self.input_timeout_enabled = True
+
+    def _disable_input_timeout(self):
+        """
+        reset halfdelay
+        """
+        if self.input_timeout_enabled:
+            curses.cbreak()
+            self.input_timeout_enabled = False
 
     def clear(self):
         """

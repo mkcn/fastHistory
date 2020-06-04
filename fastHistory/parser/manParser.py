@@ -69,7 +69,7 @@ class ManParser(object):
             self.man_page = subprocess.check_output(
                 ["man", cmd],
                 stderr=subprocess.DEVNULL,
-                timeout=1.5).decode('utf-8')
+                timeout=5).decode('utf-8')
             # man command uses "Backspace" characters to show words bold
             # in macOS this special char is still present in the subprocess output and must be removed
             self.man_page = re.sub(r'.\x08', '', self.man_page)
@@ -117,7 +117,7 @@ class ManParser(object):
         """
         final_result = []
         if self.man_page is None:
-            logging.error("get_flag_meaning: man_page is None")
+            logging.debug("get_flag_meaning: man_page is None")
             return None
         else:
             try:
@@ -125,7 +125,7 @@ class ManParser(object):
                 if result is not None:
                     result = result.group(2)
                 else:
-                    logging.error("get_flag_meaning: regex does not match")
+                    logging.debug("get_flag_meaning: regex does not match '%s'" % flag)
                     return None
             except sre_constants.error:
                 logging.error("flag meaning parser: ", sys.exc_info()[0])
