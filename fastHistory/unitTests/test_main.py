@@ -122,14 +122,14 @@ class TestMain(unittest.TestCase):
         sys.argv = ["", "--export", "%/", "--from-installer"]
         fastHistory.f(logger_console=logger_test)
         console_logs = logger_test.get_console_logs()
-        self.assertRegex(console_logs[1][LoggerBashTest.INDEX_VALUE], "^error: please check your log file:")
+        self.assertRegex(console_logs[1][LoggerBashTest.INDEX_VALUE], "^export failed, please check your log file:")
 
     def test_call_export_with_error_2(self):
         logger_test = LoggerBashTest()
         sys.argv = ["", "--export", "/", "--from-installer"]
         fastHistory.f(logger_console=logger_test)
         console_logs = logger_test.get_console_logs()
-        self.assertRegex(console_logs[1][LoggerBashTest.INDEX_VALUE], "^error: output path cannot be a directory")
+        self.assertRegex(console_logs[1][LoggerBashTest.INDEX_VALUE], "^output path cannot be a directory")
 
     def test_call_import_with_error(self):
         logger_test = LoggerBashTest()
