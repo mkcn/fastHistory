@@ -113,7 +113,7 @@ def handle_import_db(logger_console, db_abs_path, path_data_folder):
 		logger_console.log_on_console_info("import database: %s elements imported" % str(imported_items))
 		return
 	elif not os.path.isfile(db_abs_path):
-		logging.error("import database: fail")
+		logging.error("input file does not exist: %s" % str(db_abs_path))
 		logger_console.log_on_console_error("input file does not exist: %s" % str(db_abs_path))
 	else:
 		logging.error("import database: fail")
@@ -144,14 +144,17 @@ def handle_export_db(logger_console, output_path, path_data_folder):
 				logger_console.log_on_console_error("export database cancel")
 				return
 		if os.path.isdir(output_path):
-			logger_console.log_on_console_error("error: output path cannot be a directory")
+			logger_console.log_on_console_error("output path cannot be a directory")
+			return
+		if not os.path.isfile(path_data_folder + NAME_DATABASE_FILE):
+			logger_console.log_on_console_info("nothing to export")
 			return
 		copyfile(path_data_folder + NAME_DATABASE_FILE, output_path)
 		logging.info("export output exported")
 		logger_console.log_on_console_info("database file exported")
 	except Exception as ex:
 		logging.error("export database error: %s" % str(ex))
-		logger_console.log_on_console_error("error: please check your log file: %s" %
+		logger_console.log_on_console_error("export failed, please check your log file: %s" %
 											os.path.abspath(path_data_folder + NAME_LOG_FILE))
 		logger_console.log_on_console_info("syntax : f-export [OUTPUT]")
 		logger_console.log_on_console_info("example: f-export fastHistory_virtual_machine.db")
