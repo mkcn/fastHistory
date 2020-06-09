@@ -99,9 +99,15 @@ if declare -f "f" >/dev/null 2>&1; then
     _fast_history_log "debug" "old functions found and disabled";
 fi
 
+# set trap for ctrl+c signal, the precmd call after this signal must be ignored
+trap _fast_history_trap_int INT
+function _fast_history_trap_int() {
+        _fast_history_trap_int_enabled=1
+}
+_fast_history_trap_int_enabled=0
+
 # "preexec" is executed just after a command has been read and is about to be executed
 # we store the hooked command in a bash variable
-
 export _fast_history_hooked_cmd
 
 preexec() {
@@ -109,7 +115,9 @@ preexec() {
 	if [[ "$_fast_history_hooked_cmd" == "#"* ]]; then
 		# remove the intial '#'
 		_fast_history_hooked_cmd="${_fast_history_hooked_cmd:1}"
-		_fast_history_log "debug" "command will not be executed!"
+		_fast_history_log "debug" "command will NOT be executed"
+	else
+		_fast_history_log "debug" "command will be executed"
 	fi
 }
 
@@ -117,25 +125,31 @@ preexec() {
 # we use the previous hooked command and we store it with fastHistory
 # Note: any unsuccessful command (base on the return code '$?') is ignored
 precmd() {
-	# check if variable is not empty
 	if [ -n "$_fast_history_hooked_cmd" ]; then
-		if ! $_fast_history_check_return_code || [ $? -eq 0 ]; then
-		    # check if the hooked cmd contains the 'comment' char, any command without it will be ignored
-			  # check also if the command is fasthistory itself (e.g. 'f #test' should not be stored)
-		    # this is just a preliminary check, in the python module a strict regex will be used
-		    # this is only done to avoid to load the python module for each command
-		    if [[ "$_fast_history_hooked_cmd" == *"#"* ]] && [[ "$_fast_history_hooked_cmd" != "$_fast_history_executable "* ]] ; then
-          $_fast_history_executable --add-explicit "$_fast_history_hooked_cmd"
-        else
-          _fast_history_log "debug" "command ignored";
-        fi;
-		else
-			_fast_history_log "debug" "error code detected: command ignored";
-		fi;
-
-		 # clean the cmd, this is needed because precmd can be trigged without preexec (e.g. ctrl+c)
-    _fast_history_hooked_cmd="";
+	  if [ "$_fast_history_trap_int_enabled" -eq 0 ]; then
+      if ! $_fast_history_check_return_code || [ $? -eq 0 ]; then
+          # check also if the command is fasthistory itself (e.g. 'f #test' should not be stored)
+          if [[ "$_fast_history_hooked_cmd" != "$_fast_history_executable "* ]]; then
+            # check if the hooked cmd contains the 'comment' char, any command without it will be ignored
+            # this is just a preliminary check, in the python module a strict regex will be used
+            # this is only done to avoid to load the python module for each command
+            if [[ "$_fast_history_hooked_cmd" == *"#"* ]]; then
+              $_fast_history_executable --add-explicit "$_fast_history_hooked_cmd"
+            else
+              _fast_history_log "debug" "command ignored: no tag";
+            fi;
+          else
+              _fast_history_log "debug" "command ignored: fastHistory";
+          fi;
+      else
+        _fast_history_log "debug" "command ignored: error code detected";
+      fi;
+    else
+      _fast_history_log "debug" "command ignored: interupt";
+    fi;
+    _fast_history_hooked_cmd=""
 	fi;
+  _fast_history_trap_int_enabled=0
 }
 
 _fast_history_log "debug" "loading fastHistory completed, use 'f' to start"; 
