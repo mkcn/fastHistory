@@ -250,11 +250,15 @@ def retrieve_parameters_from_bash_hook(arg1=None):
 
 def handle_arguments(logger_console, config_reader, path_data_folder, path_code_folder):
 	# set logging (this setting is applied globally for all logging calls from now on)
-	logging.basicConfig(filename=path_data_folder + NAME_LOG_FILE, level=config_reader.get_log_level())
+	if config_reader.get_log_level() == 'NOTSET' or config_reader.get_log_level() == 'NONE':
+		logging.disable(logging.CRITICAL)
+	else:
+		logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+			datefmt='%Y-%m-%d %H:%M:%S',
+			filename=path_data_folder + NAME_LOG_FILE,
+			level=config_reader.get_log_level())
 	logging.debug("bash input: %s" % str(sys.argv))
-
 	logger_console.set_theme(config_reader.get_theme())
-
 	args_len = len(sys.argv)
 	# check number of parameters
 	if args_len == 1:

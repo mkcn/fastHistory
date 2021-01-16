@@ -26,7 +26,8 @@ class ConfigReader:
     THEME_AZURE = "AZURE"
     THEME_GREEN = "GREEN"
 
-    _ALLOWED_LOG_LEVELS = ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG', 'NOTSET']
+    # NOTSET may be used by old configutation files ( <= 2.1.5) and it must be considered equal to NONE
+    _ALLOWED_LOG_LEVELS = ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG', 'NOTSET', 'NONE']
     _ALLOWED_THEME = [THEME_AZURE, THEME_GREEN]
 
     _config = None
