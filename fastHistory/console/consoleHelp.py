@@ -29,6 +29,7 @@ OPTIONS
   --import <input_name>        import commands from exported database
                                 the commands will be imported only if not already present
                                 if same command has different tag or description they will be merged 
+  --log                        open log file
   --setup                      re-run the setup, possibly to repair fastHistory
   --update                     update fastHistory
   -v, --version                show current version

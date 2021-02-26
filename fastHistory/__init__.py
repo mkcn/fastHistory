@@ -195,11 +195,25 @@ def handle_config_file(logger_console, path_data_folder):
 	config_file= path_data_folder + NAME_CONFIGURATION_FILE
 	logger_console.log_on_console_info("to change the config file use the following injected command")
 	try:
-		ConsoleUtils.fill_terminal_input("nano "+config_file)
+		ConsoleUtils.fill_terminal_input("nano " + config_file)
 	except:
 		logger_console.log_on_console_error("your terminal does not support automatic input injection")
 		logger_console.log_on_console_error("please edit the configuration file manually")
 		logger_console.log_on_console(config_file)
+
+
+def handle_log_file(logger_console, path_data_folder):
+	log_file= path_data_folder + NAME_LOG_FILE
+	if not os.path.exists(log_file):
+		logger_console.log_on_console_warn("log file not found, try to change the log level in the config file")
+	else:
+		logger_console.log_on_console_info("to read the log file use the following injected command")
+		try:
+			ConsoleUtils.fill_terminal_input("nano " + log_file)
+		except:
+			logger_console.log_on_console_error("your terminal does not support automatic input injection")
+			logger_console.log_on_console_error("please read the log file manually")
+			logger_console.log_on_console(log_file)
 
 
 def handle_helper(logger_console):
@@ -275,6 +289,8 @@ def handle_arguments(logger_console, config_reader, path_data_folder, path_code_
 			handle_add_request(logger_console, input_cmd, path_data_folder, error_feedback=False)
 		elif (arg1 == "--config") and args_len == 2:
 			handle_config_file(logger_console, path_data_folder)
+		elif (arg1 == "--log") and args_len == 2:
+			handle_log_file(logger_console, path_data_folder)
 		elif (arg1 == "--setup") and args_len == 2:
 			handle_setup(logger_console, path_data_folder, path_code_folder, config_reader, force=True)
 		elif arg1 == "--import" and args_len == 3:
