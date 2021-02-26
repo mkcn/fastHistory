@@ -192,7 +192,7 @@ def handle_update(logger_console):
 
 
 def handle_config_file(logger_console, path_data_folder):
-	config_file= path_data_folder + NAME_CONFIGURATION_FILE
+	config_file = path_data_folder + NAME_CONFIGURATION_FILE
 	logger_console.log_on_console_info("to change the config file use the following injected command")
 	try:
 		ConsoleUtils.fill_terminal_input("nano " + config_file)
@@ -203,7 +203,7 @@ def handle_config_file(logger_console, path_data_folder):
 
 
 def handle_log_file(logger_console, path_data_folder):
-	log_file= path_data_folder + NAME_LOG_FILE
+	log_file = path_data_folder + NAME_LOG_FILE
 	if not os.path.exists(log_file):
 		logger_console.log_on_console_warn("log file not found, try to change the log level in the config file")
 	else:

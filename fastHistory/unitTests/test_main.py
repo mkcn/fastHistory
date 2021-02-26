@@ -172,7 +172,7 @@ class TestMain(unittest.TestCase):
         elif len(console_logs) == 1:
             # note: this test may be successful if executed directly from the terminal
             # e.g. python3 -m unittest discover -s fastHistory/
-            self.assertEqual(console_logs[0][LoggerBashTest.INDEX_VALUE], "to change the config file use the following injected command")
+            self.assertEqual(console_logs[0][LoggerBashTest.INDEX_VALUE], "to update fastHistory use the following injected command")
         else:
             self.assertTrue(False)
 
@@ -188,7 +188,12 @@ class TestMain(unittest.TestCase):
         elif len(console_logs) == 1:
             # note: this test may be successful if executed directly from the terminal
             # e.g. python3 -m unittest discover -s fastHistory/
-            self.assertEqual(console_logs[0][LoggerBashTest.INDEX_VALUE], "to change the config file use the following injected command")
+            if console_logs[0][LoggerBashTest.INDEX_VALUE] == "log file not found, try to change the log level in the config file":
+                self.assertTrue(True)
+            elif console_logs[0][LoggerBashTest.INDEX_VALUE] == "to read the log file use the following injected command":
+                self.assertTrue(True)
+            else:
+                self.assertTrue(False)
         else:
             self.assertTrue(False)
 

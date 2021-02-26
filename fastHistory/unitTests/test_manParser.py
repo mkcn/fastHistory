@@ -12,6 +12,8 @@ from fastHistory.unitTests.loggerTest import LoggerTest
 class TestManParser(TestCase):
     """
     test class for the man parser
+
+    NOTE: you need to have "nmap" and "netstat" commands installed
     """
 
     @classmethod
@@ -55,10 +57,10 @@ class TestManParser(TestCase):
         test_string = [
             "tar",
             "ls",
-            "netstat",
+            "netstat",  # this may need to be manually installed (sudo apt install net-tools)
             "wget",
             "grep",
-            "nmap"
+            "nmap"  # this need to be manually installed (sudo apt install nmap)
         ]
         for t in test_string:
             logging.info("test: " + str(t))
@@ -110,9 +112,7 @@ class TestManParser(TestCase):
             [True, ["netstat", "--verbose"], ["--verbose, -v",
                                               "--verbose , -v"]],
             [True, ["netstat", "--interfaces"], ["--interfaces, -i"]],  # outside the options chapter
-            [False, ["lsof", "-i"], ["-i [i]   selects  the  listing  of  files any of whose Internet address",
-                                     "-i [i]   selects the listing of files any of whose Internet address matches the address speci‐",
-                                     "-i [i]   selects  the listing of files any of whose Internet address matches the address specified in i.  If no address is specified, this option selects the listing of all Internet and x.25 (HP-UX)"]],  # this man page contains 2 sentences which start with '-i'
+            [False, ["lsof", "-i"], ["-i [i]  selects the listing of files any of whose Internet address"]],
             [False, ["wget", "--quiet"], ["-q"]],  # -q\n--quite
             [False, ["git", "--help"], ["--help"]],
             [False, ["git", "--version"], ["--version"]],
@@ -130,10 +130,13 @@ class TestManParser(TestCase):
             if not t[0] or sys.platform.startswith('linux'):
                 if parser.load_man_page(t[1][0]):
                     flag_meaning = parser.get_flag_meaning(t[1][1])
-                    if flag_meaning != None:
+                    if flag_meaning is not None:
                         found = False
                         for meaning in t[2]:
-                            if flag_meaning[0][1] == meaning:
+                            # note: some command adds spaces between words based on the terminal window size (e.g. lsof)
+                            flag_meaning_no_space = flag_meaning[0][1].replace(" ", "")
+                            meaning_no_space = meaning.replace(" ", "")
+                            if flag_meaning_no_space.startswith(meaning_no_space):
                                 found = True
                                 break
                         if not found:
@@ -149,7 +152,7 @@ class TestManParser(TestCase):
                     logging.warning("warning! program not found in your system:" + t[1])
                     all_true = False
             else:
-                logging.info("check skipped")
+                logging.warning("check skipped because this is not a Linux OS")
 
         if all_true:
             self.assertTrue(True)
