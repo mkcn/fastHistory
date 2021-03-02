@@ -167,14 +167,14 @@ class PageSelector(PageGeneric):
         self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Select", x_indent=1, allow_last_row=True)
 
+        self.drawer.draw_row("Ctrl+space", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Copy", x_indent=1, allow_last_row=True)
+
         self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("More", x_indent=1, allow_last_row=True)
 
         self.drawer.draw_row("Del", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Delete", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("← → ", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Scroll", x_indent=1, allow_last_row=True)
-
-        self.drawer.draw_row("Ctrl+c ", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Ctrl+c", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Exit", x_indent=1, allow_last_row=True)

@@ -24,6 +24,7 @@ KEY_TAB = '\t'
 KEY_ESC = '\x1b'  # NOTE: the KEY_ESC can be received with some delay
 KEY_CTRL_A = '\x01'
 KEY_CTRL_E = '\x05'
+KEY_SHIFT_C = '\x00'
 KEY_START = curses.KEY_HOME
 KEY_END = curses.KEY_END
 KEYS_EDIT = ('e', 'E')
@@ -550,7 +551,9 @@ class Picker(object):
             if c == KEY_TIMEOUT:
                 continue
             elif c in KEYS_ENTER:
-                return self.get_selected()
+                return [True, self.get_selected()]
+            elif c == KEY_SHIFT_C:
+                return [False, self.get_selected()]
             # delete current selected option
             elif c == KEY_CANC:
                 self.data_manager.delete_element(self.current_selected_option[DataManager.OPTION.INDEX_CMD])
@@ -562,12 +565,12 @@ class Picker(object):
             elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
                 return None
             # open man page
-            elif c == 109:  # char 'm'
+            # elif c == 109:  # char 'm'
                 # TODO fix and show description in help line
                 # from fastHistory.console import consoleUtils
-                #cmd = data_from_man_page[0][BashParser.INDEX_CMD][BashParser.INDEX_VALUE]
-                #consoleUtils.ConsoleUtils.open_interactive_man_page(cmd)
-                return ""
+                # cmd = data_from_man_page[0][BashParser.INDEX_CMD][BashParser.INDEX_VALUE]
+                # consoleUtils.ConsoleUtils.open_interactive_man_page(cmd)
+                # return ""
             # -> command
             elif c == KEY_RIGHT:
                 self.context_shift.shift_context_right()
@@ -649,7 +652,9 @@ class Picker(object):
                         self.search_t.get_text_lower(),
                         self.index + self.get_number_options_to_draw())
             elif c in KEYS_ENTER:
-                return self.get_selected()
+                return [True, self.get_selected()]
+            elif c == KEY_SHIFT_C:
+                return [False, self.get_selected()]
             # note: currently not implemented
             elif c == KEY_SELECT and self.is_multi_select:
                 self.mark_index()

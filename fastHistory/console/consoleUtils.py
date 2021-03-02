@@ -33,6 +33,15 @@ class ConsoleUtils:
 		sys.stdout.write('\r')
 
 	@staticmethod
+	def set_value_clipboard(data):
+		try:
+			import pyperclip
+			pyperclip.copy(data)
+			return True
+		except Exception as e:
+			return False
+
+	@staticmethod
 	def handler_close_signal(signum, frame):
 		"""
 		gracefully close the program when a SIGINT (ctrl + c) is detected

@@ -38,7 +38,17 @@ def handle_search_request(logger_console, input_cmd_str, path_data_folder, theme
 
 		# inject into the terminal the selected command
 		try:
-			ConsoleUtils.fill_terminal_input(selected_option)
+			if selected_option[0]:
+				ConsoleUtils.fill_terminal_input(selected_option[1])
+			else:
+				if ConsoleUtils.set_value_clipboard(selected_option[1]):
+					logger_console.log_on_console_info("copied to clipboard: '%s'" % selected_option[1])
+				else:
+					logger_console.log_on_console_error("pyperclip package not found")
+					logger_console.log_on_console_error("To enable auto-copy execute the following command:")
+					logger_console.log_on_console("")
+					logger_console.log_on_console("pip3 install pyperclip")
+					logger_console.log_on_console("")
 		except:
 			logging.debug("your terminal does not support automatic input injection")
 			logger_console.log_on_console_error("your terminal does not support automatic input injection")
