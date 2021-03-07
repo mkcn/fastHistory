@@ -14,6 +14,18 @@ sudo apt install python3 python3-pip python3-venv
 
 you may need to run this twice the first time
 
+### install from test pip account
+
+```
+pip3 install --index-url https://test.pypi.org/simple/ fastHistory
+```
+
+### install from pip account
+
+```
+pip3 install fastHistory
+```
+
 ## manual build mode
 
 ### create the build environemnt
@@ -40,6 +52,7 @@ pip3 install -I dist/*.whl
 python3 setup.py bdist_wheel
 sudo pip3 install -I dist/*.whl
 ```
+
 
 ### uninstall for local user
 

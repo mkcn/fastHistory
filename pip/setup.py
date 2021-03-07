@@ -39,8 +39,8 @@ try:
 		platforms='OS-independent',
 		# dependeces
 		install_requires=[
-			"bashlex>=0.14",
-			"pyperclip>=1.7.0"
+			"bashlex>=0.15",
+			"pyperclip>=1.8.2"
 		],
 		# all data files to include 
 		package_data={

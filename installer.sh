@@ -59,8 +59,9 @@ if [ -z "$1" ]; then
 	fi
 
 
-	# copy folder fastHistory (only .py, .sh and a couple of configuration files) to ~/.fastHistory
-	# try 'cp parents' or the equivalent 'rsync' to copy file structure
+	# copy folder fastHistory (only .py, .sh, a couple of configuration and license files) to ~/.fastHistory
+	# note: macOS does not support "cp -r"
+	# try 'cp parents' (linux) or the equivalent 'rsync' (macOS) to copy file structure
 	if command -v rsync >/dev/null 2>&1; then
 	  rm -f -r "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  mkdir -p "$FASTHISTORY_PATH_CODE_FOLDER" && \
@@ -68,7 +69,8 @@ if [ -z "$1" ]; then
 	  rsync -R fastHistory/*/*.py "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  rsync -R fastHistory/bash/*.sh "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  rsync -R fastHistory/config/default_fastHistory.conf "$FASTHISTORY_PATH_CODE_FOLDER" && \
-	  rsync -R fastHistory/config/default_version.txt "$FASTHISTORY_PATH_CODE_FOLDER"
+	  rsync -R fastHistory/config/default_version.txt "$FASTHISTORY_PATH_CODE_FOLDER" && \
+	  rsync -R LICENSE "$FASTHISTORY_PATH_CODE_FOLDER"/fastHistory/
 	else
 	  rm -f -r "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  mkdir -p "$FASTHISTORY_PATH_CODE_FOLDER" && \
@@ -76,7 +78,8 @@ if [ -z "$1" ]; then
 	  cp --parents fastHistory/*/*.py "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  cp --parents fastHistory/bash/*.sh "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  cp --parents fastHistory/config/default_fastHistory.conf "$FASTHISTORY_PATH_CODE_FOLDER" && \
-	  cp --parents fastHistory/config/default_version.txt "$FASTHISTORY_PATH_CODE_FOLDER"
+	  cp --parents fastHistory/config/default_version.txt "$FASTHISTORY_PATH_CODE_FOLDER" && \
+	  cp --parents LICENSE "$FASTHISTORY_PATH_CODE_FOLDER"/fastHistory/
 	fi
 	# check if all files have been copied
 	if [ $? -eq 0 ]; then
@@ -86,14 +89,31 @@ if [ -z "$1" ]; then
 		exit 1
 	fi
 
-	# copy the 'bashlex' third party software to enable the 'man page' feature. this is not mandatory and you can remove this section if you like
+	# copy the third party software ('bashlex', 'pyperclip') to enable the 'man page' feature
+	# NOTE: FastHistory will run even without these extra code, but some feature will not work
 	if [[ $YN == "y" || $YN == "Y" || $YN == "" ]]; then
+	  # source: https://github.com/idank/bashlex/releases/ (tag 0.15)
 		tar -xzf pip/third-party/bashlex-*.tar.gz --directory "$FASTHISTORY_PATH_CODE_FOLDER"
 		mv "$FASTHISTORY_PATH_CODE_FOLDER"/bashlex-*/bashlex/ "$FASTHISTORY_PATH_CODE_FOLDER/"
-		if rm -r "$FASTHISTORY_PATH_CODE_FOLDER"/bashlex-*/; then
+		mv "$FASTHISTORY_PATH_CODE_FOLDER"/bashlex-*/LICENSE "$FASTHISTORY_PATH_CODE_FOLDER"/bashlex/
+		rm -r "$FASTHISTORY_PATH_CODE_FOLDER"/bashlex-*/
+
+	  # source: https://github.com/asweigart/pyperclip/blob/master/src/pyperclip/__init__.py (pip 1.8.2 - commit 76e2dcb13c4eb26d97a9c41a6a20d5b2e2f87ef5)
+	  #         https://github.com/asweigart/pyperclip/blob/master/LICENSE.txt (pip 1.8.2 - commit 76e2dcb13c4eb26d97a9c41a6a20d5b2e2f87ef5)
+	  mkdir "$FASTHISTORY_PATH_CODE_FOLDER"/pyperclip
+		cp pip/third-party/pyperclip/*  "$FASTHISTORY_PATH_CODE_FOLDER"/pyperclip/
+
+		if [[ -f "$FASTHISTORY_PATH_CODE_FOLDER"/bashlex/__init__.py ]]; then
 			_fast_history_install_log "info" "bashlex: enabled" 
 		else
-			_fast_history_install_log "error" "tar command failed, check the '$FASTHISTORY_PATH_CODE_FOLDER' folder permissions and try again"
+			_fast_history_install_log "error" "bashlex not enabled, check the '$FASTHISTORY_PATH_CODE_FOLDER' folder permissions and try again"
+			exit 1
+		fi
+
+		if [[ -f "$FASTHISTORY_PATH_CODE_FOLDER"/pyperclip/__init__.py ]]; then
+			_fast_history_install_log "info" "pyperclip: enabled"
+		else
+			_fast_history_install_log "error" "pyperclip not enabled, check the '$FASTHISTORY_PATH_CODE_FOLDER' folder permissions and try again"
 			exit 1
 		fi
 	elif [[ $YN == "n" || $YN == "N" ]]; then

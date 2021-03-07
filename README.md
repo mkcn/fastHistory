@@ -320,19 +320,18 @@ The license for this is the same as that used by GNU bash, GNU GPL v3+.
 
 # Copyright
 
-The following external projects have been used as part of **fastHistory**:
-*  https://github.com/rcaloras/bash-preexec 
-    *  **goal**: this bash script is used to hook the commands from the terminal
-    *  **code section**: ```bash-preexec.sh```
-    *  **changes**: no change
-*  https://github.com/idank/bashlex
-    *  **goal**: this Python module is used to parse bash commands in order to show info from the man page
-    *  **code section**: ```fastHistory/parser/bashlex/```
-    *  **changes**: no change 
 *  https://github.com/wong2/pick
-    *  **goal**: this Python module has been used to select the option from the menu
+    *  **goal**: python module modified to build the command-selection menu
     *  **code section**: ```fastHistory/pick```
-    *  **changes**: all code has been restructured and adapted with a different UI
+*  https://github.com/rcaloras/bash-preexec 
+    *  **goal**: bash script used to hook the commands from the terminal
+    *  **code section**: ```fastHistory/bash/bash-preexec.sh```
+*  https://pypi.org/project/pyperclip/ 
+    *  **goal**: copy into the clipboard a selected command 
+    *  **code section**: ```(optional) pip dependence```
+*  https://pypi.org/project/bashlex/
+    *  **goal**: parse commands to retrieve info from the related man page 
+    *  **code section**: ```(optional) pip dependence``` 
 
 
 
