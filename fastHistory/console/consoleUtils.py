@@ -15,31 +15,42 @@ class ConsoleUtils:
 	"""
 
 	@staticmethod
-	def fill_terminal_input(data):
+	def paste_into_terminal(data):
 		"""
 		Fill terminal input with data
 		# https://unix.stackexchange.com/a/217390
 		"""
-		# check if python version >= 3
-		if sys.version_info >= (3,):
-			# reverse the automatic encoding and pack into a list of bytes
-			data = (struct.pack('B', c) for c in os.fsencode(data))
 
-		# put each char of data in the standard input of the current terminal
-		for c in data:
-			fcntl.ioctl(sys.stdin, termios.TIOCSTI, c)
-		# clear output printed by the previous command
-		# and leave only the terminal with the submitted input
-		sys.stdout.write('\r')
+		try:
+			# check if python version >= 3
+			if sys.version_info >= (3,):
+				# reverse the automatic encoding and pack into a list of bytes
+				data_bytes = (struct.pack('B', c) for c in os.fsencode(data))
+
+			# put each char of data in the standard input of the current terminal
+			for c in data_bytes:
+				fcntl.ioctl(sys.stdin, termios.TIOCSTI, c)
+			# clear output printed by the previous command
+			# and leave only the terminal with the submitted input
+			sys.stdout.write('\r')
+			return [True, None]
+		except Exception:
+			res = ConsoleUtils.copy_to_clipboard(data)
+			if res[0]:
+				return [False, "your terminal does not support auto-paste, the command is copied to clipboard instead:\n%s" % data]
+			else:
+				return [False, "your terminal does not support auto-paste\ncopy-to-clipboard failed too with the following message:\n\t%s\nplease manually copy and use the following command:\n\t%s" % (res[1], data)]
 
 	@staticmethod
-	def set_value_clipboard(data):
+	def copy_to_clipboard(data):
 		try:
 			import pyperclip
 			pyperclip.copy(data)
-			return True
+			return [True, "copied to clipboard: %s" % data]
+		except ImportError:
+			return [False, "pyperclip module not found (to install it run 'pip3 install pyperclip')"]
 		except Exception as e:
-			return False
+			return [False, "pyperclip error: %s" % str(e)]
 
 	@staticmethod
 	def handler_close_signal(signum, frame):

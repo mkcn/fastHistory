@@ -36,26 +36,16 @@ def handle_search_request(logger_console, input_cmd_str, path_data_folder, theme
 		picker = Picker(data_manager, theme=theme, last_column_size=last_column_size, search_text=input_cmd_str)
 		selected_option = picker.start()
 
-		# inject into the terminal the selected command
-		try:
-			if selected_option[0]:
-				ConsoleUtils.fill_terminal_input(selected_option[1])
+		if selected_option[0]:
+			res = ConsoleUtils.paste_into_terminal(selected_option[1])
+			if not res[0]:
+				logger_console.log_on_console_error(res[1])
+		else:
+			res = ConsoleUtils.copy_to_clipboard(selected_option[1])
+			if res[0]:
+				logger_console.log_on_console_info(res[1])
 			else:
-				if ConsoleUtils.set_value_clipboard(selected_option[1]):
-					logger_console.log_on_console_info("copied to clipboard: '%s'" % selected_option[1])
-				else:
-					logger_console.log_on_console_error("pyperclip package not found")
-					logger_console.log_on_console_error("To enable auto-copy execute the following command:")
-					logger_console.log_on_console("")
-					logger_console.log_on_console("pip3 install pyperclip")
-					logger_console.log_on_console("")
-		except:
-			logging.debug("your terminal does not support automatic input injection")
-			logger_console.log_on_console_error("your terminal does not support automatic input injection")
-			logger_console.log_on_console_error("please manually copy and paste the selected command")
-			logger_console.log_on_console("")
-			logger_console.log_on_console(selected_option)
-			logger_console.log_on_console("")
+				logger_console.log_on_console_error(res[1])
 
 
 def handle_add_request(logger_console, input_cmd_str, path_data_folder, error_feedback=False):
@@ -192,24 +182,18 @@ def handle_update(logger_console):
 			update_command = update_with_installer
 	except ImportError as e:
 		update_command = update_with_installer
-	logger_console.log_on_console_info("to update fastHistory use the following injected command")
-	try:
-		ConsoleUtils.fill_terminal_input(update_command)
-	except:
-		logger_console.log_on_console_error("your terminal does not support automatic input injection")
-		logger_console.log_on_console_error("please copy and execute the following command")
-		logger_console.log_on_console(update_command)
+	logger_console.log_on_console_info("to update fastHistory use the following command")
+	res = ConsoleUtils.paste_into_terminal(update_command)
+	if not res[0]:
+		logger_console.log_on_console_error(res[1])
 
 
 def handle_config_file(logger_console, path_data_folder):
 	config_file = path_data_folder + NAME_CONFIGURATION_FILE
-	logger_console.log_on_console_info("to change the config file use the following injected command")
-	try:
-		ConsoleUtils.fill_terminal_input("nano " + config_file)
-	except:
-		logger_console.log_on_console_error("your terminal does not support automatic input injection")
-		logger_console.log_on_console_error("please edit the configuration file manually")
-		logger_console.log_on_console(config_file)
+	logger_console.log_on_console_info("to change the config file use the following command")
+	res = ConsoleUtils.paste_into_terminal("nano " + config_file)
+	if not res[0]:
+		logger_console.log_on_console_error(res[1])
 
 
 def handle_log_file(logger_console, path_data_folder):
@@ -217,13 +201,10 @@ def handle_log_file(logger_console, path_data_folder):
 	if not os.path.exists(log_file):
 		logger_console.log_on_console_warn("log file not found, try to change the log level in the config file")
 	else:
-		logger_console.log_on_console_info("to read the log file use the following injected command")
-		try:
-			ConsoleUtils.fill_terminal_input("nano " + log_file)
-		except:
-			logger_console.log_on_console_error("your terminal does not support automatic input injection")
-			logger_console.log_on_console_error("please read the log file manually")
-			logger_console.log_on_console(log_file)
+		logger_console.log_on_console_info("to read the log file use the following command")
+		res = ConsoleUtils.paste_into_terminal("nano " + log_file)
+		if not res[0]:
+			logger_console.log_on_console_error(res[1])
 
 
 def handle_helper(logger_console):

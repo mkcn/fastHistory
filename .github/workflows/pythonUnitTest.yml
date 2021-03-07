@@ -40,6 +40,8 @@ jobs:
       if: always()
       run: |
         $GITHUB_WORKSPACE/installer.sh
+        # this flag file is needed to run the TestMain unitTests (test_main.py)
+        touch $HOME/.local/share/fastHistory/THIS_IS_A_TEST_FASTHISTORY_INSTALLATION
 
     - name: Test with UnitTest
       run: |
