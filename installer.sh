@@ -60,7 +60,8 @@ if [ -z "$1" ]; then
 
 
 	# copy folder fastHistory (only .py, .sh, a couple of configuration and license files) to ~/.fastHistory
-	# try 'cp parents' or the equivalent 'rsync' to copy file structure
+	# note: macOS does not support "cp -r"
+	# try 'cp parents' (linux) or the equivalent 'rsync' (macOS) to copy file structure
 	if command -v rsync >/dev/null 2>&1; then
 	  rm -f -r "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  mkdir -p "$FASTHISTORY_PATH_CODE_FOLDER" && \
@@ -99,7 +100,8 @@ if [ -z "$1" ]; then
 
 	  # source: https://github.com/asweigart/pyperclip/blob/master/src/pyperclip/__init__.py (pip 1.8.2 - commit 76e2dcb13c4eb26d97a9c41a6a20d5b2e2f87ef5)
 	  #         https://github.com/asweigart/pyperclip/blob/master/LICENSE.txt (pip 1.8.2 - commit 76e2dcb13c4eb26d97a9c41a6a20d5b2e2f87ef5)
-		cp -r pip/third-party/pyperclip/ "$FASTHISTORY_PATH_CODE_FOLDER/"
+	  mkdir "$FASTHISTORY_PATH_CODE_FOLDER"/pyperclip
+		cp pip/third-party/pyperclip/*  "$FASTHISTORY_PATH_CODE_FOLDER"/pyperclip/
 
 		if [[ -f "$FASTHISTORY_PATH_CODE_FOLDER"/bashlex/__init__.py ]]; then
 			_fast_history_install_log "info" "bashlex: enabled" 
