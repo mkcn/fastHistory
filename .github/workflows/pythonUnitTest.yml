@@ -28,6 +28,7 @@ jobs:
           if [[ "$OSTYPE" == "linux-gnu" ]]; then
               echo "OS: Linux"
               sudo apt-get install nmap # nmap is needed for the man parser in UnitTest
+              sudo apt-get install xclip # needed because of pyperclip only for linux (more info: https://pyperclip.readthedocs.io/en/latest/index.html#not-implemented-error)
           elif [[ "$OSTYPE" == "darwin"* ]]; then
               echo "OS: Mac OSX"
               brew install nmap
