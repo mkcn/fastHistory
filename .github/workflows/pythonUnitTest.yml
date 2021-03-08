@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
         matrix:
-            os: [ubuntu-latest, macos-latest]
+            os: [ubuntu-16.04, ubuntu-latest, macos-latest]
             python-version: [3.6, 3.8]
 
     runs-on: ${{ matrix.os }}
@@ -27,8 +27,8 @@ jobs:
 
           if [[ "$OSTYPE" == "linux-gnu" ]]; then
               echo "OS: Linux"
-              sudo apt-get --yes install nmap # nmap is needed for the man parser in UnitTest
-              sudo apt-get --yes install xsel xclip # needed because of pyperclip only for linux (more info: https://pyperclip.readthedocs.io/en/latest/index.html#not-implemented-error)
+              sudo apt-get --yes install net-tools nmap # needed for the man parser in UnitTest
+              # sudo apt-get --yes install xclip # needed for pyperclip, only on Linux (more info: https://pyperclip.readthedocs.io/en/latest/index.html#not-implemented-error)
           elif [[ "$OSTYPE" == "darwin"* ]]; then
               echo "OS: Mac OSX"
               brew install nmap

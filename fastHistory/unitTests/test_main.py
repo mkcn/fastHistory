@@ -182,7 +182,7 @@ class TestMain(unittest.TestCase):
             self.assertEqual(console_logs[0][LoggerBashTest.INDEX_TYPE], LoggerBashTest.INFO)
             self.assertEqual(console_logs[0][LoggerBashTest.INDEX_VALUE], "to update fastHistory use the following command")
             self.assertEqual(console_logs[1][LoggerBashTest.INDEX_TYPE], LoggerBashTest.ERROR)
-            self.assertRegex(console_logs[1][LoggerBashTest.INDEX_VALUE], "^your terminal does not support auto-paste, the command is copied to clipboard instead:")
+            self.assertRegex(console_logs[1][LoggerBashTest.INDEX_VALUE], "^your terminal does not support auto-paste")
         elif len(console_logs) == 1:
             # note: this test may be successful if executed directly from the terminal
             # e.g. python3 -m unittest discover -s fastHistory/
@@ -201,7 +201,7 @@ class TestMain(unittest.TestCase):
             self.assertEqual(console_logs[0][LoggerBashTest.INDEX_TYPE], LoggerBashTest.INFO)
             self.assertEqual(console_logs[0][LoggerBashTest.INDEX_VALUE], "to read the log file use the following command")
             self.assertEqual(console_logs[1][LoggerBashTest.INDEX_TYPE], LoggerBashTest.ERROR)
-            self.assertRegex(console_logs[1][LoggerBashTest.INDEX_VALUE], "^your terminal does not support auto-paste, the command is copied to clipboard instead:")
+            self.assertRegex(console_logs[1][LoggerBashTest.INDEX_VALUE], "^your terminal does not support auto-paste")
         elif len(console_logs) == 1:
             # note: this test may be successful if executed directly from the terminal
             # e.g. python3 -m unittest discover -s fastHistory/
@@ -224,7 +224,7 @@ class TestMain(unittest.TestCase):
             self.assertEqual(console_logs[0][LoggerBashTest.INDEX_TYPE], LoggerBashTest.INFO)
             self.assertEqual(console_logs[0][LoggerBashTest.INDEX_VALUE], "to change the config file use the following command")
             self.assertEqual(console_logs[1][LoggerBashTest.INDEX_TYPE], LoggerBashTest.ERROR)
-            self.assertRegex(console_logs[1][LoggerBashTest.INDEX_VALUE], "^your terminal does not support auto-paste, the command is copied to clipboard instead:")
+            self.assertRegex(console_logs[1][LoggerBashTest.INDEX_VALUE], "^your terminal does not support auto-paste")
         elif len(console_logs) == 1:
             # note: this test may be successful if executed directly from the terminal
             # e.g. python3 -m unittest discover -s fastHistory/
@@ -243,7 +243,7 @@ class TestMain(unittest.TestCase):
             self.assertEqual(console_logs[0][LoggerBashTest.INDEX_TYPE], LoggerBashTest.INFO)
             self.assertEqual(console_logs[0][LoggerBashTest.INDEX_VALUE], "to change the config file use the following command")
             self.assertEqual(console_logs[1][LoggerBashTest.INDEX_TYPE], LoggerBashTest.ERROR)
-            self.assertRegex(console_logs[1][LoggerBashTest.INDEX_VALUE], "^your terminal does not support auto-paste, the command is copied to clipboard instead:")
+            self.assertRegex(console_logs[1][LoggerBashTest.INDEX_VALUE], "^your terminal does not support auto-paste")
         elif len(console_logs) == 1:
             # note: this test may be successful if executed directly from the terminal
             # e.g. python3 -m unittest discover -s fastHistory/
