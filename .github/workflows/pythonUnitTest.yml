@@ -6,8 +6,8 @@ jobs:
   build:
     strategy:
         matrix:
-            os: [ubuntu-16.04, ubuntu-18.04, macos-10.15] # ubuntu-16.04, macos-10.15
-            python-version: [3.6, 3.7, 3.8] # 3.7, 3.8
+            os: [ubuntu-16.04, ubuntu-latest, macos-latest]
+            python-version: [3.6, 3.8]
 
     runs-on: ${{ matrix.os }}
 
@@ -27,7 +27,8 @@ jobs:
 
           if [[ "$OSTYPE" == "linux-gnu" ]]; then
               echo "OS: Linux"
-              sudo apt-get install nmap # nmap is needed for the man parser in UnitTest
+              sudo apt-get --yes install net-tools nmap # needed for the man parser in UnitTest
+              # sudo apt-get --yes install xclip # needed for pyperclip, only on Linux (more info: https://pyperclip.readthedocs.io/en/latest/index.html#not-implemented-error)
           elif [[ "$OSTYPE" == "darwin"* ]]; then
               echo "OS: Mac OSX"
               brew install nmap
@@ -40,6 +41,8 @@ jobs:
       if: always()
       run: |
         $GITHUB_WORKSPACE/installer.sh
+        # this flag file is needed to run the TestMain unitTests (test_main.py)
+        touch $HOME/.local/share/fastHistory/THIS_IS_A_TEST_FASTHISTORY_INSTALLATION
 
     - name: Test with UnitTest
       run: |

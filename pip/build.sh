@@ -4,13 +4,16 @@ installation_python_env="build-env/bin/activate"
 version_file="../fastHistory/config/default_version.txt"
 
 
+# note: manually create $HOME/.pypirc based on the pyirc_template
+# https://pypi.org/manage/account/token/
+# https://test.pypi.org/manage/account/token/
 pypi_upload=false
 pypi_domain="pypi.org"
-pypi_repo="pypi" #defined in the $HOME/.pypirc file
+pypi_repo="pypi"
 
 pypi_test_upload=false
 pypi_test_domain="test.pypi.org"
-pypi_test_repo="testpypi" #defined in the $HOME/.pypirc file
+pypi_test_repo="testpypi"
 
 
 if [ -f setup.py ]; then	
