@@ -29,7 +29,8 @@ jobs:
               echo "OS: Linux"
               sudo apt-get --yes install net-tools nmap # nmap is needed for the man parser in UnitTest
               sudo apt-get --yes install xsel xclip # needed because of pyperclip only for linux (more info: https://pyperclip.readthedocs.io/en/latest/index.html#not-implemented-error)
-              echo -e "import pyperclip; pyperclip.copy('test')" | python3
+              which xclip 
+              which xsel  
           elif [[ "$OSTYPE" == "darwin"* ]]; then
               echo "OS: Mac OSX"
               brew install nmap
