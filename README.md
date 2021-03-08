@@ -1,5 +1,5 @@
 
-# fastHistory 2.0 - speed up your terminal!
+# fastHistory - speed up your terminal!
 
 [![](https://img.shields.io/pypi/status/fastHistory?color=00999b&style=for-the-badge)](https://pypi.org/project/fastHistory/)
 [![](https://img.shields.io/pypi/v/fastHistory?color=00999b&style=for-the-badge)](https://pypi.org/project/fastHistory/)
@@ -107,13 +107,12 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 
 | OS         | OS Version | Shell | Python versions | fastHistory version | Test mode | Result | Comment   |
 | ---------- |:----------:| ------:|-------------:| -------------------:|----------:| ---------:| ---------:| 
-| Ubuntu     | 16.04      | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  |    |
-| Ubuntu     | 18.04      | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  |    |
+| Ubuntu     | 16.04, 18.04, 20.04 | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  |    |
 | macOS      | 10.15      | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | python3 needs to be [installed](https://docs.python-guide.org/starting/install3/osx/)  |
 | Fedora     | 29         | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |  pip3 requires the  [`--user` ](https://developer.fedoraproject.org/tech/languages/python/pypi-installation.html) flag |
 | Debian     | 9          | bash   | 3.5           | 2.1.3   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
 | Debian     | 10         | zsh*   | 3.7           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> | *[syntax limitation](https://github.com/mkcn/fastHistory#Commands-and-syntax)   |
-| Windows*   | 10 (1809)  | bash   | 3.6           | 2.0.0  | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | *using the [Windows Subsystem for Linux](https://www.microsoft.com/en-us/p/ubuntu-2004-lts/9n6svws3rx71) (WSL) you can execute and store [Windows commands](https://docs.microsoft.com/en-us/windows/wsl/interop#run-windows-tools-from-linux) |
+| Windows*   | 10 (1809)  | bash   | 3.6           | 2.2.2  | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | *using the [Windows Subsystem for Linux](https://www.microsoft.com/en-us/p/ubuntu-2004-lts/9n6svws3rx71) (WSL) you can execute and store [Windows commands](https://docs.microsoft.com/en-us/windows/wsl/interop#run-windows-tools-from-linux) |
 
 # How to install
 
@@ -278,6 +277,14 @@ f --update
 f --help
 ```
 
+#### Copy-to-clipboard (available from 2.2.2)
+```
+ 1. `f`
+ 2. select command
+ 3. 'ctrl+space'
+```
+
+
 # Troubleshooting 
 
 To fix common issues you can:
@@ -327,11 +334,11 @@ The license for this is the same as that used by GNU bash, GNU GPL v3+.
     *  **goal**: bash script used to hook the commands from the terminal
     *  **code section**: ```fastHistory/bash/bash-preexec.sh```
 *  https://pypi.org/project/pyperclip/ 
-    *  **goal**: copy into the clipboard a selected command 
-    *  **code section**: ```(optional) pip dependence```
+    *  **goal**: copy-to-clipboard feature
+    *  **code section**: ```(optional) pip module```
 *  https://pypi.org/project/bashlex/
-    *  **goal**: parse commands to retrieve info from the related man page 
-    *  **code section**: ```(optional) pip dependence``` 
+    *  **goal**: parse commands to fill the 'Man page info' section 
+    *  **code section**: ```(optional) pip module``` 
 
 
 
