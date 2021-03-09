@@ -159,9 +159,8 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 ### Update with installer.sh
  - same steps as [installation](https://github.com/mkcn/fastHistory/blob/master/README.md#Install-with-installersh) 
 
-### Migrate from 1.x.x to 2.x.x 
 
-[Wiki - How to migrate from 1.x.x ](https://github.com/mkcn/fastHistory/wiki/How-to-migrate-from-1.x.x-to-2.x.x) 
+**Note**: to update from the 1.x.x version your need to follow [these steps](https://github.com/mkcn/fastHistory/wiki/How-to-migrate-from-1.x.x-to-2.x.x) 
  
 # How to uninstall
 
@@ -173,7 +172,7 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 
 **Note**: `pip3 install fasthistory` is not sufficient to uninstall fastHistory 
 
-# Wiki
+# Commands and systax
 
 Find out more about commands and systax in the [Wiki](https://github.com/mkcn/fastHistory/wiki/Commands-and-syntax) section 
 
