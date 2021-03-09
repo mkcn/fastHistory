@@ -9,9 +9,7 @@
 - [Supported systems](https://github.com/mkcn/fastHistory/blob/master/README.md#Supported-OSs)
 - [Install](https://github.com/mkcn/fastHistory/blob/master/README.md#How-to-install)
 - [Update](https://github.com/mkcn/fastHistory/blob/master/README.md#How-to-update)
-- [Migrate from 1.x to 2.x](https://github.com/mkcn/fastHistory/blob/master/README.md#how-to-migrate-from-1xx-to-2xx) 
-- [Commands and syntax](https://github.com/mkcn/fastHistory/blob/master/README.md#Commands-and-syntax)
-- [Troubleshooting](https://github.com/mkcn/fastHistory/blob/master/README.md#Troubleshooting)
+- [Commands and syntax](https://github.com/mkcn/fastHistory/wiki/Commands-and-syntax)
 - [License](https://github.com/mkcn/fastHistory/blob/master/README.md#License)
 
 
@@ -107,7 +105,7 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 
 | OS         | OS Version | Shell | Python versions | fastHistory version | Test mode | Result | Comment   |
 | ---------- |:----------:| ------:|-------------:| -------------------:|----------:| ---------:| ---------:| 
-| Ubuntu     | 16.04, 18.04, 20.04 | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  |    |
+| Ubuntu     | 16.04, 18.04, 20.04* | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  |  * [xclip](https://howtoinstall.co/en/xclip) may need to be installed to enable the copy-to-clipboard feature |
 | macOS      | 10.15      | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | python3 needs to be [installed](https://docs.python-guide.org/starting/install3/osx/)  |
 | Fedora     | 29         | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |  pip3 requires the  [`--user` ](https://developer.fedoraproject.org/tech/languages/python/pypi-installation.html) flag |
 | Debian     | 9          | bash   | 3.5           | 2.1.3   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
@@ -161,24 +159,9 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 ### Update with installer.sh
  - same steps as [installation](https://github.com/mkcn/fastHistory/blob/master/README.md#Install-with-installersh) 
 
+### Migrate from 1.x.x to 2.x.x 
 
-# How to migrate from 1.x.x to 2.x.x
- 
- 1. [install fastHistory 2.0](https://github.com/mkcn/fastHistory/blob/master/README.md#How-to-install) 
- 2. check version
-
-	`f --version`
-
- 2. import data 
-
-	- from default folder (if not already automatically imported)
-	    
-	    `f --import $HOME/fastHistory/data/fh_v1.db`
-	
-	- from custom folder
-	 
-	   `f --import <old_fastHistory_folder>/data/fh_v1.db` 
-
+[Wiki - How to migrate from 1.x.x ](https://github.com/mkcn/fastHistory/wiki/How-to-migrate-from-1.x.x-to-2.x.x) 
  
 # How to uninstall
 
@@ -190,155 +173,13 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 
 **Note**: `pip3 install fasthistory` is not sufficient to uninstall fastHistory 
 
-# Commands and syntax
+# Wiki
 
-#### Simple adding
-
-```
-<command_to_save> #[<tag> [#<tag> ...]][@<description>]
-```
-
-#### Adding without execution
-
-```
-f --add <command> #[<tag> [#<tag> ...]][@<description>]
-```
-or 
-```
-# <command_to_save> #[<tag> [#<tag> ...]][@<description>]
-```
-
-Note: the latter is not available with `zsh`
-
-![](https://github.com/mkcn/fastHistory/raw/master/images/add_without_execute_and_search_cut.gif)
-
-#### Simple search 
-
-```
-f [<filter>]
-```
-
-**OR search**: match any row where **at least one** of the following conditions is true:
-
-* the __filter__ words are contained in the **command** 
-* the __filter__ words are contained in the **tags** list
-* the __filter__ words are contained in the **description**
-
-#### Advanced search
-```
-f [<filter>] [#<tag_filter> ...] [@<description_filter>]
-```
-
-**AND search**: match any rows where **all** the following conditions are true:
-
-* the __filter__ words are contained in the **command** OR **tags** OR **description**
-* the __tag_filter__ words are contained in the **tag** list
-* the __description_filter__ words contained in the **description**
-
-![](https://github.com/mkcn/fastHistory/raw/master/images/f_advanced_search_cut.gif)
-
-#### Export database
-```
-f --export [<output_name>]
-```
-* the __output__ is the file name of the output database (this parameter is optional)
-
-#### Import external database
-```
-f --import <input_name>
-```
-
-* the __input_name__ is the file name of the input database (e.g. fastHistory_2019-03-23.db)
-
-#### Change fastHistory configuration
-```
-f --config
-```
-
-#### Force a fastHistory setup to fix possible issues
-```
-f --setup
-```
-
-this may be needed if you install zsh **after** fastHistory
-
-#### Check fastHistory version
-```
-f --version
-```
-
-#### Update fastHistory
-```
-f --update
-```
-
-#### Show fastHistory help
-```
-f --help
-```
-
-#### Copy-to-clipboard (available from 2.2.2)
-```
- 1. `f`
- 2. select command
- 3. 'ctrl+space'
-```
-
-
-# Troubleshooting 
-
-To fix common issues you can:
-
-- run `f --setup` to automatically check and fix your environment
-- explicitly call `$HOME/.local/bin/f` instead of `f`
-- restart your terminal to reload the bash hook
-
-In case of persistent issues please [report](https://github.com/mkcn/fastHistory/issues) them together with the following info:
-
-- OS version
-- fastHistory version (`f --version`)
-
-### fastHistory structure
-
-#### user data folder
-
-`$HOME/.local/share/fastHistory`
-
-`$HOME/.local/share/fastHistory/fh_v1.db` (database file)
-
-`$HOME/.local/share/fastHistory/fh.log` (log file)
-
-#### code folder (pip3)
-`$HOME/.local/lib/pythonX.Y/site-packages/fastHistory/` 
-
-#### code folder (installer.sh)
-`$HOME/.fastHistory/` 
-
-#### bash (zsh) hook in `$HOME/.bashrc` (`$HOME/.zsh`)
-```
-...
-source "/home/USER/.local/lib/pythonX.Y/site-packages/fastHistory/bash/f.sh"
-```
+Find out more about commands and systax in the [Wiki](https://github.com/mkcn/fastHistory/wiki/Commands-and-syntax) section 
 
 # License
 
 The license for this is the same as that used by GNU bash, GNU GPL v3+.
-
-
-# Copyright
-
-*  https://github.com/wong2/pick
-    *  **goal**: python module modified to build the command-selection menu
-    *  **code section**: ```fastHistory/pick```
-*  https://github.com/rcaloras/bash-preexec 
-    *  **goal**: bash script used to hook the commands from the terminal
-    *  **code section**: ```fastHistory/bash/bash-preexec.sh```
-*  https://pypi.org/project/pyperclip/ 
-    *  **goal**: copy-to-clipboard feature
-    *  **code section**: ```(optional) pip module```
-*  https://pypi.org/project/bashlex/
-    *  **goal**: parse commands to fill the 'Man page info' section 
-    *  **code section**: ```(optional) pip module``` 
 
 
 
