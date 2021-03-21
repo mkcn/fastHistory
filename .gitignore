@@ -12,6 +12,8 @@ pip/dist/
 pip/build/
 pip/build-env/
 
+pip/fastHistory.egg-info/
+
 # Log and user data
 data/
 data_test/
@@ -21,3 +23,4 @@ data_test/
 *.swp
 .coverage
 .vagrant
+*.snap

@@ -1,0 +1,38 @@
+name: testfh
+#version: git
+adopt-info: testfh
+summary: test-fastHistory-summary
+base: core20
+confinement: classic
+#confinement: devmode #TODO re-enable
+#confinement: strict
+# NOTE: strict is not possible because of the past-into-terminal core feature and copy-to-clipboard limitation  
+#grade: devel
+
+
+parts:
+  testfh:
+    plugin: python
+    source: .
+    # https://snapcraft.io/docs/using-external-metadata#heading--setup-py
+    parse-info: [setup.py]
+
+#plugs:
+#  test-hook3:
+#    interface: personal-files
+#    read:
+#    - $HOME/.bashrc
+#    - $HOME/.zshrc
+#    write:
+#    - $HOME/.bashrc
+#    - $HOME/.zshrc
+
+apps:
+  testfh:
+    # https://forum.snapcraft.io/t/failed-to-generate-snap-metadata-errors/8955
+    command: bin/runFH
+    #plugs:
+    #  - test-hook3
+
+environment:
+    ENV_TEST: "$SNAP_USER_DATA"

@@ -4,7 +4,7 @@ from setuptools.command.install import install
 from distutils.command.install_data import install_data
 
 project_name = "fastHistory"
-project_path = "../"
+project_path = ""
 license_file="LICENSE"
 license="GPLv3+"
 description="A python tool connected to your terminal to store important commands and search them in a new and faster way"
@@ -27,7 +27,7 @@ try:
 	setup(name=project_name,
 		version=version,
 		# set relative working folder
-		package_dir={'':project_path},
+		#package_dir={'':project_path},
 		description=description,
 		long_description=readme,
 		long_description_content_type="text/markdown",
@@ -42,7 +42,6 @@ try:
 			"bashlex>=0.15",
 			"pyperclip>=1.8.2"
 		],
-		# all data files to include 
 		package_data={
 			'': [ 
 				'bash/*.sh',
@@ -51,12 +50,12 @@ try:
 			],
 		},
 		# all python files to include
-		packages=find_packages(where=project_path, exclude=["*unitTests"]),
-		entry_points={
-			'console_scripts': [
-				'f=fastHistory:f',
-			]
-		},
+		packages=find_packages(exclude=["*unitTests"]),
+		#entry_points={
+		#	'console_scripts': [
+		#		'f=fastHistory:f',
+		#	]
+		#},
 		# https://pypi.org/classifiers/
 		classifiers=[
 			'Development Status :: 5 - Production/Stable',
@@ -69,6 +68,7 @@ try:
 			'Programming Language :: Python',
 			'Programming Language :: Python :: 3',
 		    ],
+		scripts = ['bin/runFH'],
 		#scripts=[project_path + '/bash/setup'],
 		#setup_requires=['setup'],
 		#license_file=license_file_path,
