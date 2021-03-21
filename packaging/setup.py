@@ -68,10 +68,7 @@ try:
 			'Programming Language :: Python',
 			'Programming Language :: Python :: 3',
 		    ],
-		scripts = ['bin/runFH'],
-		#scripts=[project_path + '/bash/setup'],
-		#setup_requires=['setup'],
-		#license_file=license_file_path,
+		scripts = ['bin/ftest'],
 	)
 
 except OSError:

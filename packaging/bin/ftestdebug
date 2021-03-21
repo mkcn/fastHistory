@@ -4,7 +4,7 @@ import sys
 import os
 
 print("*" * 30)
-print("running 'runFH'")
+print("running 'f test debug'")
 print("script run from:  %s " % os.path.dirname(os.path.abspath(__file__)))
 print("working dir:  %s " % os.path.abspath(os.getcwd()))
 print("home var:  %s " % os.environ['HOME'] )

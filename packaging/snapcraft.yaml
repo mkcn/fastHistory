@@ -1,14 +1,10 @@
-name: testfh
-#version: git
+name: fasthistory
 adopt-info: testfh
-summary: test-fastHistory-summary
+summary: testfh-summary
 base: core20
-confinement: classic
-#confinement: devmode #TODO re-enable
-#confinement: strict
-# NOTE: strict is not possible because of the past-into-terminal core feature and copy-to-clipboard limitation  
+confinement: classic # NOTE: strict is not possible because of the past-into-terminal core feature and copy-to-clipboard limitation  
+#confinement: devmode # test mode
 #grade: devel
-
 
 parts:
   testfh:
@@ -30,9 +26,7 @@ parts:
 apps:
   testfh:
     # https://forum.snapcraft.io/t/failed-to-generate-snap-metadata-errors/8955
-    command: bin/runFH
+    command: bin/ftest
+    #command: bin/ftestdebug
     #plugs:
     #  - test-hook3
-
-environment:
-    ENV_TEST: "$SNAP_USER_DATA"
