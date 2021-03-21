@@ -8,11 +8,11 @@ __pycache__/
 venv/
 .idea/
 notes/
-pip/dist/
-pip/build/
-pip/build-env/
+packaging/dist/
+packaging/build/
+packaging/build-env/
 
-pip/fastHistory.egg-info/
+packaging/fastHistory.egg-info/
 
 # Log and user data
 data/
