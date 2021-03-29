@@ -4,17 +4,17 @@ import sys
 import os
 
 print("*" * 30)
-print("running 'f test debug'")
+print("running 'f debug'")
 print("script run from:  %s " % os.path.dirname(os.path.abspath(__file__)))
 print("working dir:  %s " % os.path.abspath(os.getcwd()))
 print("home var:  %s " % os.environ['HOME'] )
 print("User var:  %s " % os.environ['USER'] )
+#print("SNAP_PLATFORM:  %s " % os.environ['SNAP_PLATFORM'] )
 #print("$SNAP_USER_DATA:  %s " % os.environ['SNAP_USER_DATA'] )
 #print("ENV_TEST var:  %s " % os.environ['ENV_TEST'] )
 
-print("modify sys.path")
-#TODO: find a better solution, at least with dynamic python
-sys.path.insert(1, os.path.dirname(os.path.abspath(__file__)) + "/../lib/python3.8/site-packages/")
+#print("modify sys.path")
+#sys.path.insert(1, os.path.dirname(os.path.abspath(__file__)) + "/../lib/python3.*/site-packages/")
 print("sys.path: %s " % sys.path)
 
 ##print("test read and write on ~/test1")

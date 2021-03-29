@@ -1,0 +1,27 @@
+name: fasthistory
+summary: "Console tool to store and search important commands"
+adopt-info: fasthistory # this points to parse-info and it substitutes "version" and "description" fields 
+base: core20
+confinement: classic  # NOTE: 'strict' mode is not possible because of the past-into-terminal core feature and copy-to-clipboard limitation 
+
+parts:
+  fasthistory:
+    plugin: python
+    source: .
+    # https://snapcraft.io/docs/using-external-metadata#heading--setup-py
+    parse-info: [setup.py]
+
+apps:
+  fasthistory:
+    # https://forum.snapcraft.io/t/failed-to-generate-snap-metadata-errors/8955
+    command: bin/f
+    environment:
+      # https://bugs.launchpad.net/snapcraft/+bug/1670749
+      PATH: $SNAP/usr/bin:$SNAP/bin/:$PATH
+      PYTHONPATH: $SNAP/usr/lib/python3.*/site-packages:$SNAP/usr/lib/python3.*/dist-packages:$PYTHONPATH
+  debug:
+    command: bin/fdebug
+    environment:
+      # https://bugs.launchpad.net/snapcraft/+bug/1670749
+      PATH: $SNAP/usr/bin:$SNAP/bin/:$PATH
+      PYTHONPATH: $SNAP/usr/lib/python3.*/site-packages:$SNAP/usr/lib/python3.*/dist-packages:$PYTHONPATH

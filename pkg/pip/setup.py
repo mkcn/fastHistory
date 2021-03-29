@@ -4,7 +4,7 @@ from setuptools.command.install import install
 from distutils.command.install_data import install_data
 
 project_name = "fastHistory"
-project_path = ""
+project_path = "."
 license_file="LICENSE"
 license="GPLv3+"
 description="A python tool connected to your terminal to store important commands and search them in a new and faster way"
@@ -12,17 +12,28 @@ url_project="http://github.com/mkcn/fasthistory"
 author="Mirko Conti"
 author_email="mirko.conti29@gmail.com"
 keywords="bash history search fast"
-version_file = project_path + project_name + "/config/default_version.txt"
-readme_file = project_path + "README.md"
+version_file = project_name + "/config/default_version.txt"
+readme_file = "README.md"
+log_intro="[setup.py]"
 
 try:
-	f = open(version_file, "r")
-	version = f.read()
-	f.close()
-
-	f = open(readme_file, "r")
-	readme = f.read()
-	f.close()
+	try:
+		f = open(version_file, "r")
+		version = f.read()
+		f.close()
+		print("%s version file ok: %s" % (log_intro, version_file))
+	except IOError:
+		version = "0.0.1"
+		print("%s version file NOT ok: %s" % (log_intro, version_file))
+		
+	try:
+		f = open(readme_file, "r")
+		readme = f.read()
+		f.close()
+		print("%s README file ok: %s" % (log_intro, readme_file))
+	except IOError:
+		readme = ""
+		print("%s README file NOT ok: %s" % (log_intro, readme_file))
 
 	setup(name=project_name,
 		version=version,
@@ -45,17 +56,18 @@ try:
 		package_data={
 			'': [ 
 				'bash/*.sh',
+				'bin/*',
 				'config/default_fastHistory.conf', 
 				'config/default_version.txt',
 			],
 		},
 		# all python files to include
-		packages=find_packages(exclude=["*unitTests"]),
-		#entry_points={
-		#	'console_scripts': [
-		#		'f=fastHistory:f',
-		#	]
-		#},
+		packages=find_packages(where=project_path, exclude=["*unitTests"]),
+		entry_points={
+			'console_scripts': [
+				'f=fastHistory:f',
+			]
+		},
 		# https://pypi.org/classifiers/
 		classifiers=[
 			'Development Status :: 5 - Production/Stable',
@@ -68,7 +80,9 @@ try:
 			'Programming Language :: Python',
 			'Programming Language :: Python :: 3',
 		    ],
-		scripts = ['bin/ftest'],
+		scripts = [
+			project_name + '/bin/fdebug',
+			],
 	)
 
 except OSError:

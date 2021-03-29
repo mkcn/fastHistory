@@ -4,7 +4,6 @@
 # tool: fastHistory
 # note: this script must be called with "source <file>" 
 # author: Mirko Conti
-# date: 2020-03
 ############################################################
 
 # enable this to debug the bash hook of fastHistory
@@ -14,7 +13,7 @@ _fast_history_hooked_cmd=""
 _fast_history_short_cmd=false
 # [sperimental feature, off by default] if true the return code of the executed command is check before to store it
 _fast_history_check_return_code=false
-_fast_history_executable="f"
+_fast_history_executable="fasthistory"
 _fast_history_path_preexec_file="bash/bash-preexec.sh"
 _fast_history_path_version_file="config/default_version.txt"
 
