@@ -167,7 +167,7 @@ def handle_setup(logger_console, path_data_folder, path_code_folder, config_read
 		if config_reader.check_config():
 			return True
 		else:
-			logger_console.log_on_console_warn("please restart your terminal and then use 'f' to start")
+			logger_console.log_on_console_warn("please restart your terminal and then use 'fasthistory' to start")
 			return False
 	else:
 		return False

@@ -1,8 +1,16 @@
+
+# get fastHistory code
+rm -r fastHistory
+cp -r ../../fastHistory/ fastHistory/
+rm -r fastHistory/__pycache__
+rm -r fastHistory/*/__pycache__
+
+cp ../../README.md README.md
+
 # build file used to generate and install the whl package in a test python environment
 
 installation_python_env="build-env/bin/activate"
-version_file="../fastHistory/config/default_version.txt"
-
+version_file="fastHistory/config/default_version.txt"
 
 # note: manually create $HOME/.pypirc based on the pyirc_template
 # https://pypi.org/manage/account/token/
@@ -16,7 +24,7 @@ pypi_test_domain="test.pypi.org"
 pypi_test_repo="testpypi"
 
 
-if [ -f setup.py ]; then	
+if [ -f pip_setup.py ]; then	
 	if [ -f $installation_python_env ]; then
 		
 		source $installation_python_env
@@ -72,7 +80,7 @@ if [ -f setup.py ]; then
 		rm -f -r dist/*.whl
 
 		# build
-		python3 setup.py bdist_wheel
+		python3 pip_setup.py bdist_wheel
 
 		# clean build folder
 		rm -f -r "build"
@@ -110,7 +118,7 @@ if [ -f setup.py ]; then
 		fi
 	fi
 else
-	echo "Error: setup.py file not found. Please execute the build.sh script from the build folder"
+	echo "Error: pip_setup.py file not found. Please execute the build.sh script from the build folder"
 fi
 
 

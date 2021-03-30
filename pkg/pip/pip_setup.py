@@ -14,7 +14,7 @@ author_email="mirko.conti29@gmail.com"
 keywords="bash history search fast"
 version_file = project_name + "/config/default_version.txt"
 readme_file = "README.md"
-log_intro="[setup.py]"
+log_intro="[pip_setup.py]"
 
 try:
 	try:
@@ -23,8 +23,8 @@ try:
 		f.close()
 		print("%s version file ok: %s" % (log_intro, version_file))
 	except IOError:
-		version = "0.0.1"
 		print("%s version file NOT ok: %s" % (log_intro, version_file))
+		exit()
 		
 	try:
 		f = open(readme_file, "r")
@@ -32,8 +32,8 @@ try:
 		f.close()
 		print("%s README file ok: %s" % (log_intro, readme_file))
 	except IOError:
-		readme = ""
 		print("%s README file NOT ok: %s" % (log_intro, readme_file))
+		exit()
 
 	setup(name=project_name,
 		version=version,
@@ -56,7 +56,7 @@ try:
 		package_data={
 			'': [ 
 				'bash/*.sh',
-				'bin/*',
+				#'bin/*',
 				'config/default_fastHistory.conf', 
 				'config/default_version.txt',
 			],
@@ -66,6 +66,7 @@ try:
 		entry_points={
 			'console_scripts': [
 				'f=fastHistory:f',
+				'fasthistory=fastHistory:f',
 			]
 		},
 		# https://pypi.org/classifiers/
@@ -80,14 +81,13 @@ try:
 			'Programming Language :: Python',
 			'Programming Language :: Python :: 3',
 		    ],
-		scripts = [
-			project_name + '/bin/fdebug',
-			],
 	)
+	print("%s build done" % (log_intro))
 
-except OSError:
-	print("version file not found; " + version_file)
-except ValueError:
-	print("version is not a valid float. Fix your version file: " + version_file)
-
+except OSError as e:
+	print("OS error: " + e)
+except ValueError as e:
+	print("Value error: " + e)
+except Exception() as e:
+	print("Generic error: " + e)
 
