@@ -4,15 +4,18 @@ __pycache__/
 *$py.class
 *.pyc
 
+
 # Distribution / packaging
 venv/
 .idea/
 notes/
-packaging/dist/
-packaging/build/
-packaging/build-env/
-
-packaging/fastHistory.egg-info/
+pkg/*/dist/
+pkg/*/build/
+pkg/*/build-env/
+pkg/*/fastHistory.egg-info/
+pkg/*/fastHistory/
+pkg/*/README.md
+pkg/snap/setup.py
 
 # Log and user data
 data/

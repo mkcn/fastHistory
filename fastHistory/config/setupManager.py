@@ -6,6 +6,9 @@ from shutil import copyfile, move
 
 class SetupManager:
 
+	BASHRC_FILE_NAME = ".bashrc"
+	ZSHRC_FILE_NAME = ".zshrc"
+
 	def __init__(self, logger_console, path_data_folder, path_code_folder, configuration_file, version_file, home_path=None):
 		self.logger_console = logger_console
 		self.path_data_folder = path_data_folder
@@ -15,7 +18,11 @@ class SetupManager:
 
 		self.path_code_folder = path_code_folder
 		if home_path is None:
-			self.home_path = os.environ['HOME'] + "/"
+			# TODO: fix this in case of root
+			if os.environ['USER'] == "root":
+				self.home_path = "/root/"
+			else:
+				self.home_path = "/home/" + os.environ['USER'] + "/"
 		else:
 			self.home_path = home_path
 
@@ -100,33 +107,34 @@ class SetupManager:
 			return False
 
 	def setup_rc_file(self):
-		bashrc_path = self.home_path + ".bashrc"
-		zshrc_path = self.home_path + ".zshrc"
 		bash_found = False
 		bash_result = False
 		zsh_found = False
 		zsh_result = False
 
-		if os.path.isfile(bashrc_path):
+		if os.path.isfile(self.home_path + self.BASHRC_FILE_NAME):
 			bash_found = True
-			bash_result = self.check_for_source_string(bashrc_path)
+			bash_result = self.check_for_source_string(self.home_path, self.BASHRC_FILE_NAME)
 
-		if os.path.isfile(zshrc_path):
+		if os.path.isfile(self.home_path + self.ZSHRC_FILE_NAME):
 			zsh_found = True
-			zsh_result = self.check_for_source_string(zshrc_path)
-		
+			zsh_result = self.check_for_source_string(self.home_path, self.ZSHRC_FILE_NAME)
+
 		if not bash_found and not zsh_found:
-			self.logger_console.log_on_console_error("neither" + bashrc_path + " nor " + zshrc_path + " have been found. Please check your system")
+			self.logger_console.log_on_console_error("neither '%s' nor '%s' have been found. Please check your system" %
+			(self.home_path + self.ZSHRC_FILE_NAME, self.home_path + self.ZSHRC_FILE_NAME))
 			return False
 		else:
 			# if a file exists the result must be true
 			return (not bash_found or bash_result) and (not zsh_found or zsh_result)
 
-	def check_for_source_string(self, file_path_in):
+	def check_for_source_string(self, home_folder, file_in):
+		file_path_in = home_folder + file_in
 		self.logger_console.log_on_console_info("setup: " + file_path_in)
-		file_path_out = file_path_in + ".fastHistory.tmp"
+		# keep tmp and backup in path data folder (snap permission limitation)
+		file_path_out = self.path_data_folder + file_in + ".fastHistory.tmp"
 		fin = open(file_path_in, "r")
-		fout = open(file_path_out, "w")
+		fout = open(file_path_out,  "w")
 
 		pattern = re.compile("^source .*/fastHistory.*/bash/f.sh.*")
 		found_hook_updated = False
@@ -161,7 +169,8 @@ class SetupManager:
 			dt = datetime.datetime.now()
 			nowms = str(dt.microsecond)
 
-			file_path_in_tmp = file_path_in + "-" + nowms + ".fastHistory.backup"
+			# keep tmp and backup in path data folder (snap permission limitation)
+			file_path_in_tmp = self.path_data_folder + file_in + "-" + nowms + ".fastHistory.backup"
 			if os.path.isfile(file_path_in_tmp):
 				self.logger_console.log_on_console_error("backup file already exist '%s', try again" % file_path_in_tmp)
 				if os.path.isfile(file_path_out):
@@ -188,6 +197,5 @@ class SetupManager:
 					self.logger_console.log_on_console_error("a backup file can be found here: " + file_path_in_tmp)
 					return False
 		return False
-
 
 

@@ -34,12 +34,14 @@ class ConsoleUtils:
 			# and leave only the terminal with the submitted input
 			sys.stdout.write('\r')
 			return [True, None]
-		except Exception:
-			res = ConsoleUtils.copy_to_clipboard(data)
-			if res[0]:
-				return [False, "your terminal does not support auto-paste, the command is copied to clipboard instead:\n%s" % data]
-			else:
-				return [False, "your terminal does not support auto-paste\ncopy-to-clipboard failed too with the following message:\n\t%s\nplease manually copy and use the following command:\n\t%s" % (res[1], data)]
+		except Exception as e:
+			print("error in paste_into_terminal: %s" % e)
+			return [False, "your terminal does not support auto-paste"]
+			#res = ConsoleUtils.copy_to_clipboard(data)
+			#if res[0]:
+			#	return [False, "your terminal does not support auto-paste, the command is copied to clipboard instead:\n%s" % data]
+			#else:
+			#	return [False, "your terminal does not support auto-paste\ncopy-to-clipboard failed too with the following message:\n\t%s\nplease manually copy and use the following command:\n\t%s" % (res[1], data)]
 
 	@staticmethod
 	def copy_to_clipboard(data):

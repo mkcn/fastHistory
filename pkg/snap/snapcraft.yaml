@@ -1,14 +1,17 @@
 name: fasthistory
 summary: "Console tool to store and search important commands"
 adopt-info: fasthistory # this points to parse-info and it substitutes "version" and "description" fields 
-base: core20
-confinement: classic  # NOTE: 'strict' mode is not possible because of the past-into-terminal core feature and copy-to-clipboard one 
+base: core18
+confinement: strict  # NOTE: 'strict' mode is not possible because of the past-into-terminal core feature and copy-to-clipboard one 
 
 parts:
   fasthistory:
     plugin: python
     source: .
     parse-info: [setup.py] # https://snapcraft.io/docs/using-external-metadata#heading--setup-py
+    stage-packages:
+      - xclip
+      #- xsel
 
 apps:
   fasthistory:
@@ -16,3 +19,18 @@ apps:
     environment: # snap bug: https://bugs.launchpad.net/snapcraft/+bug/1670749
       PATH: $SNAP/usr/bin:$SNAP/bin/:$PATH
       PYTHONPATH: $SNAP/usr/lib/python3.*/site-packages:$SNAP/usr/lib/python3.*/dist-packages:$PYTHONPATH
+    plugs:
+      - accessrc
+      - home
+      - x11
+      - account-control
+
+plugs:
+  accessrc:
+    interface: personal-files
+    read:
+    - $HOME/.bashrc
+    - $HOME/.zshrc
+    write:
+    - $HOME/.bashrc
+    - $HOME/.zshrc

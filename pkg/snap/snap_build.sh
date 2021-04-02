@@ -5,7 +5,7 @@ mkdir -p  $DIR_MNT
 
 # clean
 rm -f -r fastHistory
-rm -f *.snap
+rm -f  *.snap
 rm -f setup.py 
 rm -f README.md
 mountpoint -q $DIR_MNT && fusermount -u $DIR_MNT
@@ -15,7 +15,6 @@ cp ../pip/pip_setup.py setup.py
 cp ../../README.md README.md
 
 # get fastHistory code
-rm -r fastHistory
 cp -r ../../fastHistory/ fastHistory/
 rm -r fastHistory/__pycache__
 rm -r fastHistory/*/__pycache__

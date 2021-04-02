@@ -80,6 +80,7 @@ else
 fi
 
 # check if $PATH is correctly set 
+# TODO check and fix this for snap option
 _fast_history_local_bin=$HOME/.local/bin
 if [ -f "$_fast_history_local_bin/$_fast_history_executable" ]; then
 	if echo "$PATH" | grep -q -F "$_fast_history_local_bin"; then

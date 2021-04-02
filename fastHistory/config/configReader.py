@@ -62,6 +62,7 @@ class ConfigReader:
         general_advice = "Please use the '--config' option to fix it manually"
 
         if self.path_data_folder is None:
+            # TODO check $HOME and fix
             self._checkError = [None, "$HOME variable cannot be found"]
         elif not os.path.isdir(self.path_data_folder):
             self._checkError = [True, "installation folder not found"]

@@ -1,0 +1,1 @@
+sudo journalctl | grep snap
