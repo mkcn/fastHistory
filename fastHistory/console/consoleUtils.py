@@ -7,6 +7,7 @@ import sys
 
 import struct
 import os
+from shutil import which
 
 
 class ConsoleUtils:
@@ -51,6 +52,13 @@ class ConsoleUtils:
 			return [False, "pyperclip module not found (to install it run 'pip3 install pyperclip')"]
 		except Exception as e:
 			return [False, "pyperclip error: %s" % str(e)]
+
+	@staticmethod
+	def is_cmd_available_on_this_machine(cmd_name):
+		try:
+			return which(cmd_name) is not None
+		except:
+			return False
 
 	@staticmethod
 	def handler_close_signal(signum, frame):
