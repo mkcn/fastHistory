@@ -48,6 +48,9 @@ try:
 				'bash/*.sh',
 				'config/default_fastHistory.conf', 
 				'config/default_version.txt',
+				'tldr/tldr/last_update.txt',
+				'tldr/tldr/LICENSE.mdt',
+				'tldr/tldr/pages/*/*.md',
 			],
 		},
 		# all python files to include
