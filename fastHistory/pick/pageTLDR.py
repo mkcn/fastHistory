@@ -1,7 +1,7 @@
 import logging
 
 from fastHistory.pick.pageGeneric import PageGeneric
-from fastHistory.pick.textManager import ContextShifter
+from fastHistory.pick.textManager import ContextShifter, TextManager
 from fastHistory.tldr.tldrParser import ParsedTLDRExample
 
 
@@ -13,7 +13,7 @@ class PageTLDRSearchDrawer(PageGeneric):
     TITLE_DEFAULT = "TLDR search"
 
     FILE_COLUMN_NAME = "Command"
-    EXAMPLE_COLUMN_NAME = "Examples"
+    EXAMPLE_COLUMN_NAME = "Examples from tldr-pages"
 
     INDEX_CMD_TO_DRAW = 1
     INDEX_CMD_AVAILABLE_ON_THIS_MACHINE = 3
@@ -105,7 +105,7 @@ class PageTLDRSearchDrawer(PageGeneric):
         self.drawer.new_line()
         self.drawer.draw_row(" " * (self.drawer.get_max_x()), color=self.drawer.color_columns_title)
         self.drawer.draw_row(self.FILE_COLUMN_NAME, x=2, color=self.drawer.color_columns_title)
-        self.drawer.draw_row(self.EXAMPLE_COLUMN_NAME, x=self.TLDR_PAGES_COLUMN_SIZE,
+        self.drawer.draw_row(self.EXAMPLE_COLUMN_NAME, x=self.TLDR_PAGES_COLUMN_SIZE + 2,
                              color=self.drawer.color_columns_title)
 
         self.drawer.new_line()
@@ -136,7 +136,6 @@ class PageTLDRSearchDrawer(PageGeneric):
         else:
             for i in range(number_options):
                 value_tldr_cmd = tldr_options_draw[i][self.INDEX_CMD_TO_DRAW]
-                logging.debug("value_tldr_cmd: %s" % value_tldr_cmd)
                 if i == selected_command_index:
                     if has_focus:
                         background_color = self.drawer.color_search
@@ -144,8 +143,8 @@ class PageTLDRSearchDrawer(PageGeneric):
                         background_color = self.drawer.color_selected_row  # TODO use a better name
                 else:
                     background_color = self.drawer.NULL_COLOR
-                # TODO add until_x var
-                # TODO add fill data until_x with background
+                if len(value_tldr_cmd) > self.TLDR_PAGES_COLUMN_SIZE:
+                    value_tldr_cmd = value_tldr_cmd[:self.TLDR_PAGES_COLUMN_SIZE] + TextManager.TEXT_TOO_LONG
                 self.draw_marked_string(value_tldr_cmd,
                                         words_to_mark,
                                         recursive=True,

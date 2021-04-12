@@ -56,8 +56,8 @@ class ParsedTLDRExample(object):
             if i > examples_index:
                 delta_next_example_index += 1
                 if self.rows[i][0] == self.Type.EXAMPLE:
-                    break
-        return delta_next_example_index
+                    return delta_next_example_index
+        return 0
 
     def get_delta_previous_example_index(self, examples_index: int) -> int:
         delta_previous_example_index = 0

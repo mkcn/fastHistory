@@ -78,7 +78,7 @@ class PageTLDRLoop(object):
                     tldr_options_draw=self.tldr_options_draw,
                     tldr_options_draw_index=self.tldr_options_draw_index,
                     tldr_examples_draw=self.tldr_examples_draw,
-                    example_draw_index=self.tldr_examples_index,  # TODO
+                    example_draw_index=self.tldr_examples_draw_index,
                     example_content_shift=self.example_content_shift,
                     focus_area=self.focus)
                 page_tldr_search.refresh_page()
@@ -209,8 +209,8 @@ class PageTLDRLoop(object):
                     # end     4(pointer) + 1  = 5
                     # result  [0,1,2,3,4,5,6,7,8][2:5] = [2,3,4]
                     self.tldr_examples_draw = self.tldr_examples.get_rows()[
-                                             self.tldr_examples_index - number_tldr_lines_to_draw + 1:self.tldr_examples_index + 1]
-                    self.tldr_examples_draw_index = len(self.tldr_examples_draw)
+                                             self.tldr_examples_index + 1 - number_tldr_lines_to_draw:self.tldr_examples_index + 1]
+                    self.tldr_examples_draw_index = number_tldr_lines_to_draw - 1
                 else:
                     self.tldr_examples_draw_index += next_example_delta_index
             return False
