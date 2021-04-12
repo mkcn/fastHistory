@@ -80,7 +80,7 @@ $ f
 
 For each command you can get a quick summary from the man page
 
-**Warning**: this feature currently does not cover the syntax of all commands
+**Warning**: this feature does not cover the syntax of all commands
 
 ![](https://github.com/mkcn/fastHistory/raw/master/images/man_page.png)
 
@@ -174,7 +174,7 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 
 # Commands and systax
 
-Find out more about commands and systax in the [Wiki](https://github.com/mkcn/fastHistory/wiki/Commands-and-syntax) section 
+Find out more about commands and syntax in the [Wiki](https://github.com/mkcn/fastHistory/wiki/Commands-and-syntax) section 
 
 # License
 
