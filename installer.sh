@@ -63,7 +63,7 @@ if [ -z "$1" ]; then
 	# note: macOS does not support "cp -r"
 	# try 'cp parents' (linux) or the equivalent 'rsync' (macOS) to copy file structure
 	if command -v rsync >/dev/null 2>&1; then
-	  rm --force --recursive "$FASTHISTORY_PATH_CODE_FOLDER" && \
+	  rm -f -r "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  mkdir -p "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  rsync --relative fastHistory/*.py "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  rsync --relative fastHistory/*/*.py "$FASTHISTORY_PATH_CODE_FOLDER" && \
@@ -73,7 +73,7 @@ if [ -z "$1" ]; then
 	  rsync --relative LICENSE "$FASTHISTORY_PATH_CODE_FOLDER"/fastHistory/ && \
 	  rsync --relative --recursive fastHistory/tldr/tldr/ "$FASTHISTORY_PATH_CODE_FOLDER"/
 	else
-	  rm --force --recursive "$FASTHISTORY_PATH_CODE_FOLDER" && \
+	  rm -f -r "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  mkdir -p "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  cp --parents fastHistory/*.py "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  cp --parents fastHistory/*/*.py "$FASTHISTORY_PATH_CODE_FOLDER" && \
