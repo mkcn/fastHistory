@@ -27,7 +27,6 @@ class PageTLDRLoop(object):
         self.tldr_examples_draw: list = []
         self.tldr_examples_index: int = 0
         self.tldr_examples_draw_index: int = 0
-        # TODO use this
         self.example_content_shift = ContextShifter()
 
         self.focus = PageTLDRSearchDrawer.Focus.AREA_FILES

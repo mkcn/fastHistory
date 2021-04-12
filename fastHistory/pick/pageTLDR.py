@@ -1,7 +1,7 @@
 import logging
 
 from fastHistory.pick.pageGeneric import PageGeneric
-from fastHistory.pick.textManager import ContextShifter, TextManager
+from fastHistory.pick.textManager import ContextShifter
 from fastHistory.tldr.tldrParser import ParsedTLDRExample
 
 
@@ -113,14 +113,21 @@ class PageTLDRSearchDrawer(PageGeneric):
 
         # TODO re-useit
         #words_to_mark = search_filters.get_main_words()
-        words_to_mark = input_data_raw # TMP
+        words_to_mark = input_data_raw  # TMP
 
         # draw tldr command options
-        self.draw_command_column(tldr_options_draw, words_to_mark, tldr_options_draw_index, focus_area == self.Focus.AREA_FILES)
+        self.draw_command_column(tldr_options_draw,
+                                 words_to_mark,
+                                 tldr_options_draw_index,
+                                 focus_area == self.Focus.AREA_FILES)
 
         # draw tldr examples
         self.drawer.set_y(y=current_y, x=self.TLDR_PAGES_COLUMN_SIZE+2)
-        self.draw_example_column(tldr_examples_draw, words_to_mark, example_draw_index, focus_area == self.Focus.AREA_EXAMPLES)
+        self.draw_example_column(tldr_examples_draw,
+                                 words_to_mark,
+                                 example_draw_index,
+                                 example_content_shift,
+                                 focus_area == self.Focus.AREA_EXAMPLES)
 
         # help line in the last line
         self._draw_help_line_selector()
@@ -134,6 +141,7 @@ class PageTLDRSearchDrawer(PageGeneric):
         if number_options == 0:
             self.draw_no_result(msg_no_result="no match found")
         else:
+            command_context_shifter = ContextShifter()
             for i in range(number_options):
                 value_tldr_cmd = tldr_options_draw[i][self.INDEX_CMD_TO_DRAW]
                 if i == selected_command_index:
@@ -143,8 +151,7 @@ class PageTLDRSearchDrawer(PageGeneric):
                         background_color = self.drawer.color_selected_row  # TODO use a better name
                 else:
                     background_color = self.drawer.NULL_COLOR
-                if len(value_tldr_cmd) > self.TLDR_PAGES_COLUMN_SIZE:
-                    value_tldr_cmd = value_tldr_cmd[:self.TLDR_PAGES_COLUMN_SIZE] + TextManager.TEXT_TOO_LONG
+                value_tldr_cmd = command_context_shifter.get_text_shifted(value_tldr_cmd, self.TLDR_PAGES_COLUMN_SIZE - 1)
                 self.draw_marked_string(value_tldr_cmd,
                                         words_to_mark,
                                         recursive=True,
@@ -152,10 +159,11 @@ class PageTLDRSearchDrawer(PageGeneric):
                                         color_default=background_color)
                 self.drawer.new_line()
 
-    def draw_example_column(self, tldr_examples_draw, words_to_mark, example_draw_index, has_focus):
+    def draw_example_column(self, tldr_examples_draw, words_to_mark, example_draw_index, example_content_shift, has_focus):
         if tldr_examples_draw is None or len(tldr_examples_draw) == 0:
             self.draw_no_result(msg_no_result="no example available")
         else:
+            tldr_example_column_size = self.drawer.get_max_x() - self.TLDR_PAGES_COLUMN_SIZE
             for i in range(len(tldr_examples_draw)):
                 row_type = tldr_examples_draw[i][ParsedTLDRExample.INDEX_EXAMPLE_TYPE]
                 row_value = tldr_examples_draw[i][ParsedTLDRExample.INDEX_EXAMPLE_VALUE]
@@ -170,9 +178,9 @@ class PageTLDRSearchDrawer(PageGeneric):
                         background_color = self.drawer.color_search_input
                 else:
                     background_color = self.drawer.NULL_COLOR
-
+                row_value = example_content_shift.get_text_shifted(row_value, tldr_example_column_size)
                 # set starting point because we are in the second column
-                self.drawer.set_x(self.TLDR_PAGES_COLUMN_SIZE+2)
+                self.drawer.set_x(self.TLDR_PAGES_COLUMN_SIZE)
                 self.draw_marked_string(row_value,
                                         words_to_mark,
                                         recursive=True,
