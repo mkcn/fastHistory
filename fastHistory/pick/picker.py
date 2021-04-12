@@ -7,30 +7,10 @@ from fastHistory.parser.bashParser import BashParser, BashParserThread
 from fastHistory.database.dataManager import DataManager
 from fastHistory.parser.inputParser import InputParser
 from fastHistory.pick.drawer import Drawer
+from fastHistory.pick.keys import Keys
 from fastHistory.pick.pageSelect import PageSelector
 from fastHistory.pick.textManager import TextManager, ContextShifter
 
-KEYS_ENTER = (curses.KEY_ENTER, '\n', '\r')
-KEY_SELECT = None  # used for future feature (multi select)
-KEY_UP = curses.KEY_UP
-KEY_DOWN = curses.KEY_DOWN
-KEYS_DELETE = (curses.KEY_BACKSPACE, '\b', '\x7f')
-KEY_CANC = curses.KEY_DC
-KEY_SHIFT_TAB = curses.KEY_BTAB
-KEY_RIGHT = curses.KEY_RIGHT
-KEY_LEFT = curses.KEY_LEFT
-KEY_RESIZE = curses.KEY_RESIZE
-KEY_TAB = '\t'
-KEY_ESC = '\x1b'  # NOTE: the KEY_ESC can be received with some delay
-KEY_CTRL_A = '\x01'
-KEY_CTRL_E = '\x05'
-KEY_SHIFT_C = '\x00'
-KEY_START = curses.KEY_HOME
-KEY_END = curses.KEY_END
-KEYS_EDIT = ('e', 'E')
-KEY_TAG = '#'
-KEY_AT = '@'
-KEY_TIMEOUT = curses.ERR
 
 class Picker(object):
     """
@@ -70,7 +50,9 @@ class Picker(object):
         # object to handle the page selector
         self.page_selector = None
 
+        # TODO rename with options_index
         self.index = 0
+        # TODO rename with options_to_draw_index
         self.current_line_index = 0
         self.options = None
         self.option_to_draw = None
@@ -100,9 +82,9 @@ class Picker(object):
         """
         if self.index > 0:
             self.index -= 1
-            number_option_to_draw = self.drawer.get_max_y() - 3
             # the current line is the first line
             if self.current_line_index == 0:
+                number_option_to_draw = self.drawer.get_max_y() - 3
                 self.option_to_draw = self.options[self.index:self.index+number_option_to_draw]
             else:
                 self.current_line_index -= 1
@@ -222,7 +204,7 @@ class Picker(object):
                 tmp_options.append([False, option])
         return tmp_options
 
-    def run_loop_edit_command(self,blocks_shift, bash_parser_thread):
+    def run_loop_edit_command(self, blocks_shift, bash_parser_thread):
         """
         loop to capture user input keys to interact with the "edit command" page
 
@@ -231,10 +213,10 @@ class Picker(object):
         # import this locally to improve performance when the program is loaded
         from fastHistory.pick.pageEditCommand import PageEditCommand
         page_command = PageEditCommand(self.drawer,
-                                    option=self.current_selected_option,
-                                    search_filters=self.data_manager.get_search_filters(),
-                                    context_shift=self.context_shift,
-                                    blocks_shift=blocks_shift)
+                                       option=self.current_selected_option,
+                                       search_filters=self.data_manager.get_search_filters(),
+                                       context_shift=self.context_shift,
+                                       blocks_shift=blocks_shift)
 
         current_command = self.current_selected_option[DataManager.OPTION.INDEX_CMD]
         command_t = TextManager(self.current_selected_option[DataManager.OPTION.INDEX_CMD],
@@ -245,18 +227,18 @@ class Picker(object):
             if page_command.has_minimum_size():
                 page_command.clean_page()
                 page_command.draw_page_edit(command_text=command_t.get_text_to_print(),
-                                         command_cursor_index=command_t.get_cursor_index_to_print(),
-                                         input_error_msg=input_error_msg,
-                                         data_from_man_page=bash_parser_thread.get_result())
+                                            command_cursor_index=command_t.get_cursor_index_to_print(),
+                                            input_error_msg=input_error_msg,
+                                            data_from_man_page=bash_parser_thread.get_result())
                 page_command.refresh_page()
 
             # wait for char
             c = self.drawer.wait_next_char(multi_threading_mode=bash_parser_thread.is_alive())
 
-            if c == KEY_TIMEOUT:
+            if c == Keys.KEY_TIMEOUT:
                 continue
             # save and exit
-            elif c in KEYS_ENTER:
+            elif c in Keys.KEYS_ENTER:
                 if current_command == command_t.get_text():
                     return False
                 else:
@@ -282,16 +264,16 @@ class Picker(object):
                         input_error_msg = "no tags and description are allowed here"
 
             # exit without saving
-            elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
+            elif c == Keys.KEY_TAB or c == Keys.KEY_SHIFT_TAB or c == Keys.KEY_ESC:
                 return False
             # -> command
-            elif c == KEY_RIGHT:
+            elif c == Keys.KEY_RIGHT:
                 if command_t.is_cursor_at_the_end():
                     self.context_shift.shift_context_right()
                 else:
                     command_t.move_cursor_right()
                 # <- command
-            elif c == KEY_LEFT:
+            elif c == Keys.KEY_LEFT:
                 if not self.context_shift.is_context_index_zero():
                     self.context_shift.shift_context_left()
                 elif not command_t.is_cursor_at_the_beginning():
@@ -300,17 +282,17 @@ class Picker(object):
                     # do nothing, the cursor is already on the position 0
                     pass
             # delete a char of the search
-            elif c in KEYS_DELETE:
+            elif c in Keys.KEYS_DELETE:
                 command_t.delete_char()
                 input_error_msg = None
             # move cursor to the beginning
-            elif c == KEY_START or c == KEY_CTRL_A:
+            elif c == Keys.KEY_START or c == Keys.KEY_CTRL_A:
                 command_t.move_cursor_to_start()
                 self.context_shift.reset_context_shifted()
             # move cursor to the end
-            elif c == KEY_END or c == KEY_CTRL_E:
+            elif c == Keys.KEY_END or c == Keys.KEY_CTRL_E:
                 command_t.move_cursor_to_end()
-            elif c == KEY_RESIZE:
+            elif c == Keys.KEY_RESIZE:
                 # this occurs when the console size changes
                 self.drawer.reset()
                 command_t.set_max_x(self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
@@ -354,10 +336,10 @@ class Picker(object):
             # wait for char
             c = self.drawer.wait_next_char(multi_threading_mode=bash_parser_thread.is_alive())
 
-            if c == KEY_TIMEOUT:
+            if c == Keys.KEY_TIMEOUT:
                 continue
             # save and exit
-            elif c in KEYS_ENTER:
+            elif c in Keys.KEYS_ENTER:
                 new_description = InputParser.parse_description(description_t.get_text())
                 if new_description is not None:
                     if self.data_manager.update_description(current_command, new_description):
@@ -370,16 +352,16 @@ class Picker(object):
                     input_error_msg = self.TEXT_NOT_ALLOWED_STR
 
             # exit without saving
-            elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
+            elif c == Keys.KEY_TAB or c == Keys.KEY_SHIFT_TAB or c == Keys.KEY_ESC:
                 return False
             # -> command
-            elif c == KEY_RIGHT:
+            elif c == Keys.KEY_RIGHT:
                 if description_t.is_cursor_at_the_end():
                     self.context_shift.shift_context_right()
                 else:
                     description_t.move_cursor_right()
                 # <- command
-            elif c == KEY_LEFT:
+            elif c == Keys.KEY_LEFT:
                 if not self.context_shift.is_context_index_zero():
                     self.context_shift.shift_context_left()
                 elif not description_t.is_cursor_at_the_beginning():
@@ -388,7 +370,7 @@ class Picker(object):
                     # do nothing, the cursor is already on the position 0
                     pass
             # delete a char of the search
-            elif c in KEYS_DELETE:
+            elif c in Keys.KEYS_DELETE:
                 description_t.delete_char()
                 if input_error_msg is not None:
                     new_description = InputParser.parse_description(description_t.get_text())
@@ -397,13 +379,13 @@ class Picker(object):
                     else:
                         input_error_msg = None
             # move cursor to the beginning
-            elif c == KEY_START or c == KEY_CTRL_A:
+            elif c == Keys.KEY_START or c == Keys.KEY_CTRL_A:
                 description_t.move_cursor_to_start()
                 self.context_shift.reset_context_shifted()
             # move cursor to the end
-            elif c == KEY_END or c == KEY_CTRL_E:
+            elif c == Keys.KEY_END or c == Keys.KEY_CTRL_E:
                 description_t.move_cursor_to_end()
-            elif c == "#":  # KEY_RESIZE:
+            elif c == "#":  # Keys.KEY_RESIZE:
                 # this occurs when the console size changes
                 self.drawer.reset()
                 description_t.set_max_x(self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
@@ -456,9 +438,9 @@ class Picker(object):
             # wait for char
             c = self.drawer.wait_next_char(multi_threading_mode=bash_parser_thread.is_alive())
 
-            if c == KEY_TIMEOUT:
+            if c == Keys.KEY_TIMEOUT:
                 continue
-            elif c in KEYS_ENTER:
+            elif c in Keys.KEYS_ENTER:
                 new_tags_array = InputParser.parse_tags_str(new_tags_t.get_text())
                 if new_tags_array is not None:
                     if self.data_manager.update_tags(current_command, new_tags_array):
@@ -471,17 +453,17 @@ class Picker(object):
                     input_error_msg = self.TEXT_NOT_ALLOWED_STR
             # exit without saving
             # TODO fix return if "alt+char" is pressed
-            elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
+            elif c == Keys.KEY_TAB or c == Keys.KEY_SHIFT_TAB or c == Keys.KEY_ESC:
                 return False
             # -> command
-            elif c == KEY_RIGHT:
+            elif c == Keys.KEY_RIGHT:
                 if new_tags_t.is_cursor_at_the_end():
                     self.context_shift.shift_context_right()
                 else:
                     # move the search cursor one position right (->)
                     new_tags_t.move_cursor_right()
                 # <- command
-            elif c == KEY_LEFT:
+            elif c == Keys.KEY_LEFT:
                 if not self.context_shift.is_context_index_zero():
                     self.context_shift.shift_context_left()
                 elif not new_tags_t.is_cursor_at_the_beginning():
@@ -490,7 +472,7 @@ class Picker(object):
                     # do nothing, the cursor is already on the position 0
                     pass
                     # delete a char of the search
-            elif c in KEYS_DELETE:
+            elif c in Keys.KEYS_DELETE:
                 # the delete is allowed if the search text is not empty and if
                 if new_tags_t.delete_char():
                     self.context_shift.reset_context_shifted()
@@ -501,14 +483,14 @@ class Picker(object):
                     else:
                         input_error_msg = None
             # move cursor to the beginning
-            elif c == KEY_START or c == KEY_CTRL_A:
+            elif c == Keys.KEY_START or c == Keys.KEY_CTRL_A:
                 new_tags_t.move_cursor_to_start()
                 self.context_shift.reset_context_shifted()
             # move cursor to the end
-            elif c == KEY_END or c == KEY_CTRL_E:
+            elif c == Keys.KEY_END or c == Keys.KEY_CTRL_E:
                 new_tags_t.move_cursor_to_end()
-            elif c == KEY_RESIZE:
-                # this occurs when the console size changes
+            # this occurs when the console size changes
+            elif c == Keys.KEY_RESIZE:
                 self.drawer.reset()
                 new_tags_t.set_max_x(self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
             elif type(c) is str:
@@ -548,21 +530,21 @@ class Picker(object):
             # wait for char
             c = self.drawer.wait_next_char(multi_threading_mode=bash_parser_thread.is_alive())
 
-            if c == KEY_TIMEOUT:
+            if c == Keys.KEY_TIMEOUT:
                 continue
-            elif c in KEYS_ENTER:
+            elif c in Keys.KEYS_ENTER:
                 return [True, self.get_selected()]
-            elif c == KEY_SHIFT_C:
+            elif c == Keys.KEY_CTRL_SPACE:
                 return [False, self.get_selected()]
             # delete current selected option
-            elif c == KEY_CANC:
+            elif c == Keys.KEY_CANC:
                 self.data_manager.delete_element(self.current_selected_option[DataManager.OPTION.INDEX_CMD])
                 self.options = self.data_manager.filter(self.search_t.get_text_lower(),
                                                         self.index + self.get_number_options_to_draw())
                 self.update_options_to_draw()
                 return None
             # go back to select page
-            elif c == KEY_TAB or c == KEY_SHIFT_TAB or c == KEY_ESC:
+            elif c == Keys.KEY_TAB or c == Keys.KEY_SHIFT_TAB or c == Keys.KEY_ESC:
                 return None
             # open man page
             # elif c == 109:  # char 'm'
@@ -572,16 +554,16 @@ class Picker(object):
                 # consoleUtils.ConsoleUtils.open_interactive_man_page(cmd)
                 # return ""
             # -> command
-            elif c == KEY_RIGHT:
+            elif c == Keys.KEY_RIGHT:
                 self.context_shift.shift_context_right()
             # <- command
-            elif c == KEY_LEFT:
+            elif c == Keys.KEY_LEFT:
                 self.context_shift.shift_context_left()
-            elif c == KEY_DOWN:
+            elif c == Keys.KEY_DOWN:
                 page_info.shift_blocks_down()
-            elif c == KEY_UP:
+            elif c == Keys.KEY_UP:
                 page_info.shift_blocks_up()
-            elif c in KEYS_EDIT:
+            elif c in Keys.KEYS_EDIT:
                 if self.run_loop_edit_command(page_info.get_blocks_shift(), bash_parser_thread):
                     # reload options from db
                     self.options = self.data_manager.filter(self.search_t.get_text_lower(),
@@ -595,26 +577,31 @@ class Picker(object):
                     bash_parser_thread = BashParserThread(
                         cmd_text=self.current_selected_option[DataManager.OPTION.INDEX_CMD])
                     bash_parser_thread.start()
-            elif c == KEY_TAG:  # "#"
+            elif c == Keys.KEY_TAG:  # "#"
                 if self.run_loop_edit_tags(bash_parser_thread):
                     self.options = self.data_manager.filter(self.search_t.get_text_lower(),
                                                             self.index + self.get_number_options_to_draw())
                     self.update_options_to_draw()
                     self.get_options()
                     page_info.update_option_value(self.current_selected_option)
-            elif c == KEY_AT:  # "@"
+            elif c == Keys.KEY_AT:  # "@"
                 if self.run_loop_edit_description(page_info.get_blocks_shift(), bash_parser_thread):
                     self.options = self.data_manager.filter(self.search_t.get_text_lower(),
                                                             self.index + self.get_number_options_to_draw())
                     self.update_options_to_draw()
                     self.get_options()
                     page_info.update_option_value(self.current_selected_option)
-            elif c == KEY_RESIZE:
+            elif c == Keys.KEY_RESIZE:
                 # this occurs when the console size changes
                 self.drawer.reset()
                 self.search_t.set_max_x(self.drawer.get_max_x())
             else:
                 logging.error("loop info - input not handled: " + repr(c))
+
+    def run_loop_tldr(self):
+        from fastHistory.pick.pageTLDRLoop import PageTLDRLoop
+        page_tldr_loop = PageTLDRLoop(self.drawer, self.search_t.get_text())
+        return page_tldr_loop.run_loop_tldr()
 
     @property
     def run_loop_select(self):
@@ -640,33 +627,40 @@ class Picker(object):
             # wait for char
             c = self.drawer.wait_next_char()
 
-            if c == KEY_TIMEOUT:
+            if c == Keys.KEY_TIMEOUT:
                 continue
-            elif c == KEY_UP:
+            elif c == Keys.KEY_UP:
                 self.move_up()
-            elif c == KEY_DOWN:
+            elif c == Keys.KEY_DOWN:
                 self.move_down()
                 # retrieve more data from db when user want to view more
                 if self.index % (self.get_number_options_to_draw() - 1) == 0:
                     self.options = self.data_manager.filter(
                         self.search_t.get_text_lower(),
                         self.index + self.get_number_options_to_draw())
-            elif c in KEYS_ENTER:
+            elif c in Keys.KEYS_ENTER:
                 return [True, self.get_selected()]
-            elif c == KEY_SHIFT_C:
+            elif c == Keys.KEY_CTRL_SPACE:
                 return [False, self.get_selected()]
             # note: currently not implemented
-            elif c == KEY_SELECT and self.is_multi_select:
+            elif c == Keys.KEY_SELECT and self.is_multi_select:
                 self.mark_index()
             # tab command
-            elif c == KEY_TAB:
+            elif c == Keys.KEY_TAB:
                 # reset index of search text (to avoid confusion when the scroll is done on the info page)
                 self.search_t.move_cursor_to_end()
                 res = self.run_loop_info()
                 if res is not None:
                     return res
+            # search TLDR
+            elif c == Keys.KEY_CTRL_S:
+                res = self.run_loop_tldr()
+                if res is not None and res[1] is not None:
+                    return res
+                else:
+                    continue
             # -> command
-            elif c == KEY_RIGHT:
+            elif c == Keys.KEY_RIGHT:
                 if self.search_t.is_cursor_at_the_end():
                     if self.options != []:
                         # move all options list to right
@@ -674,7 +668,7 @@ class Picker(object):
                 else:
                     self.search_t.move_cursor_right()
             # <- command
-            elif c == KEY_LEFT:
+            elif c == Keys.KEY_LEFT:
                 if not self.context_shift.is_context_index_zero():
                     self.context_shift.shift_context_left()
                 elif not self.search_t.is_cursor_at_the_beginning():
@@ -683,7 +677,7 @@ class Picker(object):
                     # do nothing, the cursor is already on the position 0
                     pass
             # delete a char of the search
-            elif c in KEYS_DELETE:
+            elif c in Keys.KEYS_DELETE:
                 if self.search_t.delete_char():
                     # reset shift value
                     self.context_shift.reset_context_shifted()
@@ -691,11 +685,11 @@ class Picker(object):
                     # update the options to show
                     self.update_options_to_draw(initialize_index=True)
             # delete current selected option
-            elif c == KEY_CANC:
+            elif c == Keys.KEY_CANC:
                 self.data_manager.delete_element(self.current_selected_option[DataManager.OPTION.INDEX_CMD])
                 self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.index + self.get_number_options_to_draw())
                 self.update_options_to_draw()
-            elif c == KEY_RESIZE:
+            elif c == Keys.KEY_RESIZE:
                 # this occurs when the console size changes
                 self.drawer.reset()
                 self.search_t.set_max_x(self.drawer.get_max_x() - self.SEARCH_FIELD_MARGIN)
@@ -705,11 +699,11 @@ class Picker(object):
                 # update the options to show
                 self.update_options_to_draw()
             # move cursor to the beginning
-            elif c == KEY_START or c == KEY_CTRL_A:
+            elif c == Keys.KEY_START or c == Keys.KEY_CTRL_A:
                 self.search_t.move_cursor_to_start()
                 self.context_shift.reset_context_shifted()
             # move cursor to the end
-            elif c == KEY_END or c == KEY_CTRL_E:
+            elif c == Keys.KEY_END or c == Keys.KEY_CTRL_E:
                 self.search_t.move_cursor_to_end()
             # normal search char
             elif type(c) is str:

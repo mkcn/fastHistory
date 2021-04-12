@@ -2,11 +2,11 @@ import logging
 import time
 from unittest import TestCase
 
-from fastHistory.tldr.tldrSearcher import TLDRSearcher
+from fastHistory.tldr.tldrParser import TLDRParser, ParsedTLDRExample
 from fastHistory.unitTests.loggerTest import LoggerTest
 
 
-class TestTLDRSearcher(TestCase):
+class TestTLDRParser(TestCase):
     """
     test class for the tldr searcher
 
@@ -24,7 +24,7 @@ class TestTLDRSearcher(TestCase):
         get the meaning ('name' field) from the man page
         :return:
         """
-        searcher = TLDRSearcher()
+        searcher = TLDRParser()
 
         test_strings = [
             # input, excepted cmd, max index of expected cmd
@@ -58,7 +58,7 @@ class TestTLDRSearcher(TestCase):
                 self.assertTrue(len(results) == 0)
 
     def test_TLDR_search_time(self):
-        searcher = TLDRSearcher()
+        searcher = TLDRParser()
 
         test_strings = [
             # input, excepted cmd, max index of expected cmd
@@ -69,12 +69,12 @@ class TestTLDRSearcher(TestCase):
         for test in test_strings:
             start_time = time.time()
             results = searcher.find_match_command(test)
-            execution_time =  (time.time() - start_time)
-            print("--- %s seconds ---" % execution_time)
+            execution_time = (time.time() - start_time)
+            logging.info("--- %s seconds ---" % execution_time)
             self.assertTrue(execution_time < 0.5, msg="execution takes too long")
 
     def test_TLDR_parser(self):
-        searcher = TLDRSearcher()
+        searcher = TLDRParser()
 
         test_strings = [
             # input, excepted first example cmd, number of example
@@ -89,11 +89,11 @@ class TestTLDRSearcher(TestCase):
 
             self.assertTrue(len(results) > 0, msg="no results, check if the 'pages' folder exist")
             first_result = results[0]
-            rows = searcher.get_tldr_cmd_examples(first_result)
+            parsed_tldr_example = searcher.get_tldr_cmd_examples(first_result)
             example_count = 0
-            for row in rows:
-                if row[0]:
+            for row in parsed_tldr_example.get_rows():
+                if row[ParsedTLDRExample.INDEX_EXAMPLE_TYPE] == ParsedTLDRExample.Type.EXAMPLE:
                     if example_count == 0:
-                        self.assertEqual(test[1], row[1], msg="wrong command found: %s -> %s" % (test, row))
+                        self.assertEqual(test[1], row[ParsedTLDRExample.INDEX_EXAMPLE_VALUE], msg="wrong command found: %s -> %s" % (test, row))
                     example_count += 1
-            self.assertEqual(test[2], example_count , msg="wrong number of command found: %s -> %s" % (test, rows))
+            self.assertEqual(test[2], example_count, msg="wrong number of command found")

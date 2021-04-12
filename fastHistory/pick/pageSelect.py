@@ -1,6 +1,5 @@
 import logging
 
-from fastHistory.database.dataManager import DataManager
 from fastHistory.pick.pageGeneric import PageGeneric
 
 

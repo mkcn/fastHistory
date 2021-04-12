@@ -134,7 +134,7 @@ class Drawer(object):
         this allows to have not blocking UI that works with threads
         """
         if not self.input_timeout_enabled:
-            curses.halfdelay(4)  # 400 ms
+            curses.halfdelay(1)  # 100 ms
             self.input_timeout_enabled = True
 
     def _disable_input_timeout(self):
@@ -188,6 +188,12 @@ class Drawer(object):
     def set_y(self, y, x=0):
         self.x = x
         self.y = y
+
+    def get_y(self):
+        return self.y
+
+    def get_x(self):
+        return self.x
 
     def new_line(self, x=0):
         self.y += 1

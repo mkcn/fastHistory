@@ -154,10 +154,8 @@ class ContextShifter(object):
          "..o 'test'"
     """
 
-    context_shift = 0
-
     def __init__(self):
-        pass
+        self.context_shift = 0
 
     def reset_context_shifted(self):
         self.context_shift = 0
