@@ -30,6 +30,7 @@ class TestTLDRParser(TestCase):
             # input, excepted cmd, max index of expected cmd
             [["randomstringwithnomatch"], "", 0],
             [["hex"], "hexdump", 3],
+            [["srm"], "srm", 1],
             [["open", "port", "listen"], "netstat", 3],
             [["time", "boot"], "systemd-analyze", 4],
             [["tar"], "tar", 1],  # tar is also a substring of many other cmds

@@ -142,7 +142,11 @@ class TLDRParser(object):
                                         words_dict[word] += 1
                                         total_weight += weight
                     if all(count > 0 for count in words_dict.values()):
-                        cmd_name = fname.rstrip(".md")
+                        if fname.endswith(".md"):
+                            cmd_name = fname[:-3]
+                        else:
+                            logging.error("find_match_command: fname does not ends with md: %s" % fname)
+                            cmd_name = fname
                         logging.debug("find_match_command: %s -> %s" % (file_full_path, words_dict))
                         cmd_to_draw = os_folder + "/" + cmd_name
                         result.append([total_weight, cmd_to_draw, file_full_path])
