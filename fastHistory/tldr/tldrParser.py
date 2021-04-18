@@ -1,5 +1,6 @@
 import logging
 import os
+import threading
 
 
 class ParsedTLDRExample(object):
@@ -103,13 +104,16 @@ class TLDRParser(object):
         if not os.path.isdir(self.pages_path):
             logging.error("TLDRParser: %s not found " % self.pages_path)
 
-    def find_match_command(self, words):
+    def find_match_command(self, words, thread=None):
         # NO empty, already trimmed
         words = [word.lower() for word in words]
         result = []
         for os_folder in self.enabled_os_folders:
             for root, dirs, fnames in os.walk(self.pages_path + os_folder):
                 for fname in fnames:
+                    if thread and thread.has_been_stopped():
+                        logging.debug("find_match_command: thread stopped, stop the research")
+                        return []
                     # this remove any empty word
                     words_dict = dict((word, 0) for word in words if len(word) > 0)
                     total_weight = 0
@@ -147,7 +151,7 @@ class TLDRParser(object):
                         else:
                             logging.error("find_match_command: fname does not ends with md: %s" % fname)
                             cmd_name = fname
-                        logging.debug("find_match_command: %s -> %s" % (file_full_path, words_dict))
+                        # logging.debug("find_match_command: %s -> %s" % (file_full_path, words_dict))
                         cmd_to_draw = os_folder + "/" + cmd_name
                         result.append([total_weight, cmd_to_draw, file_full_path])
 
@@ -247,7 +251,6 @@ class TLDRParser(object):
             return "%d pages have been correctly formatted" % count
         except Exception as e:
             return "Error: %s" % e
-
 
 
 

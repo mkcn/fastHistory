@@ -160,7 +160,7 @@ class PageTLDRSearchDrawer(PageGeneric):
                 self.drawer.new_line()
 
     def draw_example_column(self, tldr_examples_draw, words_to_mark, example_draw_index, example_content_shift, has_focus):
-        if tldr_examples_draw is None or len(tldr_examples_draw) == 0:
+        if len(tldr_examples_draw) == 0:
             self.draw_no_result(msg_no_result="no example available")
         else:
             tldr_example_column_size = self.drawer.get_max_x() - self.TLDR_PAGES_COLUMN_SIZE

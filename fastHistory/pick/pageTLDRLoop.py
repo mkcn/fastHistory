@@ -4,6 +4,7 @@ from fastHistory.pick.textManager import TextManager, ContextShifter
 from fastHistory.pick.keys import Keys
 from fastHistory.pick.pageTLDR import PageTLDRSearchDrawer
 from fastHistory.tldr.tldrParser import TLDRParser, ParsedTLDRExample
+from fastHistory.tldr.tldrParserThread import TLDRParseThread
 
 
 class PageTLDRLoop(object):
@@ -37,22 +38,28 @@ class PageTLDRLoop(object):
         """
         page_tldr_search = PageTLDRSearchDrawer(self.drawer)
         tldr_parser = TLDRParser()
-        input_data = ""
+        tldr_parser_thread = None
         input_data_raw = ""
         tldr_options_reload_needed = True
+        tldr_options_waiting = True
         tldr_examples_reload_needed = True
 
         while True:
             if tldr_options_reload_needed:
                 tldr_options_reload_needed = False
                 # TODO parse input (remove special char and # and \n)
-                #input_data = InputParser.parse_input(self.search_field.get_text_lower(), is_search_cmd=True)
+                # input_data = InputParser.parse_input(self.search_field.get_text_lower(), is_search_cmd=True)
                 input_data_raw = self.search_field.get_text_lower().split(" ")
-                # TODO decide if we want to use threads
-                self.tldr_options = tldr_parser.find_match_command(input_data_raw)
-                logging.debug("run_loop_tldr - input_data_raw: %s" % input_data_raw)
-                # TODO check if i need to "inizialize results based on the screen resolution
-                # TODO check this
+                if tldr_parser_thread:
+                    tldr_parser_thread.stop()
+                tldr_parser_thread = TLDRParseThread(tldr_parser, input_data_raw, self.tldr_options_index, )
+                tldr_parser_thread.start()
+                tldr_options_waiting = True
+                # TODO kill old parser (?)
+
+            if tldr_options_waiting and not tldr_parser_thread.is_alive():
+                tldr_options_waiting = False
+                self.tldr_options = tldr_parser_thread.get_result_tldr_options()
                 self.update_tldr_options_to_draw()
                 tldr_examples_reload_needed = True
 
@@ -66,8 +73,8 @@ class PageTLDRLoop(object):
                     self.tldr_examples_index = self.tldr_examples.get_first_example_index()
                     self.tldr_examples_draw_index = self.tldr_examples_index
                 else:
-                    self.tldr_examples = None
-                    self.tldr_examples_draw = None
+                    self.tldr_examples = []
+                    self.tldr_examples_draw = []
 
             if page_tldr_search.has_minimum_size():
                 page_tldr_search.clean_page()
@@ -83,7 +90,7 @@ class PageTLDRLoop(object):
                 page_tldr_search.refresh_page()
 
             # wait for char
-            c = self.drawer.wait_next_char()
+            c = self.drawer.wait_next_char(multi_threading_mode=tldr_parser_thread.is_alive())
 
             if c == Keys.KEY_TIMEOUT:
                 continue
