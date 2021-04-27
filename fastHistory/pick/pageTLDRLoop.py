@@ -1,5 +1,6 @@
 import logging
 
+from fastHistory import ConsoleUtils
 from fastHistory.pick.textManager import TextManager, ContextShifter
 from fastHistory.pick.keys import Keys
 from fastHistory.pick.pageTLDR import PageTLDRSearchDrawer
@@ -52,10 +53,9 @@ class PageTLDRLoop(object):
                 input_data_raw = self.search_field.get_text_lower().split(" ")
                 if tldr_parser_thread:
                     tldr_parser_thread.stop()
-                tldr_parser_thread = TLDRParseThread(tldr_parser, input_data_raw, self.tldr_options_index, )
+                tldr_parser_thread = TLDRParseThread(tldr_parser, input_data_raw)
                 tldr_parser_thread.start()
                 tldr_options_waiting = True
-                # TODO kill old parser (?)
 
             if tldr_options_waiting and not tldr_parser_thread.is_alive():
                 tldr_options_waiting = False
@@ -69,6 +69,7 @@ class PageTLDRLoop(object):
                     tldr_page_match = self.tldr_options_draw[self.tldr_options_draw_index]
                     self.tldr_examples = tldr_parser.get_tldr_cmd_examples(tldr_page_match)
                     self.update_tldr_example_to_draw()
+                    self.update_tldr_options_to_draw_cmd_availability()
                     # reset example index
                     self.tldr_examples_index = self.tldr_examples.get_first_example_index()
                     self.tldr_examples_draw_index = self.tldr_examples_index
@@ -95,11 +96,17 @@ class PageTLDRLoop(object):
             if c == Keys.KEY_TIMEOUT:
                 continue
             elif c in Keys.KEYS_ENTER:
-                return [True, self.get_selected_example()]
+                res = self.get_selected_example(search_input=input_data_raw)
+                if res:
+                    return res
             elif c == Keys.KEY_CTRL_SPACE:
-                return [False, self.get_selected_example()]
+                res = self.get_selected_example(search_input=input_data_raw, copied=True)
+                if res:
+                    return res
+            elif c == Keys.KEY_TAB:
+                self.flip_focus()
             # go back to main page
-            elif c == Keys.KEY_CTRL_F:
+            elif c == Keys.KEY_CTRL_F or c == Keys.KEY_ESC:
                 return None
             elif c == Keys.KEY_UP:
                 if self.move_up():
@@ -121,9 +128,12 @@ class PageTLDRLoop(object):
             elif c == Keys.KEY_START or c == Keys.KEY_CTRL_A:
                 self.search_field.move_cursor_to_start()
                 self.example_content_shift.reset_context_shifted()
+                self.focus = PageTLDRSearchDrawer.Focus.AREA_FILES
             # move cursor to the end
             elif c == Keys.KEY_END or c == Keys.KEY_CTRL_E:
                 self.search_field.move_cursor_to_end()
+                self.example_content_shift.reset_context_shifted()
+                self.focus = PageTLDRSearchDrawer.Focus.AREA_FILES
             # delete a char of the search
             elif c in Keys.KEYS_DELETE:
                 if self.delete_char():
@@ -137,16 +147,33 @@ class PageTLDRLoop(object):
             else:
                 logging.error("loop TLDR page - input not handled: " + repr(c))
 
-    def get_selected_example(self):
+    def get_selected_example(self, search_input: list, copied: bool = False):
         res = self.tldr_examples.get_current_selected_example(self.tldr_examples_index)
-        return res + self.SELECTED_COMMAND_ENDING
+        if not copied:
+            ending = ""
+            for item in search_input:
+                if len(item) > 0:
+                    ending += self.SELECTED_COMMAND_ENDING + item.strip()
+            if ending == "":
+                ending += self.SELECTED_COMMAND_ENDING
+            res += ending
+
+        if self.focus == PageTLDRSearchDrawer.Focus.AREA_EXAMPLES:
+            if not copied:
+                return [True, res]
+            else:
+                return [False, res]
+        else:
+            self.focus = PageTLDRSearchDrawer.Focus.AREA_EXAMPLES
+            self.search_field.move_cursor_to_end()
+            return None
 
     def move_up(self):
         """
         :return: true if the selected example needs to be changed
         """
         number_tldr_lines_to_draw = self.get_number_tldr_lines_to_draw()
-        if self.focus == PageTLDRSearchDrawer.Focus.AREA_INPUT or self.focus == PageTLDRSearchDrawer.Focus.AREA_FILES:
+        if self.focus == PageTLDRSearchDrawer.Focus.AREA_FILES:
             if self.tldr_options_index > 0:
                 self.tldr_options_index -= 1
                 # the current line is the first line
@@ -181,7 +208,7 @@ class PageTLDRLoop(object):
         :return: true if the selected example needs to be changed
         """
         number_tldr_lines_to_draw = self.get_number_tldr_lines_to_draw()
-        if self.focus == PageTLDRSearchDrawer.Focus.AREA_INPUT or self.focus == PageTLDRSearchDrawer.Focus.AREA_FILES:
+        if self.focus == PageTLDRSearchDrawer.Focus.AREA_FILES:
             if self.tldr_options_index + 1 < len(self.tldr_options):
                 self.tldr_options_index += 1
                 # # the current line is the last line
@@ -225,13 +252,11 @@ class PageTLDRLoop(object):
             return False
 
     def move_right(self):
-        if self.focus == PageTLDRSearchDrawer.Focus.AREA_INPUT:
+        if self.focus == PageTLDRSearchDrawer.Focus.AREA_FILES:
             if self.search_field.is_cursor_at_the_end():
-                self.focus = PageTLDRSearchDrawer.Focus.AREA_FILES
+                self.focus = PageTLDRSearchDrawer.Focus.AREA_EXAMPLES
             else:
                 self.search_field.move_cursor_right()
-        elif self.focus == PageTLDRSearchDrawer.Focus.AREA_FILES:
-            self.focus = PageTLDRSearchDrawer.Focus.AREA_EXAMPLES
         elif self.focus == PageTLDRSearchDrawer.Focus.AREA_EXAMPLES:
             self.example_content_shift.shift_context_right()
         else:
@@ -244,8 +269,6 @@ class PageTLDRLoop(object):
             else:
                 self.focus = PageTLDRSearchDrawer.Focus.AREA_FILES
         elif self.focus == PageTLDRSearchDrawer.Focus.AREA_FILES:
-            self.focus = PageTLDRSearchDrawer.Focus.AREA_INPUT
-        elif self.focus == PageTLDRSearchDrawer.Focus.AREA_INPUT:
             if not self.search_field.is_cursor_at_the_beginning():
                 self.search_field.move_cursor_left()
         else:
@@ -278,6 +301,16 @@ class PageTLDRLoop(object):
         self.tldr_options_draw = self.tldr_options[
                               self.tldr_options_index - self.tldr_options_draw_index:
                               self.tldr_options_index - self.tldr_options_draw_index + number_lines_to_draw]
+
+    def update_tldr_options_to_draw_cmd_availability(self):
+        """
+        the check is done only once for command (included with move_up and move_down) unless the input change
+        :return:
+        """
+        for tldr_item in self.tldr_options_draw:
+            if tldr_item[TLDRParser.INDEX_TLDR_MATCH_AVAILABILITY] is None:
+                tldr_item[TLDRParser.INDEX_TLDR_MATCH_AVAILABILITY] = ConsoleUtils.is_cmd_available_on_this_machine(
+                    tldr_item[TLDRParser.INDEX_TLDR_MATCH_CMD])
 
     def update_tldr_example_to_draw(self):
         number_lines_to_draw = self.get_number_tldr_lines_to_draw()
@@ -313,3 +346,11 @@ class PageTLDRLoop(object):
             return True
         else:
             return False
+
+    def flip_focus(self):
+        if self.focus != PageTLDRSearchDrawer.Focus.AREA_EXAMPLES:
+            self.focus = PageTLDRSearchDrawer.Focus.AREA_EXAMPLES
+            self.search_field.move_cursor_to_end()
+        else:
+            self.focus = PageTLDRSearchDrawer.Focus.AREA_FILES
+            self.example_content_shift.reset_context_shifted()

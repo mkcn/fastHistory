@@ -18,6 +18,7 @@ class ParsedTLDRExample(object):
 
     def __init__(self):
         self.command = ""
+        self.cmd_folder = ""
         self.rows = []
 
     def set_command(self, command: str) -> None:
@@ -92,7 +93,10 @@ class TLDRParser(object):
     PAGE_EXAMPLE_CHAR = "`"
     PAGE_EXAMPLE_DESC_CHAR = "-"
 
-    INDEX_TLDR_MATCH_FULL_PATH = 2
+    INDEX_TLDR_MATCH_CMD_FOLDER = 1
+    INDEX_TLDR_MATCH_CMD = 2
+    INDEX_TLDR_MATCH_FULL_PATH = 3
+    INDEX_TLDR_MATCH_AVAILABILITY = 4
 
     def __init__(self, enabled_os_folders=None):
         # TODO read from configuration or make dynamic based on OS ( enabled_os_folders: "linux", "windows", "osx"
@@ -151,9 +155,8 @@ class TLDRParser(object):
                         else:
                             logging.error("find_match_command: fname does not ends with md: %s" % fname)
                             cmd_name = fname
-                        # logging.debug("find_match_command: %s -> %s" % (file_full_path, words_dict))
-                        cmd_to_draw = os_folder + "/" + cmd_name
-                        result.append([total_weight, cmd_to_draw, file_full_path])
+                        # NOTE: the system availability of the command (5' value) is calculated later only if needed
+                        result.append([total_weight, os_folder, cmd_name, file_full_path, None])
 
         result.sort(key=TLDRParser._find_match_command_sort_key, reverse=True)
         return result

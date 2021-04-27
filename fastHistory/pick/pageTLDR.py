@@ -2,7 +2,7 @@ import logging
 
 from fastHistory.pick.pageGeneric import PageGeneric
 from fastHistory.pick.textManager import ContextShifter
-from fastHistory.tldr.tldrParser import ParsedTLDRExample
+from fastHistory.tldr.tldrParser import ParsedTLDRExample, TLDRParser
 
 
 class PageTLDRSearchDrawer(PageGeneric):
@@ -15,18 +15,14 @@ class PageTLDRSearchDrawer(PageGeneric):
     FILE_COLUMN_NAME = "Command"
     EXAMPLE_COLUMN_NAME = "Examples from tldr-pages"
 
-    INDEX_CMD_TO_DRAW = 1
-    INDEX_CMD_AVAILABLE_ON_THIS_MACHINE = 3
-
     DEBUG_MODE = False
 
     SEARCH_FIELD_MARGIN = 23
     TLDR_PAGES_COLUMN_SIZE = 27
 
     class Focus:
-        AREA_INPUT = 0
-        AREA_FILES = 1
-        AREA_EXAMPLES = 2
+        AREA_FILES = 0
+        AREA_EXAMPLES = 1
 
     def __init__(self, drawer):
         PageGeneric.__init__(self, drawer)
@@ -130,7 +126,7 @@ class PageTLDRSearchDrawer(PageGeneric):
                                  focus_area == self.Focus.AREA_EXAMPLES)
 
         # help line in the last line
-        self._draw_help_line_selector()
+        self._draw_help_line_selector(focus_area == self.Focus.AREA_EXAMPLES)
 
         # cursor set position
         self.drawer.show_cursor()
@@ -143,7 +139,12 @@ class PageTLDRSearchDrawer(PageGeneric):
         else:
             command_context_shifter = ContextShifter()
             for i in range(number_options):
-                value_tldr_cmd = tldr_options_draw[i][self.INDEX_CMD_TO_DRAW]
+                tldr_item = tldr_options_draw[i]
+                value_tldr_cmd = tldr_item[TLDRParser.INDEX_TLDR_MATCH_CMD_FOLDER] + "\\" + tldr_item[TLDRParser.INDEX_TLDR_MATCH_CMD]
+                if tldr_item[TLDRParser.INDEX_TLDR_MATCH_AVAILABILITY]:
+                    value_tldr_cmd = u'\u2713' + value_tldr_cmd
+                else:
+                    value_tldr_cmd = u' ' + value_tldr_cmd
                 if i == selected_command_index:
                     if has_focus:
                         background_color = self.drawer.color_search
@@ -164,6 +165,7 @@ class PageTLDRSearchDrawer(PageGeneric):
             self.draw_no_result(msg_no_result="no example available")
         else:
             tldr_example_column_size = self.drawer.get_max_x() - self.TLDR_PAGES_COLUMN_SIZE
+            self.drawer.set_x(self.TLDR_PAGES_COLUMN_SIZE)
             for i in range(len(tldr_examples_draw)):
                 row_type = tldr_examples_draw[i][ParsedTLDRExample.INDEX_EXAMPLE_TYPE]
                 row_value = tldr_examples_draw[i][ParsedTLDRExample.INDEX_EXAMPLE_VALUE]
@@ -172,7 +174,6 @@ class PageTLDRSearchDrawer(PageGeneric):
                         if has_focus:
                             background_color = self.drawer.color_search  # TODO use a better name
                         else:
-                            # TODO TBD if remove this case
                             background_color = self.drawer.color_search_input
                     else:
                         background_color = self.drawer.color_search_input
@@ -197,13 +198,18 @@ class PageTLDRSearchDrawer(PageGeneric):
         self.drawer.draw_row(" " * msg_space, x=x)
         self.drawer.draw_row(msg_no_result)
 
-    def _draw_help_line_selector(self):
+    def _draw_help_line_selector(self, is_focus_examples: bool):
         self.drawer.set_y(self.drawer.get_max_y() - 1)
-        self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Select", x_indent=1, allow_last_row=True)
+        if is_focus_examples:
+            self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+            self.drawer.draw_row("Select", x_indent=1, allow_last_row=True)
+        else:
+            self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+            self.drawer.draw_row("Get examples", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("Ctrl+space", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Copy", x_indent=1, allow_last_row=True)
+        if is_focus_examples:
+            self.drawer.draw_row("Ctrl+space", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+            self.drawer.draw_row("Copy", x_indent=1, allow_last_row=True)
 
         self.drawer.draw_row("Ctrl+f", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Go back", x_indent=1, allow_last_row=True)

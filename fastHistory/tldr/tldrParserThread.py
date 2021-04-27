@@ -5,11 +5,10 @@ from fastHistory.tldr.tldrParser import TLDRParser, ParsedTLDRExample
 
 class TLDRParseThread(threading.Thread):
 
-    def __init__(self, tldr_parser: TLDRParser, user_input: list, current_index: int):
+    def __init__(self, tldr_parser: TLDRParser, user_input: list):
         threading.Thread.__init__(self)
         self.tldr_parser = tldr_parser
         self.user_input = user_input
-        self.current_index = current_index
         self.result_tldr_options: list = []
         self.stopped = False
 
