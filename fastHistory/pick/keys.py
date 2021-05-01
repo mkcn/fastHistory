@@ -16,7 +16,7 @@ class Keys(object):
     KEY_ESC = '\x1b'  # NOTE: the KEY_ESC can be received with some delay
     KEY_CTRL_A = '\x01'
     KEY_CTRL_E = '\x05'
-    KEY_CTRL_S = '\x13'
+    KEY_CTRL_S = '\x13'  # not working well on ubuntu 20.04 terminal
     KEY_CTRL_D = '\x04'
     KEY_CTRL_F = '\x06'
     KEY_CTRL_SPACE = '\x00'

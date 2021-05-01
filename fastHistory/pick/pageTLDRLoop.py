@@ -46,6 +46,7 @@ class PageTLDRLoop(object):
         tldr_examples_reload_needed = True
 
         while True:
+            # TODO fix "alt+d" crash
             if tldr_options_reload_needed:
                 tldr_options_reload_needed = False
                 # TODO parse input (remove special char and # and \n)
@@ -130,7 +131,7 @@ class PageTLDRLoop(object):
                 self.example_content_shift.reset_context_shifted()
                 self.focus = PageTLDRSearchDrawer.Focus.AREA_FILES
             # move cursor to the end
-            elif c == Keys.KEY_END or c == Keys.KEY_CTRL_E:
+            elif c == Keys.KEY_CTRL_E:
                 self.search_field.move_cursor_to_end()
                 self.example_content_shift.reset_context_shifted()
                 self.focus = PageTLDRSearchDrawer.Focus.AREA_FILES
@@ -354,3 +355,6 @@ class PageTLDRLoop(object):
         else:
             self.focus = PageTLDRSearchDrawer.Focus.AREA_FILES
             self.example_content_shift.reset_context_shifted()
+
+    def get_updated_search_field(self):
+        return self.search_field

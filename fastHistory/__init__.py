@@ -17,7 +17,7 @@ NAME_VERSION_FILE = "version.txt"
 DATABASE_MODE = DataManager.DATABASE_MODE_SQLITE
 
 
-def handle_search_request(logger_console, input_cmd_str, path_data_folder, theme, last_column_size):
+def handle_search_request(logger_console, input_cmd_str, path_data_folder, theme, last_column_size, is_tldr_search=False):
 	"""
 	take input and show the filtered list of command to select
 
@@ -33,7 +33,11 @@ def handle_search_request(logger_console, input_cmd_str, path_data_folder, theme
 		data_manager = DataManager(path_data_folder, NAME_DATABASE_FILE, DATABASE_MODE)
 
 		# open picker to select from history
-		picker = Picker(data_manager, theme=theme, last_column_size=last_column_size, search_text=input_cmd_str)
+		picker = Picker(data_manager,
+						theme=theme,
+						last_column_size=last_column_size,
+						search_text=input_cmd_str,
+						is_tldr_search=is_tldr_search)
 		selected_option = picker.start()
 
 		if selected_option[0]:
@@ -275,14 +279,18 @@ def handle_arguments(logger_console, config_reader, path_data_folder, path_code_
 		if arg1 == "-a" or arg1 == "--add":
 			input_cmd = retrieve_parameters_from_bash_hook(arg1=arg1)
 			handle_add_request(logger_console, input_cmd, path_data_folder, error_feedback=True)
-		elif (arg1 == "--add-explicit") and args_len == 3:
+		elif arg1 == "--add-explicit" and args_len == 3:
 			input_cmd = str(sys.argv[2]).strip()
 			handle_add_request(logger_console, input_cmd, path_data_folder, error_feedback=False)
-		elif (arg1 == "--config") and args_len == 2:
+		elif arg1 == "-f" or arg1 == "--find" or arg1 == "--tldr":
+			input_cmd = retrieve_parameters_from_bash_hook(arg1=arg1)
+			handle_search_request(logger_console, input_cmd, path_data_folder, config_reader.get_theme(),
+								  config_reader.get_last_column_size(), is_tldr_search=True)
+		elif arg1 == "--config" and args_len == 2:
 			handle_config_file(logger_console, path_data_folder)
-		elif (arg1 == "--log") and args_len == 2:
+		elif arg1 == "--log" and args_len == 2:
 			handle_log_file(logger_console, path_data_folder)
-		elif (arg1 == "--setup") and args_len == 2:
+		elif arg1 == "--setup" and args_len == 2:
 			handle_setup(logger_console, path_data_folder, path_code_folder, config_reader, force=True)
 		elif arg1 == "--import" and args_len == 3:
 			import_file = sys.argv[2]

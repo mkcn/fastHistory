@@ -24,7 +24,7 @@ class Picker(object):
 
     DEBUG_MODE = True
 
-    def __init__(self, data_manager, theme, last_column_size, search_text="", multi_select=False):
+    def __init__(self, data_manager, theme, last_column_size, is_tldr_search=False, search_text="", multi_select=False):
         """
         initialize variables and get filtered list starting options to show
         :param data_manager          the data manager object to retrieve data
@@ -58,6 +58,7 @@ class Picker(object):
         self.option_to_draw = None
 
         self.current_selected_option = None
+        self.is_tldr_search = is_tldr_search
 
     def start(self):
         """
@@ -73,7 +74,18 @@ class Picker(object):
         # set screen context
         self.search_t.set_max_x(self.drawer.get_max_x() - self.SEARCH_FIELD_MARGIN)
 
-        return self.run_loop_select
+        return self.run_ui
+
+    @property
+    def run_ui(self):
+        if not self.is_tldr_search:
+            return self.run_loop_select()
+        else:
+            res = self.run_loop_tldr()
+            if res is not None and res[1] is not None:
+                return res
+            else:
+                return self.run_loop_select()
 
     def move_up(self):
         """
@@ -601,9 +613,10 @@ class Picker(object):
     def run_loop_tldr(self):
         from fastHistory.pick.pageTLDRLoop import PageTLDRLoop
         page_tldr_loop = PageTLDRLoop(self.drawer, self.search_t.get_text())
-        return page_tldr_loop.run_loop_tldr()
+        res = page_tldr_loop.run_loop_tldr()
+        self.search_t = page_tldr_loop.get_updated_search_field()
+        return res
 
-    @property
     def run_loop_select(self):
         """
         Loop to capture user input keys to interact with the select page
@@ -653,7 +666,7 @@ class Picker(object):
                 if res is not None:
                     return res
             # search TLDR
-            elif c == Keys.KEY_CTRL_S:
+            elif c == Keys.KEY_CTRL_F:
                 res = self.run_loop_tldr()
                 if res is not None and res[1] is not None:
                     return res

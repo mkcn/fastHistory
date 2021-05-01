@@ -142,9 +142,9 @@ class PageTLDRSearchDrawer(PageGeneric):
                 tldr_item = tldr_options_draw[i]
                 value_tldr_cmd = tldr_item[TLDRParser.INDEX_TLDR_MATCH_CMD_FOLDER] + "\\" + tldr_item[TLDRParser.INDEX_TLDR_MATCH_CMD]
                 if tldr_item[TLDRParser.INDEX_TLDR_MATCH_AVAILABILITY]:
-                    value_tldr_cmd = u'\u2713' + value_tldr_cmd
+                    value_tldr_cmd = "+" + value_tldr_cmd
                 else:
-                    value_tldr_cmd = u' ' + value_tldr_cmd
+                    value_tldr_cmd = " " + value_tldr_cmd
                 if i == selected_command_index:
                     if has_focus:
                         background_color = self.drawer.color_search

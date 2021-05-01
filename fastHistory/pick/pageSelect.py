@@ -172,6 +172,9 @@ class PageSelector(PageGeneric):
         self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("More", x_indent=1, allow_last_row=True)
 
+        self.drawer.draw_row("Ctrl+f", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("TLDR", x_indent=1, allow_last_row=True)
+
         self.drawer.draw_row("Del", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Delete", x_indent=1, allow_last_row=True)
 
