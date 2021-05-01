@@ -14,5 +14,5 @@
 - Display statistics on the number of free inodes
 `df -i`
 
-- Display filesystems but exclude the specified type
+- Display filesystems but exclude the specified types
 `df -x {{squashfs}} -x {{tmpfs}}`

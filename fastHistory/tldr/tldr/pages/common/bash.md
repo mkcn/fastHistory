@@ -1,25 +1,25 @@
 # bash
 > Bourne-Again SHell, an `sh`-compatible command line interpreter.
 > See also `histexpand` for history expansion.
-> More information: <https://gnu.org/software/bash>.
+> More information: <https://gnu.org/software/bash/>.
 
-- Start interactive shell
+- Start an interactive shell session
 `bash`
 
-- Execute a command
+- Execute a command and then exit
 `bash -c "{{command}}"`
 
-- Run commands from a file
-`bash {{file.sh}}`
+- Execute a script
+`bash {{path/to/script.sh}}`
 
-- Run commands from a file, logging all commands executed to the terminal
-`bash -x {{file.sh}}`
+- Execute a script, printing each command before executing it
+`bash -x {{path/to/script.sh}}`
 
-- Run commands from a file, stopping at the first error
-`bash -e {{file.sh}}`
+- Execute commands from a script, stopping at the first error
+`bash -e {{path/to/script.sh}}`
 
-- Run commands from stdin
+- Read and execute commands from stdin
 `bash -s`
 
-- Print the version information of bash (use `echo $BASH_VERSION` to show just the version without license information)
+- Print the Bash version (`$BASH_VERSION` contains the version without license information)
 `bash --version`

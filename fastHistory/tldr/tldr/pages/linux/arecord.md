@@ -1,6 +1,6 @@
 # arecord
 > Sound recorder for ALSA soundcard driver.
-> More information: <https://linux.die.net/man/1/arecord>.
+> More information: <https://manned.org/arecord>.
 
 - Record a snippet in "CD" quality (finish with Ctrl-C when done)
 `arecord -vv --format=cd {{path/to/file.wav}}`

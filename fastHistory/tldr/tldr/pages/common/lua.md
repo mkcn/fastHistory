@@ -9,4 +9,4 @@
 `lua {{script_name.lua}} {{--optional-argument}}`
 
 - Execute a Lua expression
-`lua -e '{{print( "Hello World" )}}`
+`lua -e '{{print( "Hello World" )}}'`

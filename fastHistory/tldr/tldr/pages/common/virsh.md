@@ -4,7 +4,7 @@
 > More information: <https://libvirt.org/virshcmdref.html>.
 
 - Connect to a hypervisor session
-`virsh connect {{qemu://system}}`
+`virsh connect {{qemu:///system}}`
 
 - List all domains
 `virsh list --all`

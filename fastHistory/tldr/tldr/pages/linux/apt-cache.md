@@ -1,5 +1,6 @@
 # apt-cache
 > Debian and Ubuntu package query tool.
+> More information: <https://manpages.debian.org/latest/apt/apt-cache.8.html>.
 
 - Search for a package in your current sources
 `apt-cache search {{query}}`

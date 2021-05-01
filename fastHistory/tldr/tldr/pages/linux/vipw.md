@@ -1,6 +1,6 @@
 # vipw
 > Edit the password file.
-> More information: <https://linux.die.net/man/8/vipw>.
+> More information: <https://manned.org/vipw>.
 
 - Edit the password file
 `vipw`

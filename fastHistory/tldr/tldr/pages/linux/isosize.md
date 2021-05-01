@@ -1,6 +1,6 @@
 # isosize
 > Display the size of an ISO file.
-> More information: <https://linux.die.net/man/8/isosize>.
+> More information: <https://manned.org/isosize>.
 
 - Display the size of an ISO file
 `isosize {{path/to/file.iso}}`

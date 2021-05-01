@@ -1,6 +1,6 @@
 # iftop
 > Show bandwidth usage on an interface by host.
-> More information: <https://linux.die.net/man/8/iftop>.
+> More information: <https://manned.org/iftop>.
 
 - Show the bandwidth usage
 `sudo iftop`

@@ -1,19 +1,28 @@
 # 7za
-> A file archiver with high compression ratio.
-> A standalone version of `7z` with support for fewer archive types.
-> More information: <https://www.7-zip.org/>.
+> File archiver with a high compression ratio.
+> Similar to `7z` except that it supports fewer file types but is cross-platform.
+> More information: <https://www.7-zip.org>.
 
-- Archive a file or directory
-`7za a {{archived.7z}} {{path/to/file_or_directory}}`
+- archive a file or directory
+`7za a {{path/to/archive.7z}} {{path/to/file_or_directory}}`
 
-- Extract an existing 7z file with original directory structure
-`7za x {{archived}}`
+- Encrypt an existing archive (including file names)
+`7za a {{path/to/encrypted.7z}} -p{{password}} -mhe=on {{path/to/archive.7z}}`
 
-- Archive using a specific archive type
-`7za a -t{{zip|gzip|bzip2|tar}} {{archived}} {{path/to/file_or_directory}}`
+- Extract an archive preserving the original directory structure
+`7za x {{path/to/archive.7z}}`
+
+- Extract an archive to a specific directory
+`7za x {{path/to/archive.7z}} -o{{path/to/output}}`
+
+- Extract an archive to stdout
+`7za x {{path/to/archive.7z}} -so`
+
+- archive using a specific archive type
+`7z a -t{{7z|zip|gzip|bzip2|lzip}} {{path/to/archive.7z}} {{path/to/file_or_directory}}`
+
+- list the contents of an archive
+`7za l {{path/to/archive.7z}}`
 
 - List available archive types
 `7za i`
-
-- List the contents of an archive file
-`7za l {{archived}}`

@@ -1,15 +1,16 @@
 # column
-> Format standard input or file into multiple columns.
-> Rows are filled before columns; default separator is whitespace.
+> Format standard input or a file into multiple columns.
+> Columns are filled before rows; the default separator is a whitespace.
+> More information: <https://manned.org/column>.
 
-- Format output for a 30 characters wide display
-`printf "header1 header2\nbar foo\n" | column -c {{30}}`
+- Format the output of a command for a 30 characters wide display
+`printf "header1 header2\nbar foo\n" | column --output-width {{30}}`
 
-- Split columns automatically and auto-align in a tabular format
-`printf "header1 header2\nbar foo\n" | column -t`
+- Split columns automatically and auto-align them in a tabular format
+`printf "header1 header2\nbar foo\n" | column --table`
 
-- Specify column delimiter character for the -t option (e.g. "," for csv); default is whitespace
-`printf "header1,header2\nbar,foo\n" | column -t -s{{,}}`
+- Specify the column delimiter character for the `--table` option (e.g. "," for csv) (defaults to whitespace)
+`printf "header1,header2\nbar,foo\n" | column --table --separator {{,}}`
 
-- Fill columns before filling rows
-`printf "header1\nbar\nfoobar\n" | column -c {{30}} -x`
+- Fill rows before filling columns
+`printf "header1\nbar\nfoobar\n" | column --output-width {{30}} --fillrows`

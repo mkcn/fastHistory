@@ -14,8 +14,8 @@
 - Run a command on a remote server
 `ssh {{remote_host}} {{command -with -flags}}`
 
-- SSH tunneling: Dynamic port forwarding (SOCKS proxy on localhost:9999)
-`ssh -D {{9999}} -C {{username}}@{{remote_host}}`
+- SSH tunneling: Dynamic port forwarding (SOCKS proxy on localhost:1080)
+`ssh -D {{1080}} {{username}}@{{remote_host}}`
 
 - SSH tunneling: Forward a specific port (localhost:9999 to example.org:80) along with disabling pseudo-tty allocation and execution of remote commands
 `ssh -L {{9999}}:{{example.org}}:{{80}} -N -T {{username}}@{{remote_host}}`

@@ -1,5 +1,6 @@
 # entr
 > Run arbitrary commands when files change.
+> More information: <https://manned.org/entr>.
 
 - Rebuild with `make` if any file in any subdirectory changes
 `{{ag -l}} | entr {{make}}`

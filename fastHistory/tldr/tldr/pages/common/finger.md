@@ -1,5 +1,6 @@
 # finger
 > User information lookup program.
+> More information: <https://manned.org/finger>.
 
 - Display information about currently logged in users
 `finger`

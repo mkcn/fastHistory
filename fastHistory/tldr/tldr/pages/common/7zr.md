@@ -1,13 +1,25 @@
 # 7zr
-> A file archiver with high compression ratio.
-> A standalone version of `7z` that only supports .7z files.
-> More information: <https://www.7-zip.org/>.
+> File archiver with a high compression ratio.
+> Similar to `7z` except that it only supports `.7z` files.
+> More information: <https://www.7-zip.org>.
 
-- Archive a file or directory
-`7zr a {{archived.7z}} {{path/to/file_or_directory}}`
+- archive a file or directory
+`7zr a {{path/to/archive.7z}} {{path/to/file_or_directory}}`
 
-- Extract an existing 7z file with original directory structure
-`7zr x {{archived.7z}}`
+- Encrypt an existing archive (including file names)
+`7zr a {{path/to/encrypted.7z}} -p{{password}} -mhe=on {{path/to/archive.7z}}`
 
-- List the contents of an archive file
-`7zr l {{archived.7z}}`
+- Extract an archive preserving the original directory structure
+`7zr x {{path/to/archive.7z}}`
+
+- Extract an archive to a specific directory
+`7zr x {{path/to/archive.7z}} -o{{path/to/output}}`
+
+- Extract an archive to stdout
+`7zr x {{path/to/archive.7z}} -so`
+
+- list the contents of an archive
+`7zr l {{path/to/archive.7z}}`
+
+- List available archive types
+`7zr i`

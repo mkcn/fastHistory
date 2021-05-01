@@ -1,5 +1,6 @@
 # chsh
-> Change user's login shell.
+> Change the user's login shell.
+> More information: <https://manned.org/chsh>.
 
-- Change shell
+- Change the user's login shell
 `chsh -s {{path/to/shell_binary}} {{username}}`

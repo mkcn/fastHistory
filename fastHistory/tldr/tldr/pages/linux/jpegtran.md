@@ -1,6 +1,6 @@
 # jpegtran
 > Perform lossless transformation of JPEG files.
-> More information: <https://linux.die.net/man/1/jpegtran>.
+> More information: <https://manned.org/jpegtran>.
 
 - Mirror an image horizontally or vertically
 `jpegtran -flip {{horizontal|vertical}} {{path/to/image.jpg}} > {{path/to/output.jpg}}`

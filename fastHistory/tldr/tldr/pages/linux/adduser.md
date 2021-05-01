@@ -1,5 +1,6 @@
 # adduser
 > User addition utility.
+> More information: <https://manpages.debian.org/latest/adduser/adduser.html>.
 
 - Create a new user with a default home directory and prompt the user to set a password
 `adduser {{username}}`

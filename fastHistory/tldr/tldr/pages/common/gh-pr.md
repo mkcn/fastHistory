@@ -14,7 +14,7 @@
 - Approve the pull request of the current branch
 `gh pr review --approve`
 
-- Merge the pull request associated with the current branch, removing the branch on both the local and the remote
+- Merge the pull request associated with the current branch interactively
 `gh pr merge`
 
 - Edit a pull request interactively

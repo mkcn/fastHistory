@@ -1,6 +1,7 @@
 # fgrep
 > Matches patterns in files.
 > Supports simple patterns and regular expressions.
+> More information: <https://manned.org/fgrep>.
 
 - Search for an exact string in a file
 `fgrep {{search_string}} {{path/to/file}}`

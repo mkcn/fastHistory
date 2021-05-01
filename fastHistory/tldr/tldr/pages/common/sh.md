@@ -1,15 +1,16 @@
 # sh
-> Bourne shell.
-> The standard command language interpreter.
+> Bourne shell, the standard command language interpreter.
+> See also `histexpand` for history expansion.
+> More information: <https://manned.org/sh>.
 
-- Start interactive shell
+- Start an interactive shell session
 `sh`
 
-- Execute a command
-`sh -c {{command}}`
+- Execute a command and then exit
+`sh -c "{{command}}"`
 
-- Run commands from a file
-`sh {{file.sh}}`
+- Execute a script
+`sh {{path/to/script.sh}}`
 
-- Run commands from stdin
+- Read and execute commands from stdin
 `sh -s`

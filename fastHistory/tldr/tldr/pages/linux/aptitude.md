@@ -1,5 +1,6 @@
 # aptitude
 > Debian and Ubuntu package management utility.
+> More information: <https://manpages.debian.org/latest/aptitude/aptitude.8.html>.
 
 - Synchronize list of packages and versions available. This should be run first, before running subsequent aptitude commands
 `aptitude update`

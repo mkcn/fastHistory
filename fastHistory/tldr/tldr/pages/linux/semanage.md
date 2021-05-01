@@ -1,6 +1,6 @@
 # semanage
 > SELinux Policy Management tool.
-> More information: <https://linux.die.net/man/8/semanage>.
+> More information: <https://manned.org/semanage>.
 
 - Output local customizations
 `semanage -S {{store}} -o {{path/to/output_file}}`

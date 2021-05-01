@@ -1,5 +1,6 @@
 # drill
 > Perform various DNS queries.
+> More information: <https://manned.org/drill>.
 
 - Lookup the IP(s) associated with a hostname (A records)
 `drill {{example.com}}`

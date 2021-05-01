@@ -1,5 +1,6 @@
 # history
 > Command Line history.
+> More information: <https://www.gnu.org/software/bash/manual/html_node/Bash-History-Builtins.html>.
 
 - Display the commands history list with line numbers
 `history`

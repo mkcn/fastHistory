@@ -1,6 +1,6 @@
 # efibootmgr
 > Manipulate the UEFI Boot Manager (the Bootoptions).
-> More information: <https://linux.die.net/man/8/efibootmgr>.
+> More information: <https://manned.org/efibootmgr>.
 
 - List the current settings / bootnums
 `efibootmgr`

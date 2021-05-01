@@ -1,6 +1,6 @@
 # mdadm
 > RAID management utility.
-> More information: <https://linux.die.net/man/8/mdadm>.
+> More information: <https://manned.org/mdadm>.
 
 - Create array
 `mdadm --create {{/dev/md/MyRAID}} --level {{raid_level}} --raid-devices {{number_of_disks}} {{/dev/sdXN}}`
