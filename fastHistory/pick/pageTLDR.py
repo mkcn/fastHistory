@@ -1,8 +1,15 @@
 import logging
 
+
 from fastHistory.pick.pageGeneric import PageGeneric
 from fastHistory.pick.textManager import ContextShifter
 from fastHistory.tldr.tldrParser import ParsedTLDRExample, TLDRParser
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from fastHistory.parser.InputData import InputData
+    from fastHistory.pick.textManager import TextManager
 
 
 class PageTLDRSearchDrawer(PageGeneric):
@@ -28,14 +35,14 @@ class PageTLDRSearchDrawer(PageGeneric):
         PageGeneric.__init__(self, drawer)
 
     def draw_page(self,
-                  search_filters,
-                  input_data_raw,
-                  tldr_options_draw,
-                  tldr_options_draw_index,
-                  tldr_examples_draw,
-                  example_draw_index,
-                  example_content_shift,
-                  focus_area):
+                  search_filters: "TextManager",
+                  input_data: "InputData",
+                  tldr_options_draw: list,
+                  tldr_options_draw_index: int,
+                  tldr_examples_draw: list,
+                  example_draw_index: int,
+                  example_content_shift: "ContextShifter",
+                  focus_area: Focus):
         """
         # TODO check and re-write
 
@@ -50,50 +57,48 @@ class PageTLDRSearchDrawer(PageGeneric):
         search_text = search_filters.get_text_to_print()
 
         # search text
-        if False:
-            #search_filters.is_advanced(): #TODO fix, search_filters != search_t
-            if search_filters.get_main_str() != "":
+        if input_data.is_advanced():
+            if input_data.get_main_str() != "":
                 # find index of cmd filter in search text (e.g. "what" in "what #cmd @desc")
-                index_cmd = search_text.find(search_filters.get_main_str())
+                index_cmd = search_text.find(input_data.get_main_str())
                 if index_cmd != -1:
                     # print until the end of the cmd option
-                    index_cmd_end = index_cmd + len(search_filters.get_main_str())
+                    index_cmd_end = index_cmd + len(input_data.get_main_str())
                     self.drawer.draw_row(search_text[0:index_cmd])
                     self.drawer.draw_row(search_text[index_cmd:index_cmd_end])
                     # cut string with unprinted section
                     search_text = search_text[index_cmd_end:]
                 else:
-                    logging.error("option cmd string not found in search field: " + search_filters.get_main_str())
+                    logging.error("option cmd string not found in search field: " + input_data.get_main_str())
 
-            for tag in search_filters.get_tags(strict=True):
+            for tag in input_data.get_tags(strict=True):
                 # find index of tag filter in search text (e.g. "cmd" in "what #cmd @desc")
                 index_tag = search_text.find(tag)
                 if index_tag != -1:
                     # print until the end of the cmd option
                     index_tag_end = index_tag + len(tag)
-                    self.drawer.draw_row(search_text[0:index_tag], color=self.drawer.color_hash_tag)
+                    self.drawer.draw_row(search_text[0:index_tag], color=self.drawer.color_hash_tag_disable)
                     self.drawer.draw_row(search_text[index_tag:index_tag_end])
                     # cut string with unprinted section
                     search_text = search_text[index_tag_end:]
                 else:
                     logging.error("option tag string not found in search field: " + tag)
 
-            if search_filters.get_description_str() is not None:
+            if input_data.get_description_str() is not None:
                 # find index of desc filter in search text (e.g. "desc" in "what #cmd @desc")
-                index_desc = search_text.find(search_filters.get_description_str())
+                index_desc = search_text.find(input_data.get_description_str())
                 if index_desc != -1:
                     # print until the end of the cmd option
-                    index_desc_end = index_desc + len(search_filters.get_description_str())
-                    self.drawer.draw_row(search_text[0:index_desc], color=self.drawer.color_hash_tag)
+                    index_desc_end = index_desc + len(input_data.get_description_str())
+                    self.drawer.draw_row(search_text[0:index_desc], color=self.drawer.color_hash_tag_disable)
                     self.drawer.draw_row(search_text[index_desc:index_desc_end])
                     # cut string with unprinted section
                     search_text = search_text[index_desc_end:]
                 else:
-                    logging.error("option tag string not found in search field: " + search_filters.get_description_str())
-
+                    logging.error("option tag string not found in search field: " + input_data.get_description_str())
             # print the rest of the unprinted text
             # NOTE: this is printed with color and it can contain "#" and "@"
-            self.drawer.draw_row(search_text, color=self.drawer.color_hash_tag)
+            self.drawer.draw_row(search_text, color=self.drawer.color_hash_tag_disable)
         else:
             self.drawer.draw_row(search_text, color=self.drawer.color_search_input)
 
@@ -107,9 +112,7 @@ class PageTLDRSearchDrawer(PageGeneric):
         self.drawer.new_line()
         current_y = self.drawer.get_y()
 
-        # TODO re-useit
-        #words_to_mark = search_filters.get_main_words()
-        words_to_mark = input_data_raw  # TMP
+        words_to_mark = input_data.get_all_words()
 
         # draw tldr command options
         self.draw_command_column(tldr_options_draw,

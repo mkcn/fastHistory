@@ -1,7 +1,8 @@
 import re
 import logging
+from typing import Optional
 
-from fastHistory.database.InputData import Input
+from fastHistory.parser.InputData import InputData
 
 
 class InputParser(object):
@@ -24,24 +25,24 @@ class InputParser(object):
     # notes:
     #   - before each # a space is needed
     #   - before @ a space is NOT needed
-    REGEXP_INSERT_CMD = "((?:\ #[" + TAGS_ALLOWED_CHARS + "]*)+)(@[" + DESCRIPTION_ALLOWED_CHARS + "]*)?$"
+    REGEXP_INSERT_STR = "((?:\ #[" + TAGS_ALLOWED_CHARS + "]*)+)(@[" + DESCRIPTION_ALLOWED_CHARS + "]*)?$"
     # notes:
     #   - it can start with #
     #   - it can start with @
     #   - unless the string start with them, before each # and @ a space is needed
-    REGEXP_SEARCH_CMD = "((?:(?:^#|\ #)[" + TAGS_ALLOWED_CHARS + "]*)*)((?:^@|\ @)[" + DESCRIPTION_ALLOWED_CHARS + "]*)?$"
+    REGEXP_SEARCH_STR = "((?:(?:^#|\ #)[" + TAGS_ALLOWED_CHARS + "]*)*)((?:^@|\ @)[" + DESCRIPTION_ALLOWED_CHARS + "]*)?$"
     # general
     REGEXP_INPUT_TAGS = "^\ *((?:(?:#|\ #)[" + TAGS_ALLOWED_CHARS + "]*)*)$"
     REGEXP_INPUT_DESCRIPTION = "^\ *(@[" + DESCRIPTION_ALLOWED_CHARS + "]*)$"
 
     @staticmethod
-    def is_privacy_mode_enable(cmd):
+    def is_privacy_mode_enable(cmd: str) -> bool:
         if cmd.endswith(InputParser.PRIVACY_SIGN):
             return True
         return False
 
     @staticmethod
-    def parse_tags_str(tags_str):
+    def parse_tags_str(tags_str: str) -> Optional[list]:
         """
         given a (user input) tags string (from 'edit tag' page) it will parse it and it will return a set of tags
         this function use a regex as input validation
@@ -81,7 +82,7 @@ class InputParser(object):
             return None
 
     @staticmethod
-    def parse_description(description):
+    def parse_description(description: str) -> Optional[str]:
         """
         given a (user input) description string (from 'edit description' page) it will parse it and it will return the
         description text
@@ -117,7 +118,7 @@ class InputParser(object):
         return desc
 
     @staticmethod
-    def is_cmd_str_valid(cmd_str):
+    def is_cmd_str_valid(cmd_str: str) -> bool:
         """
         parse cmd string with the 'insert cmd' regex to check if the end matches the tags or description structure
         if yes, it is not a valid command because the command should not contains tags or descriptions
@@ -125,7 +126,7 @@ class InputParser(object):
         :param cmd_str: command string to evaluate
         :return:        true if valid, false otherwise
         """
-        match = re.search(InputParser.REGEXP_INSERT_CMD, cmd_str, flags=re.UNICODE)
+        match = re.search(InputParser.REGEXP_INSERT_STR, cmd_str, flags=re.UNICODE)
 
         if match:
             logging.debug("command parser: regex matches")
@@ -142,23 +143,23 @@ class InputParser(object):
             return True
 
     @staticmethod
-    def adjust_multi_line_input(input):
+    def adjust_multi_line_input(input_str: str) -> list:
         """
         return [True, new value] if input is multi-line
         """
-        one_line_input = input
+        one_line_input = input_str
         for char in ['\\\n', '\n', '\r']:
             one_line_input = one_line_input.replace(char, '')
-        if one_line_input == input:
+        if one_line_input == input_str:
             return [False, one_line_input]
         else:
             return [True, one_line_input]
 
     @staticmethod
-    def parse_input(cmd, is_search_cmd=False):
+    def parse_input(input_str: str, is_search_mode: bool = False) -> Optional['InputData']:
         """
-        parse the input cmd and retrieve the cmd, tags and description
-        accepted input:     cmd_string [#[tag[#tag...]][@description]]
+        parse the input string and retrieve the cmd, tags and description
+        accepted input:     string [#[tag[#tag...]][@description]]
 
         examples:
                             ls -la #list#file @show list files
@@ -166,21 +167,13 @@ class InputParser(object):
                             ls -la #list
                             ls -la #@show list files
 
-        :param is_search_cmd:  if true it is used the regex for search cmd, otherwise the regex for insert cmd
-        :param cmd:         input console cmd
-        :return:            array with following structure
-                                0 cmd string without tag and description
-                                1 description string
-                                2 tags array
-                            None in case a command without tags or description
-                            None in case of generic errors
         """
         is_advanced_search = False
 
-        if is_search_cmd:
-            match = re.search(InputParser.REGEXP_SEARCH_CMD, cmd, flags=re.UNICODE)
+        if is_search_mode:
+            match = re.search(InputParser.REGEXP_SEARCH_STR, input_str, flags=re.UNICODE)
         else:
-            match = re.search(InputParser.REGEXP_INSERT_CMD, cmd, flags=re.UNICODE)
+            match = re.search(InputParser.REGEXP_INSERT_STR, input_str, flags=re.UNICODE)
 
         if match:
             logging.debug("input parser: regex matches")
@@ -195,8 +188,8 @@ class InputParser(object):
                 char_to_cut += len(desc_str)
 
             if char_to_cut != 0:
-                cmd = cmd[:-char_to_cut]
-            cmd = cmd.strip()
+                input_str = input_str[:-char_to_cut]
+            input_str = input_str.strip()
         else:
             logging.debug("input parser: regex does NOT match")
             return None
@@ -230,19 +223,19 @@ class InputParser(object):
             desc = None
 
         if is_advanced_search:
-            return Input(True,
-                         command_str=cmd,
-                         command_words=InputParser.get_list_words(cmd),
-                         description=desc,
-                         description_words=InputParser.get_list_words(desc),
-                         tags=tags)
+            return InputData(True,
+                             main_str=input_str,
+                             command_words=InputParser.get_list_words(input_str),
+                             description=desc,
+                             description_words=InputParser.get_list_words(desc),
+                             tags=tags)
         else:
-            return Input(False,
-                         command_str=cmd,
-                         command_words=InputParser.get_list_words(cmd))
+            return InputData(False,
+                             main_str=input_str,
+                             command_words=InputParser.get_list_words(input_str))
 
     @staticmethod
-    def get_list_words(string):
+    def get_list_words(string: str) -> list:
         if string is None:
             return []
         elif string == "":

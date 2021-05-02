@@ -70,10 +70,7 @@ class Picker(object):
     def _start(self, screen):
         self.drawer = Drawer(screen, self.theme, TextManager.TEXT_TOO_LONG)
         self.page_selector = PageSelector(self.drawer)
-
-        # set screen context
         self.search_t.set_max_x(self.drawer.get_max_x() - self.SEARCH_FIELD_MARGIN)
-
         return self.run_ui
 
     @property
@@ -612,9 +609,11 @@ class Picker(object):
 
     def run_loop_tldr(self):
         from fastHistory.pick.pageTLDRLoop import PageTLDRLoop
-        page_tldr_loop = PageTLDRLoop(self.drawer, self.search_t.get_text())
+        page_tldr_loop = PageTLDRLoop(self.drawer, self.search_t)
         res = page_tldr_loop.run_loop_tldr()
-        self.search_t = page_tldr_loop.get_updated_search_field()
+
+        self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.get_number_options_to_draw())
+        self.update_options_to_draw(initialize_index=True)
         return res
 
     def run_loop_select(self):
@@ -723,7 +722,6 @@ class Picker(object):
                 if self.search_t.add_string(c, self.data_manager.get_forbidden_chars()):
                     self.option_to_draw = None
                     self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.get_number_options_to_draw())
-                    # update the options to show
                     self.update_options_to_draw(initialize_index=True)
             elif type(c) is int:
                 logging.debug("loop select - integer input not handled: " + repr(c))

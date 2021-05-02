@@ -1,6 +1,6 @@
 import logging
 
-from fastHistory.database.InputData import Input
+from fastHistory.parser.InputData import InputData
 from fastHistory.parser.inputParser import InputParser
 
 
@@ -24,7 +24,7 @@ class DataManager(object):
 		"../../../fastHistory-0.1-beta/data/fh_v1.db"
 	]
 
-	DUMMY_INPUT_DATA = Input(False, "", [])
+	DUMMY_INPUT_DATA = InputData(False, "", [])
 
 	def __init__(self, path_data_folder, name_db_file, mode=DATABASE_MODE_SQLITE):
 		self.last_search = None
@@ -65,7 +65,7 @@ class DataManager(object):
 		search = search.lower()
 
 		# parse input search text
-		input_data = InputParser.parse_input(search, is_search_cmd=True)
+		input_data = InputParser.parse_input(search, is_search_mode=True)
 
 		if input_data:
 			self.search_filters = input_data

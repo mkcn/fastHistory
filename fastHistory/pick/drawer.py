@@ -22,6 +22,7 @@ class Drawer(object):
         self.color_search_input = None
         self.color_search = None
         self.color_hash_tag = None
+        self.color_hash_tag_disable = None
         self.color_hash_tag_selected = None
         self.color_border = None
         self.color_selected_row = None
@@ -50,7 +51,10 @@ class Drawer(object):
         id_color_white_on_green = 8
         id_color_cyan = 9
         id_color_green = 10
+        id_color_black = 11
 
+        curses.init_pair(id_color_black, curses.COLOR_BLACK, -1)
+        self.color_hash_tag_disable = curses.color_pair(id_color_black) | curses.A_BOLD
         # set colors
         if theme == ConfigReader.THEME_AZURE:
             curses.init_pair(id_color_cyan, curses.COLOR_CYAN, -1)

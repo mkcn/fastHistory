@@ -1,6 +1,8 @@
 import logging
 
 from fastHistory import ConsoleUtils
+from fastHistory.parser.InputData import InputData
+from fastHistory.parser.inputParser import InputParser
 from fastHistory.pick.textManager import TextManager, ContextShifter
 from fastHistory.pick.keys import Keys
 from fastHistory.pick.pageTLDR import PageTLDRSearchDrawer
@@ -17,7 +19,7 @@ class PageTLDRLoop(object):
 
     def __init__(self, drawer, search_text):
         self.drawer = drawer
-        self.search_field = TextManager(search_text, use_lower=True)  # set screen context
+        self.search_field = search_text
         self.search_field.set_max_x(self.drawer.get_max_x() - PageTLDRSearchDrawer.SEARCH_FIELD_MARGIN)
 
         self.tldr_options: list = []
@@ -40,7 +42,7 @@ class PageTLDRLoop(object):
         page_tldr_search = PageTLDRSearchDrawer(self.drawer)
         tldr_parser = TLDRParser()
         tldr_parser_thread = None
-        input_data_raw = ""
+        input_data = InputData(False, "", [])
         tldr_options_reload_needed = True
         tldr_options_waiting = True
         tldr_examples_reload_needed = True
@@ -49,12 +51,10 @@ class PageTLDRLoop(object):
             # TODO fix "alt+d" crash
             if tldr_options_reload_needed:
                 tldr_options_reload_needed = False
-                # TODO parse input (remove special char and # and \n)
-                # input_data = InputParser.parse_input(self.search_field.get_text_lower(), is_search_cmd=True)
-                input_data_raw = self.search_field.get_text_lower().split(" ")
+                input_data = InputParser.parse_input(self.search_field.get_text_lower(), is_search_mode=True)
                 if tldr_parser_thread:
                     tldr_parser_thread.stop()
-                tldr_parser_thread = TLDRParseThread(tldr_parser, input_data_raw)
+                tldr_parser_thread = TLDRParseThread(tldr_parser, input_data)
                 tldr_parser_thread.start()
                 tldr_options_waiting = True
 
@@ -75,14 +75,15 @@ class PageTLDRLoop(object):
                     self.tldr_examples_index = self.tldr_examples.get_first_example_index()
                     self.tldr_examples_draw_index = self.tldr_examples_index
                 else:
-                    self.tldr_examples = []
+                    self.tldr_examples = ParsedTLDRExample()
+                    self.tldr_examples_index = 0
                     self.tldr_examples_draw = []
 
             if page_tldr_search.has_minimum_size():
                 page_tldr_search.clean_page()
                 page_tldr_search.draw_page(
                     search_filters=self.search_field,
-                    input_data_raw=input_data_raw,  # TODO TO remove
+                    input_data=input_data,
                     tldr_options_draw=self.tldr_options_draw,
                     tldr_options_draw_index=self.tldr_options_draw_index,
                     tldr_examples_draw=self.tldr_examples_draw,
@@ -97,11 +98,11 @@ class PageTLDRLoop(object):
             if c == Keys.KEY_TIMEOUT:
                 continue
             elif c in Keys.KEYS_ENTER:
-                res = self.get_selected_example(search_input=input_data_raw)
+                res = self.get_selected_example(search_input=input_data)
                 if res:
                     return res
             elif c == Keys.KEY_CTRL_SPACE:
-                res = self.get_selected_example(search_input=input_data_raw, copied=True)
+                res = self.get_selected_example(search_input=input_data, copied=True)
                 if res:
                     return res
             elif c == Keys.KEY_TAB:
@@ -148,11 +149,13 @@ class PageTLDRLoop(object):
             else:
                 logging.error("loop TLDR page - input not handled: " + repr(c))
 
-    def get_selected_example(self, search_input: list, copied: bool = False):
+    def get_selected_example(self, search_input: InputData, copied: bool = False):
         res = self.tldr_examples.get_current_selected_example(self.tldr_examples_index)
+        if res is None:
+            return None
         if not copied:
             ending = ""
-            for item in search_input:
+            for item in search_input.get_all_words():
                 if len(item) > 0:
                     ending += self.SELECTED_COMMAND_ENDING + item.strip()
             if ending == "":
@@ -356,5 +359,5 @@ class PageTLDRLoop(object):
             self.focus = PageTLDRSearchDrawer.Focus.AREA_FILES
             self.example_content_shift.reset_context_shifted()
 
-    def get_updated_search_field(self):
-        return self.search_field
+    def get_updated_search_str(self):
+        return self.search_field.get_text()

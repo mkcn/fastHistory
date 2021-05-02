@@ -1,6 +1,10 @@
 import logging
 import os
-import threading
+from typing import Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from fastHistory.parser.InputData import InputData
+    from fastHistory.tldr.tldrParserThread import TLDRParseThread
 
 
 class ParsedTLDRExample(object):
@@ -30,12 +34,11 @@ class ParsedTLDRExample(object):
     def get_rows(self) -> list:
         return self.rows
 
-    def get_current_selected_example(self, row_index: int) -> str:
+    def get_current_selected_example(self, row_index: int) -> Optional[str]:
         if row_index < len(self.rows):
             return self.rows[row_index][self.INDEX_EXAMPLE_VALUE]
         else:
-            logging.error("get_current_selected_example, row_index out of bound: (%s, %s)" % (row_index, len(self.rows)))
-            return ""
+            return None
 
     def append_example_row(self, row: str) -> None:
         self.rows.append([self.Type.EXAMPLE, row])
@@ -108,8 +111,9 @@ class TLDRParser(object):
         if not os.path.isdir(self.pages_path):
             logging.error("TLDRParser: %s not found " % self.pages_path)
 
-    def find_match_command(self, words, thread=None):
+    def find_match_command(self, input_data: "InputData", thread: "TLDRParseThread" = None) -> Optional[list]:
         # NO empty, already trimmed
+        words = input_data.get_all_words()
         words = [word.lower() for word in words]
         result = []
         for os_folder in self.enabled_os_folders:

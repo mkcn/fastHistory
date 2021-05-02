@@ -1,19 +1,24 @@
-import threading
 
-from fastHistory.tldr.tldrParser import TLDRParser, ParsedTLDRExample
+from threading import Thread
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from fastHistory.parser.InputData import InputData
+    from fastHistory.tldr.tldrParser import TLDRParser
 
 
-class TLDRParseThread(threading.Thread):
+class TLDRParseThread(Thread):
 
-    def __init__(self, tldr_parser: TLDRParser, user_input: list):
-        threading.Thread.__init__(self)
+    def __init__(self, tldr_parser: "TLDRParser", user_data: "InputData"):
+        Thread.__init__(self)
         self.tldr_parser = tldr_parser
-        self.user_input = user_input
+        self.user_data = user_data
         self.result_tldr_options: list = []
         self.stopped = False
 
     def run(self):
-        self.result_tldr_options = self.tldr_parser.find_match_command(self.user_input, self)
+        self.result_tldr_options = self.tldr_parser.find_match_command(self.user_data, self)
 
     def stop(self):
         self.stopped = True
