@@ -1,5 +1,7 @@
 import logging
+import mmap
 import os
+import time
 from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -110,26 +112,39 @@ class TLDRParser(object):
         self.pages_path = os.path.abspath(os.path.dirname(__file__)) + "/" + self.FOLDER_TLDR_PAGES
         if not os.path.isdir(self.pages_path):
             logging.error("TLDRParser: %s not found " % self.pages_path)
+        self.pages_in_memory = {}
 
     def find_match_command(self, input_data: "InputData", thread: "TLDRParseThread" = None) -> Optional[list]:
         # NO empty, already trimmed
         words = input_data.get_all_words()
         words = [word.lower() for word in words]
         result = []
-        for os_folder in self.enabled_os_folders:
-            for root, dirs, fnames in os.walk(self.pages_path + os_folder):
-                for fname in fnames:
-                    if thread and thread.has_been_stopped():
-                        logging.debug("find_match_command: thread stopped, stop the research")
-                        return []
-                    # this remove any empty word
-                    words_dict = dict((word, 0) for word in words if len(word) > 0)
-                    total_weight = 0
-                    file_full_path = os.path.join(root, fname)
-                    # if dict is not empty read the file
-                    if words_dict:
-                        with open(file_full_path) as f:
-                            for line in f:
+        words_dict = {}
+        try:
+            for os_folder in self.enabled_os_folders:
+                for root, dirs, fnames in os.walk(self.pages_path + os_folder):
+                    for fname in fnames:
+                        # this remove any empty word
+                        words_dict = dict((word, 0) for word in words if len(word) > 0)
+                        total_weight = 0
+
+                        file_full_path = os.path.join(root, fname)
+                        page = self.pages_in_memory.get(os_folder + "/" + fname)
+                        if page is None:
+                            context = []
+                            with open(file_full_path, "r") as f:
+                                for line in f:
+                                    context.append(line)
+                            self.pages_in_memory[os_folder + "/" + fname] = context
+
+                        # if dict is not empty read the file
+                        if words_dict:
+                            if thread and thread.has_been_stopped():
+                                logging.debug("find_match_command: thread stopped, stop the research")
+                                return []
+                            # TODO try to use mmapls
+                            # map_file = mmap.mmap(f.fileno(), 0, prot=mmap.ACCESS_READ)
+                            for line in self.pages_in_memory[os_folder + "/" + fname]:
                                 for word in words_dict.keys():
                                     if word in line.lower():
                                         first_char = line[0]
@@ -153,17 +168,20 @@ class TLDRParser(object):
                                             weight = 0
                                         words_dict[word] += 1
                                         total_weight += weight
-                    if all(count > 0 for count in words_dict.values()):
-                        if fname.endswith(".md"):
-                            cmd_name = fname[:-3]
-                        else:
-                            logging.error("find_match_command: fname does not ends with md: %s" % fname)
-                            cmd_name = fname
-                        # NOTE: the system availability of the command (5' value) is calculated later only if needed
-                        result.append([total_weight, os_folder, cmd_name, file_full_path, None])
-
-        result.sort(key=TLDRParser._find_match_command_sort_key, reverse=True)
-        return result
+                        if all(count > 0 for count in words_dict.values()):
+                            if fname.endswith(".md"):
+                                cmd_name = fname[:-3]
+                            else:
+                                logging.error("find_match_command: fname does not ends with md: %s" % fname)
+                                cmd_name = fname
+                            # NOTE: the system availability of the command (5' value) is calculated later only if needed
+                            result.append([total_weight, os_folder, cmd_name, file_full_path, None])
+            if words_dict:
+                result.sort(key=TLDRParser._find_match_command_sort_key, reverse=True)
+            return result
+        except Exception as e:
+            logging.error("find_match_command: %s" % e)
+            return result
 
     @staticmethod
     def _find_match_command_sort_key(arr):

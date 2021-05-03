@@ -627,14 +627,12 @@ class Picker(object):
 
         while True:
             if self.page_selector.has_minimum_size():
-                self.page_selector.clean_page()
                 self.page_selector.draw_page(
                     search_filters=self.data_manager.get_search_filters(),
                     options=self.get_options(),
                     search_t=self.search_t,
                     context_shift=self.context_shift,
                     last_column_size=self.last_column_size)
-                self.page_selector.refresh_page()
 
             # wait for char
             c = self.drawer.wait_next_char()

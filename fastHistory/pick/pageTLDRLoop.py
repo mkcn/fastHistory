@@ -39,13 +39,15 @@ class PageTLDRLoop(object):
         """
         :return:
         """
-        page_tldr_search = PageTLDRSearchDrawer(self.drawer)
         tldr_parser = TLDRParser()
         tldr_parser_thread = None
         input_data = InputData(False, "", [])
         tldr_options_reload_needed = True
         tldr_options_waiting = True
         tldr_examples_reload_needed = True
+        tldr_ui_reload = True
+
+        page_tldr_search = PageTLDRSearchDrawer(self.drawer)
 
         while True:
             # TODO fix "alt+d" crash
@@ -63,6 +65,7 @@ class PageTLDRLoop(object):
                 self.tldr_options = tldr_parser_thread.get_result_tldr_options()
                 self.update_tldr_options_to_draw()
                 tldr_examples_reload_needed = True
+                tldr_ui_reload = True
 
             if tldr_examples_reload_needed:
                 tldr_examples_reload_needed = False
@@ -80,7 +83,6 @@ class PageTLDRLoop(object):
                     self.tldr_examples_draw = []
 
             if page_tldr_search.has_minimum_size():
-                page_tldr_search.clean_page()
                 page_tldr_search.draw_page(
                     search_filters=self.search_field,
                     input_data=input_data,
@@ -89,13 +91,15 @@ class PageTLDRLoop(object):
                     tldr_examples_draw=self.tldr_examples_draw,
                     example_draw_index=self.tldr_examples_draw_index,
                     example_content_shift=self.example_content_shift,
-                    focus_area=self.focus)
-                page_tldr_search.refresh_page()
+                    focus_area=self.focus,
+                    is_waiting=tldr_options_waiting)
 
             # wait for char
             c = self.drawer.wait_next_char(multi_threading_mode=tldr_parser_thread.is_alive())
 
+            tldr_ui_reload = True
             if c == Keys.KEY_TIMEOUT:
+                tldr_ui_reload = False
                 continue
             elif c in Keys.KEYS_ENTER:
                 res = self.get_selected_example(search_input=input_data)

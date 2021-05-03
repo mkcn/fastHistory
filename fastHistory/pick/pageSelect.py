@@ -8,9 +8,6 @@ class PageSelector(PageGeneric):
     Class to draw the page with the commands to select
     """
 
-    TITLE_DEFAULT = "fastHistory search"
-    TITLE_ADVANCE_SEARCH = " Advanced  search "
-
     CMD_COLUMN_NAME = "Commands"
     TAG_AND_DESCRIPTION_COLUMN_NAME = "Tags & Description"
 
@@ -33,13 +30,10 @@ class PageSelector(PageGeneric):
         :param last_column_size:size of last column (tag and description column)
         :return:
         """
+        self.clean_page()
         # title
-        if search_filters.is_advanced():
-            self.drawer.draw_row(self.TITLE_ADVANCE_SEARCH, color=self.drawer.color_columns_title)
-            title_len = len(self.TITLE_ADVANCE_SEARCH)
-        else:
-            self.drawer.draw_row(self.TITLE_DEFAULT)
-            title_len = len(self.TITLE_DEFAULT)
+        self.drawer.draw_row(self.TITLE_DEFAULT)
+        title_len = len(self.TITLE_DEFAULT)
         self.drawer.draw_row(": ")
         title_len += 2
 
@@ -92,6 +86,13 @@ class PageSelector(PageGeneric):
         else:
             self.drawer.draw_row(search_text, color=self.drawer.color_search_input)
 
+        # draw tabs
+        size_tab_1 = len(self.TAB_NAME_MY_LIST)
+        size_tab_2 = len(self.TAB_NAME_TLDR)
+        max_x = self.drawer.get_max_x()
+        self.drawer.draw_row(self.TAB_NAME_MY_LIST, x=max_x - size_tab_1 - size_tab_2 - 1, color=self.drawer.color_columns_title)
+        self.drawer.draw_row(self.TAB_NAME_TLDR, x=max_x - size_tab_2 - 1)
+
         # columns titles
         index_tab_column = int(self.drawer.get_max_x() * last_column_size / 100)
 
@@ -124,6 +125,8 @@ class PageSelector(PageGeneric):
         # cursor set position
         self.drawer.show_cursor()
         self.drawer.move_cursor(title_len + search_t.get_cursor_index_to_print(), 0)
+
+        self.refresh_page()
 
     def draw_no_result(self, search_filters):
         """

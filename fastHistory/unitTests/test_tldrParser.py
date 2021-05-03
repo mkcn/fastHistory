@@ -3,7 +3,9 @@ import time
 from unittest import TestCase
 
 from fastHistory.parser.InputData import InputData
+from fastHistory.parser.inputParser import InputParser
 from fastHistory.tldr.tldrParser import TLDRParser, ParsedTLDRExample
+from fastHistory.tldr.tldrParserThread import TLDRParseThread
 from fastHistory.unitTests.loggerTest import LoggerTest
 
 
@@ -58,11 +60,19 @@ class TestTLDRParser(TestCase):
             else:
                 self.assertTrue(len(results) == 0)
 
+    def test_TLDR_empty_input(self):
+        searcher = TLDRParser()
+        empty_input = InputData(False, "", [])
+        results = searcher.find_match_command(empty_input)
+        count_results = len(results)
+        self.assertTrue(count_results > 100, msg="results are less then 100: %s" % count_results)
+
     def test_TLDR_search_time(self):
         searcher = TLDRParser()
 
         test_strings = [
             # input, excepted cmd, max index of expected cmd
+            InputData(False, "", []),
             InputData(False, "randomstringwithnomatch", ["randomstringwithnomatch"]),
             InputData(False, "open port listen", ["open", "port", "listen"])
         ]
@@ -73,6 +83,42 @@ class TestTLDRParser(TestCase):
             execution_time = (time.time() - start_time)
             logging.info("--- %s seconds ---" % execution_time)
             self.assertTrue(execution_time < 0.5, msg="execution takes too long")
+
+    def test_TLDR_search_with_simulated_manual_input(self):
+        """
+        note:
+            without "thread.has_been_stopped()" check ->  >= 3 seconds
+            with "thread.has_been_stopped()" check at fnames level -> 0.9 seconds
+            with "thread.has_been_stopped()" check at line level -> 0.85 seconds
+        :return:
+        """
+
+        test_strings = [
+            "open port listen",
+            "a fi le file ile"
+        ]
+
+        for test in test_strings:
+            start_time = time.time()
+
+            fake_manual_input = ""
+            tldr_parser_thread = None
+            tldr_parser = TLDRParser()
+            for c in test:
+                fake_manual_input += c
+                input_data = InputParser.parse_input(test, is_search_mode=True)
+                if tldr_parser_thread:
+                    tldr_parser_thread.stop()
+                tldr_parser_thread = TLDRParseThread(tldr_parser, input_data)
+                tldr_parser_thread.start()
+                time.sleep(0.05)
+
+            while tldr_parser_thread.is_alive():
+                time.sleep(0.01)
+
+            execution_time = (time.time() - start_time)
+            logging.info("%s -> %s seconds" % (test, execution_time))
+            self.assertTrue(execution_time < 1.5, msg="execution takes too long")
 
     def test_TLDR_parser(self):
         searcher = TLDRParser()
