@@ -37,7 +37,7 @@ if [ -f setup.py ]; then
 
 			# update version 
 			# note: we assume the test pypi always has the more updated version
-			version_pypi=$(wget -qO- https://$pypi_domain/pypi/fastHistory/json | python3 -c "import sys, json; print(json.load(sys.stdin)['info']['version'])")
+			version_pypi=$(wget -qO- https://$pypi_test_domain/pypi/fastHistory/json | python3 -c "import sys, json; print(json.load(sys.stdin)['info']['version'])")
 			regex="([0-9]+).([0-9]+).([0-9]+)"
 			if [[ $version_pypi =~ $regex ]]; then
 				major="${BASH_REMATCH[1]}"
