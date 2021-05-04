@@ -35,11 +35,11 @@ class PageTLDRLoop(object):
 
         self.focus = PageTLDRSearchDrawer.Focus.AREA_FILES
 
-    def run_loop_tldr(self):
+    def run_loop_tldr(self, cached_in_memory_pages):
         """
         :return:
         """
-        tldr_parser = TLDRParser()
+        tldr_parser = TLDRParser(cached_in_memory_pages)
         tldr_parser_thread = None
         input_data = InputData(False, "", [])
         tldr_options_reload_needed = True

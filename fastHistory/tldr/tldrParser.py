@@ -103,7 +103,7 @@ class TLDRParser(object):
     INDEX_TLDR_MATCH_FULL_PATH = 3
     INDEX_TLDR_MATCH_AVAILABILITY = 4
 
-    def __init__(self, enabled_os_folders=None):
+    def __init__(self, cached_in_memory_pages=None, enabled_os_folders=None):
         # TODO read from configuration or make dynamic based on OS ( enabled_os_folders: "linux", "windows", "osx"
         if enabled_os_folders is not None:
             self.enabled_os_folders = ["common"] + enabled_os_folders
@@ -112,7 +112,10 @@ class TLDRParser(object):
         self.pages_path = os.path.abspath(os.path.dirname(__file__)) + "/" + self.FOLDER_TLDR_PAGES
         if not os.path.isdir(self.pages_path):
             logging.error("TLDRParser: %s not found " % self.pages_path)
-        self.pages_in_memory = {}
+        if cached_in_memory_pages is None:
+            self.cached_in_memory_pages = {}
+        else:
+            self.cached_in_memory_pages = cached_in_memory_pages
 
     def find_match_command(self, input_data: "InputData", thread: "TLDRParseThread" = None) -> Optional[list]:
         # NO empty, already trimmed
@@ -129,13 +132,13 @@ class TLDRParser(object):
                         total_weight = 0
 
                         file_full_path = os.path.join(root, fname)
-                        page = self.pages_in_memory.get(os_folder + "/" + fname)
+                        page = self.cached_in_memory_pages.get(os_folder + "/" + fname)
                         if page is None:
                             context = []
                             with open(file_full_path, "r") as f:
                                 for line in f:
                                     context.append(line)
-                            self.pages_in_memory[os_folder + "/" + fname] = context
+                            self.cached_in_memory_pages[os_folder + "/" + fname] = context
 
                         # if dict is not empty read the file
                         if words_dict:
@@ -144,7 +147,7 @@ class TLDRParser(object):
                                 return []
                             # TODO try to use mmapls
                             # map_file = mmap.mmap(f.fileno(), 0, prot=mmap.ACCESS_READ)
-                            for line in self.pages_in_memory[os_folder + "/" + fname]:
+                            for line in self.cached_in_memory_pages[os_folder + "/" + fname]:
                                 for word in words_dict.keys():
                                     if word in line.lower():
                                         first_char = line[0]

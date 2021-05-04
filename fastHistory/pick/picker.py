@@ -60,6 +60,8 @@ class Picker(object):
         self.current_selected_option = None
         self.is_tldr_search = is_tldr_search
 
+        self.cached_in_memory_tldr_pages = {}
+
     def start(self):
         """
         starting point
@@ -610,7 +612,7 @@ class Picker(object):
     def run_loop_tldr(self):
         from fastHistory.pick.pageTLDRLoop import PageTLDRLoop
         page_tldr_loop = PageTLDRLoop(self.drawer, self.search_t)
-        res = page_tldr_loop.run_loop_tldr()
+        res = page_tldr_loop.run_loop_tldr(self.cached_in_memory_tldr_pages)
 
         self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.get_number_options_to_draw())
         self.update_options_to_draw(initialize_index=True)
