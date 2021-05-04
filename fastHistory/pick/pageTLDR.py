@@ -112,7 +112,7 @@ class PageTLDRSearchDrawer(PageGeneric):
 
         # columns titles
         self.drawer.new_line()
-        self.drawer.draw_row(" " * (self.drawer.get_max_x()), color=self.drawer.color_columns_title)
+        self.drawer.fill_row(color=self.drawer.color_columns_title)
         self.drawer.draw_row(self.FILE_COLUMN_NAME, x=2, color=self.drawer.color_columns_title)
         self.drawer.draw_row(self.EXAMPLE_COLUMN_NAME, x=self.TLDR_PAGES_COLUMN_SIZE + 2,
                              color=self.drawer.color_columns_title)
@@ -183,7 +183,7 @@ class PageTLDRSearchDrawer(PageGeneric):
                                         color_marked=self.drawer.color_search,
                                         color_default=background_color)
                 if i == selected_command_index:
-                    self.drawer.draw_row(" " * (self.TLDR_PAGES_COLUMN_SIZE - 1 - len(value_tldr_folder + value_tldr_cmd)), color=background_color)
+                    self.drawer.fill_row(color=background_color, max_x=self.TLDR_PAGES_COLUMN_SIZE - 1)
                 self.drawer.new_line()
             return True
 
@@ -196,12 +196,12 @@ class PageTLDRSearchDrawer(PageGeneric):
             for i in range(len(tldr_examples_draw)):
                 row_type = tldr_examples_draw[i][ParsedTLDRExample.INDEX_EXAMPLE_TYPE]
                 row_value = tldr_examples_draw[i][ParsedTLDRExample.INDEX_EXAMPLE_VALUE]
-                complete_backgroud_row = False
+                complete_background_row = False
                 if row_type == ParsedTLDRExample.Type.EXAMPLE:
                     if i == example_draw_index:
                         if has_focus:
                             background_color = self.drawer.color_selected_row
-                            complete_backgroud_row = True
+                            complete_background_row = True
                         else:
                             background_color = self.drawer.color_cmd_sample
                     else:
@@ -216,9 +216,8 @@ class PageTLDRSearchDrawer(PageGeneric):
                                         recursive=True,
                                         color_marked=self.drawer.color_search,
                                         color_default=background_color)
-                if complete_backgroud_row:
-                    # TODO create fill_row function
-                    self.drawer.draw_row(" " * (self.drawer.get_max_x() - self.TLDR_PAGES_COLUMN_SIZE - 1 - len(row_value)), color=background_color)
+                if complete_background_row:
+                    self.drawer.fill_row(color=background_color, max_x=self.drawer.get_max_x() - 1)
                 self.drawer.new_line()
 
     def draw_just_msg(self, msg: str, x: int = 0):
@@ -226,8 +225,7 @@ class PageTLDRSearchDrawer(PageGeneric):
         for y in range(int(self.drawer.get_max_y()/2 - shift)):
             self.drawer.new_line()
         msg_space = int((self.drawer.get_max_x() - x) / 2 - len(msg) / 2 - 1)
-
-        self.drawer.draw_row(" " * msg_space, x=x)
+        self.drawer.fill_row(x=x, max_x=msg_space)
         self.drawer.draw_row(msg)
 
     def _draw_help_line_selector(self, is_focus_examples: bool):

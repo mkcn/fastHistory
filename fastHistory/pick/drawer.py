@@ -217,6 +217,18 @@ class Drawer(object):
     def get_max_y(self):
         return self.max_y
 
+    def fill_row(self, char=" ", x=None, max_x=None, color=1):
+        if x is not None:
+            self.x = x
+        if max_x is None:
+            max_x = self.max_x
+
+        if max_x - self.x >= 0:
+            text_len = max_x - self.x
+            text = char[0] * text_len
+            self.terminal_screen.addstr(self.y, self.x, str(text), color)
+            self.x += text_len
+
     def draw_row(self, text, x=None, x_indent=0, color=1, allow_last_row=False, return_unprinted=False):
         """
         draw data to console and take care to not exceed borders

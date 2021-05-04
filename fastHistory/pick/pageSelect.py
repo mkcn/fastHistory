@@ -98,7 +98,7 @@ class PageSelector(PageGeneric):
 
         # draw row colored
         self.drawer.new_line()
-        self.drawer.draw_row(" " * (self.drawer.get_max_x()), color=self.drawer.color_columns_title)
+        self.drawer.fill_row(color=self.drawer.color_columns_title)
         self.drawer.draw_row(self.CMD_COLUMN_NAME, x=2, color=self.drawer.color_columns_title)
         self.drawer.draw_row(self.TAG_AND_DESCRIPTION_COLUMN_NAME, x=self.drawer.max_x - index_tab_column,
                              color=self.drawer.color_columns_title)
@@ -145,7 +145,7 @@ class PageSelector(PageGeneric):
             self.drawer.new_line()
         msg_space = int(self.drawer.get_max_x()/2 - len(msg_no_result)/2 - 1)
 
-        self.drawer.draw_row(" " * msg_space)
+        self.drawer.fill_row(max_x=msg_space)
         self.drawer.draw_row(msg_no_result)
 
         self.drawer.new_line()
@@ -156,12 +156,12 @@ class PageSelector(PageGeneric):
             msg_help = "[command_filter] [#tag_filter ...] [@description_filter]"
 
             msg_space = int(self.drawer.get_max_x() / 2 - len(msg_help_title) / 2)
-            self.drawer.draw_row(" " * msg_space)
+            self.drawer.fill_row(max_x=msg_space)
             self.drawer.draw_row(msg_help_title, color=self.drawer.color_columns_title)
 
             self.drawer.new_line()
             msg_space = int(self.drawer.get_max_x() / 2 - len(msg_help) / 2)
-            self.drawer.draw_row(" " * msg_space)
+            self.drawer.fill_row(max_x=msg_space)
             self.drawer.draw_row(msg_help)
 
     def _draw_help_line_selector(self):
