@@ -107,8 +107,8 @@ class PageTLDRSearchDrawer(PageGeneric):
         size_tab_1 = len(self.TAB_NAME_MY_LIST)
         size_tab_2 = len(self.TAB_NAME_TLDR)
         max_x = self.drawer.get_max_x()
-        self.drawer.draw_row(self.TAB_NAME_MY_LIST, x=max_x - size_tab_1 - size_tab_2 - 1)
-        self.drawer.draw_row(self.TAB_NAME_TLDR, x=max_x-size_tab_2 - 1, color=self.drawer.color_columns_title)
+        self.drawer.draw_row(self.TAB_NAME_MY_LIST, x=max_x - size_tab_1 - size_tab_2 - 1, color=self.drawer.color_tab_no_focus)
+        self.drawer.draw_row(self.TAB_NAME_TLDR, x=max_x-size_tab_2 - 1, color=self.drawer.color_tab_focus)
 
         # columns titles
         self.drawer.new_line()
@@ -161,24 +161,29 @@ class PageTLDRSearchDrawer(PageGeneric):
             command_context_shifter = ContextShifter()
             for i in range(number_options):
                 tldr_item = tldr_options_draw[i]
-                value_tldr_cmd = tldr_item[TLDRParser.INDEX_TLDR_MATCH_CMD_FOLDER] + "\\" + tldr_item[TLDRParser.INDEX_TLDR_MATCH_CMD]
+                value_tldr_folder = tldr_item[TLDRParser.INDEX_TLDR_MATCH_CMD_FOLDER] + "/"
                 if tldr_item[TLDRParser.INDEX_TLDR_MATCH_AVAILABILITY]:
-                    value_tldr_cmd = "+" + value_tldr_cmd
+                    value_tldr_folder = "+" + value_tldr_folder
                 else:
-                    value_tldr_cmd = " " + value_tldr_cmd
+                    value_tldr_folder = " " + value_tldr_folder
                 if i == selected_command_index:
                     if has_focus:
-                        background_color = self.drawer.color_search
+                        background_color = self.drawer.color_selected_row
                     else:
-                        background_color = self.drawer.color_selected_row  # TODO use a better name
+                        background_color = self.drawer.color_selected_row_no_focus
                 else:
                     background_color = self.drawer.NULL_COLOR
-                value_tldr_cmd = command_context_shifter.get_text_shifted(value_tldr_cmd, self.TLDR_PAGES_COLUMN_SIZE - 1)
+
+                self.drawer.draw_row(value_tldr_folder, color=background_color)
+                # add parameter
+                value_tldr_cmd = command_context_shifter.get_text_shifted(tldr_item[TLDRParser.INDEX_TLDR_MATCH_CMD], self.TLDR_PAGES_COLUMN_SIZE - 1 - len(value_tldr_folder))
                 self.draw_marked_string(value_tldr_cmd,
                                         words_to_mark,
                                         recursive=True,
                                         color_marked=self.drawer.color_search,
                                         color_default=background_color)
+                if i == selected_command_index:
+                    self.drawer.draw_row(" " * (self.TLDR_PAGES_COLUMN_SIZE - 1 - len(value_tldr_folder + value_tldr_cmd)), color=background_color)
                 self.drawer.new_line()
             return True
 
@@ -191,14 +196,16 @@ class PageTLDRSearchDrawer(PageGeneric):
             for i in range(len(tldr_examples_draw)):
                 row_type = tldr_examples_draw[i][ParsedTLDRExample.INDEX_EXAMPLE_TYPE]
                 row_value = tldr_examples_draw[i][ParsedTLDRExample.INDEX_EXAMPLE_VALUE]
+                complete_backgroud_row = False
                 if row_type == ParsedTLDRExample.Type.EXAMPLE:
                     if i == example_draw_index:
                         if has_focus:
-                            background_color = self.drawer.color_search  # TODO use a better name
+                            background_color = self.drawer.color_selected_row
+                            complete_backgroud_row = True
                         else:
-                            background_color = self.drawer.color_search_input
+                            background_color = self.drawer.color_cmd_sample
                     else:
-                        background_color = self.drawer.color_search_input
+                        background_color = self.drawer.color_cmd_sample
                 else:
                     background_color = self.drawer.NULL_COLOR
                 row_value = example_content_shift.get_text_shifted(row_value, tldr_example_column_size)
@@ -209,6 +216,9 @@ class PageTLDRSearchDrawer(PageGeneric):
                                         recursive=True,
                                         color_marked=self.drawer.color_search,
                                         color_default=background_color)
+                if complete_backgroud_row:
+                    # TODO create fill_row function
+                    self.drawer.draw_row(" " * (self.drawer.get_max_x() - self.TLDR_PAGES_COLUMN_SIZE - 1 - len(row_value)), color=background_color)
                 self.drawer.new_line()
 
     def draw_just_msg(self, msg: str, x: int = 0):

@@ -90,8 +90,8 @@ class PageSelector(PageGeneric):
         size_tab_1 = len(self.TAB_NAME_MY_LIST)
         size_tab_2 = len(self.TAB_NAME_TLDR)
         max_x = self.drawer.get_max_x()
-        self.drawer.draw_row(self.TAB_NAME_MY_LIST, x=max_x - size_tab_1 - size_tab_2 - 1, color=self.drawer.color_columns_title)
-        self.drawer.draw_row(self.TAB_NAME_TLDR, x=max_x - size_tab_2 - 1)
+        self.drawer.draw_row(self.TAB_NAME_MY_LIST, x=max_x - size_tab_1 - size_tab_2 - 1, color=self.drawer.color_tab_focus)
+        self.drawer.draw_row(self.TAB_NAME_TLDR, x=max_x - size_tab_2 - 1, color=self.drawer.color_tab_no_focus)
 
         # columns titles
         index_tab_column = int(self.drawer.get_max_x() * last_column_size / 100)

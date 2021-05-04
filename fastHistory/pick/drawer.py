@@ -24,8 +24,11 @@ class Drawer(object):
         self.color_hash_tag = None
         self.color_hash_tag_disable = None
         self.color_hash_tag_selected = None
-        self.color_border = None
+        self.color_tab_focus = None
+        self.color_tab_no_focus = None
+        self.color_cmd_sample = None
         self.color_selected_row = None
+        self.color_selected_row_no_focus = None
         self.color_selector = None
         self.color_columns_title = None
         self.init_colors(theme)
@@ -64,13 +67,15 @@ class Drawer(object):
             curses.init_pair(id_color_cyan_on_white, curses.COLOR_CYAN, curses.COLOR_WHITE)
 
             self.color_search_input = curses.color_pair(id_color_cyan) | curses.A_BOLD
+            self.color_cmd_sample = curses.color_pair(id_color_cyan)
             self.color_hash_tag = curses.color_pair(id_color_cyan)
-            self.color_border = curses.color_pair(id_color_black_on_white)
+            self.color_tab_no_focus = curses.color_pair(id_color_black_on_white)
             self.color_selected_row = curses.color_pair(id_color_black_on_white) | curses.A_BOLD
+            self.color_selected_row_no_focus = curses.color_pair(id_color_white_on_cyan) | curses.A_BOLD
             self.color_search = curses.color_pair(id_color_white_on_cyan) | curses.A_BOLD
             self.color_hash_tag_selected = curses.color_pair(id_color_cyan_on_white)
             self.color_selector = curses.color_pair(id_color_black_on_white)
-            self.color_columns_title = curses.color_pair(id_color_white_on_cyan)
+            self.color_columns_title = curses.color_pair(id_color_white_on_cyan) | curses.A_BOLD
         else:
             curses.init_pair(id_color_green_on_black, curses.COLOR_GREEN, curses.COLOR_BLACK)
             curses.init_pair(id_color_white_on_black, curses.COLOR_WHITE, curses.COLOR_BLACK)
@@ -80,13 +85,16 @@ class Drawer(object):
             curses.init_pair(id_color_green, curses.COLOR_GREEN, -1)
 
             self.color_search_input = curses.color_pair(id_color_green) | curses.A_BOLD
+            self.color_cmd_sample = curses.color_pair(id_color_green)
             self.color_hash_tag = curses.color_pair(id_color_green) | curses.A_BOLD
-            self.color_border = curses.color_pair(id_color_green_on_black)
+            self.color_tab_no_focus = curses.color_pair(id_color_green_on_black)
             self.color_selected_row = curses.color_pair(id_color_white_on_black) | curses.A_BOLD
+            self.color_selected_row_no_focus = curses.color_pair(id_color_white_on_green) | curses.A_BOLD
             self.color_search = curses.color_pair(id_color_white_on_green) | curses.A_BOLD
             self.color_hash_tag_selected = curses.color_pair(id_color_green_on_black) | curses.A_BOLD
             self.color_selector = curses.color_pair(id_color_green_on_black)
-            self.color_columns_title = curses.color_pair(id_color_black_on_green)
+            self.color_columns_title = curses.color_pair(id_color_black_on_green) | curses.A_BOLD
+        self.color_tab_focus = self.color_columns_title
 
     def hide_cursor(self):
         """
