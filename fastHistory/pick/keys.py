@@ -19,6 +19,7 @@ class Keys(object):
     KEY_CTRL_S = '\x13'  # not working well on ubuntu 20.04 terminal
     KEY_CTRL_D = '\x04'
     KEY_CTRL_F = '\x06'
+    KEY_CTRL_U = '\x15'
     KEY_CTRL_SPACE = '\x00'
     KEY_START = curses.KEY_HOME
     KEY_END = curses.KEY_END

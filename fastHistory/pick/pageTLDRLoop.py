@@ -96,7 +96,7 @@ class PageTLDRLoop(object):
 
             # wait for char
             c = self.drawer.wait_next_char(multi_threading_mode=tldr_parser_thread.is_alive())
-            logging.debug("pressed char: %s" % repr(c))
+            logging.debug("pressed key: %s" % repr(c))
 
             tldr_ui_reload = True
             if c == Keys.KEY_TIMEOUT:
@@ -141,6 +141,9 @@ class PageTLDRLoop(object):
                 self.search_field.move_cursor_to_end()
                 self.example_content_shift.reset_context_shifted()
                 self.focus = PageTLDRSearchDrawer.Focus.AREA_FILES
+            elif c == Keys.KEY_CTRL_U:
+                if self.search_field.set_text(""):
+                    tldr_options_reload_needed = True
             # delete a char of the search
             elif c in Keys.KEYS_DELETE:
                 if self.delete_char():

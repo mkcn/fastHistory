@@ -84,7 +84,16 @@ class TextManager(object):
         self.cursor_index = 0
 
     def set_text(self, text):
-        self.text = text
+        if self.text != text:
+            text_len = len(text)
+            self.cursor_index = text_len
+            self.text_len = text_len
+            self.text = text
+            if self.use_lower:
+                self.text_lower = self.text.lower()
+            return True
+        else:
+            return False
 
     def set_max_x(self, max_x):
         self.max_x = max_x

@@ -305,6 +305,8 @@ class Picker(object):
                 # this occurs when the console size changes
                 self.drawer.reset()
                 command_t.set_max_x(self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
+            elif c == Keys.KEY_CTRL_U:
+                command_t.set_text("")
             elif type(c) is str:
                 command_t.add_string(c, self.data_manager.get_forbidden_chars())
                 input_error_msg = None
@@ -396,6 +398,8 @@ class Picker(object):
                 # this occurs when the console size changes
                 self.drawer.reset()
                 description_t.set_max_x(self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
+            elif c == Keys.KEY_CTRL_U:
+                description_t.set_text("")
             elif type(c) is str:
                 description_t.add_string(c, self.data_manager.get_forbidden_chars())
                 new_description = InputParser.parse_description(description_t.get_text())
@@ -498,6 +502,8 @@ class Picker(object):
             elif c == Keys.KEY_RESIZE:
                 self.drawer.reset()
                 new_tags_t.set_max_x(self.drawer.get_max_x() - self.EDIT_FIELD_MARGIN)
+            elif c == Keys.KEY_CTRL_U:
+                new_tags_t.set_text("")
             elif type(c) is str:
                 new_tags_t.add_string(c, self.data_manager.get_forbidden_chars())
                 new_tags_array = InputParser.parse_tags_str(new_tags_t.get_text())
@@ -532,7 +538,7 @@ class Picker(object):
 
             # wait for char
             c = self.drawer.wait_next_char(multi_threading_mode=bash_parser_thread.is_alive())
-            logging.debug("pressed char: %s" % repr(c))
+            logging.debug("pressed key: %s" % repr(c))
 
             if c == Keys.KEY_TIMEOUT:
                 continue
@@ -606,10 +612,17 @@ class Picker(object):
         from fastHistory.pick.pageTLDRLoop import PageTLDRLoop
         page_tldr_loop = PageTLDRLoop(self.drawer, self.search_t)
         res = page_tldr_loop.run_loop_tldr(self.cached_in_memory_tldr_pages)
-
-        self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.get_number_options_to_draw())
-        self.update_options_to_draw(initialize_index=True)
+        self.loop_select_options_reload(True)
         return res
+
+    def loop_select_options_reload(self, initialize_index=False):
+        # reset shift value
+        if initialize_index:
+            self.context_shift.reset_context_shifted()
+            self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.get_number_options_to_draw())
+        else:
+            self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.index + self.get_number_options_to_draw())
+        self.update_options_to_draw(initialize_index=initialize_index)
 
     def run_loop_select(self):
         """
@@ -631,7 +644,7 @@ class Picker(object):
 
             # wait for char
             c = self.drawer.wait_next_char()
-            logging.debug("pressed char: %s" % repr(c))
+            logging.debug("pressed key: %s" % repr(c))
 
             if c == Keys.KEY_TIMEOUT:
                 continue
@@ -685,38 +698,28 @@ class Picker(object):
             # delete a char of the search
             elif c in Keys.KEYS_DELETE:
                 if self.search_t.delete_char():
-                    # reset shift value
-                    self.context_shift.reset_context_shifted()
-                    self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.get_number_options_to_draw())
-                    # update the options to show
-                    self.update_options_to_draw(initialize_index=True)
+                    self.loop_select_options_reload(True)
             # delete current selected option
             elif c == Keys.KEY_CANC:
-                self.data_manager.delete_element(self.current_selected_option[DataManager.OPTION.INDEX_CMD])
-                self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.index + self.get_number_options_to_draw())
-                self.update_options_to_draw()
+                if self.data_manager.delete_element(self.current_selected_option[DataManager.OPTION.INDEX_CMD]):
+                    self.loop_select_options_reload(False)
             elif c == Keys.KEY_RESIZE:
                 # this occurs when the console size changes
                 self.drawer.reset()
                 self.search_t.set_max_x(self.drawer.get_max_x() - self.SEARCH_FIELD_MARGIN)
                 # TODO make this more efficient
-                # update list option
-                self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.index + self.get_number_options_to_draw())
-                # update the options to show
-                self.update_options_to_draw()
-            # move cursor to the beginning
+                self.loop_select_options_reload(False)
             elif c == Keys.KEY_START or c == Keys.KEY_CTRL_A:
                 self.search_t.move_cursor_to_start()
                 self.context_shift.reset_context_shifted()
-            # move cursor to the end
             elif c == Keys.KEY_END or c == Keys.KEY_CTRL_E:
                 self.search_t.move_cursor_to_end()
-            # normal search char
+            elif c == Keys.KEY_CTRL_U:
+                self.search_t.set_text("")
+                self.loop_select_options_reload(True)
             elif type(c) is str:
                 if self.search_t.add_string(c, self.data_manager.get_forbidden_chars()):
-                    self.option_to_draw = None
-                    self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.get_number_options_to_draw())
-                    self.update_options_to_draw(initialize_index=True)
+                    self.loop_select_options_reload(True)
             else:
                 logging.error("input not handled: %s" % repr(c))
 
