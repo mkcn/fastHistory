@@ -82,7 +82,7 @@ class TestTLDRParser(TestCase):
             results = searcher.find_match_command(test)
             execution_time = (time.time() - start_time)
             logging.info("execution_time: %s seconds" % execution_time)
-            self.assertTrue(execution_time < 0.5, msg="execution takes too long")
+            self.assertTrue(execution_time < 0.5, msg="execution takes too long: %s sec" % execution_time)
 
     def test_TLDR_search_with_simulated_manual_input(self):
         """
@@ -118,7 +118,7 @@ class TestTLDRParser(TestCase):
 
             execution_time = (time.time() - start_time)
             logging.info("execution_time: %s -> %s seconds" % (test, execution_time))
-            self.assertTrue(execution_time < 3.0, msg="execution takes too long")
+            self.assertTrue(execution_time < 3.0, msg="execution takes too long: %s sec" % execution_time)
 
     def test_TLDR_parser(self):
         searcher = TLDRParser()

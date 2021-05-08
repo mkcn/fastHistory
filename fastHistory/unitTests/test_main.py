@@ -127,7 +127,7 @@ class TestMain(unittest.TestCase):
         sys.argv = ["", "--import", self.output_file, "--from-installer"]
         fastHistory.f(logger_console=logger_test)
         console_logs = logger_test.get_console_logs()
-        self.assertRegex(console_logs[1][LoggerBashTest.INDEX_VALUE], "import database: \d+ elements imported")
+        self.assertRegex(console_logs[1][LoggerBashTest.INDEX_VALUE], "\d+ elements imported")
 
     def test_call_export_with_error(self):
         logger_test = LoggerBashTest()

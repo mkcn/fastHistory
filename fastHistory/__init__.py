@@ -60,7 +60,7 @@ def handle_add_request(logger_console, input_cmd_str, path_data_folder, error_fe
 	"""
 	# local import to load this module only in case of an 'add' commands
 	from fastHistory.parser.inputParser import InputParser
-	
+
 	one_line_input = InputParser.adjust_multi_line_input(input_cmd_str)
 	# define log class
 	logging.debug("input: '%s'" % one_line_input[1])
