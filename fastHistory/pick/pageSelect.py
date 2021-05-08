@@ -52,7 +52,7 @@ class PageSelector(PageGeneric):
                     # cut string with unprinted section
                     search_text = search_text[index_cmd_end:]
                 else:
-                    logging.error("option cmd string not found in search field: " + search_filters.get_main_str())
+                    logging.error("option cmd string not found in search field: %s" % search_filters.get_main_str())
 
             for tag in search_filters.get_tags(strict=True):
                 # find index of tag filter in search text (e.g. "cmd" in "what #cmd @desc")
@@ -65,7 +65,7 @@ class PageSelector(PageGeneric):
                     # cut string with unprinted section
                     search_text = search_text[index_tag_end:]
                 else:
-                    logging.error("option tag string not found in search field: " + tag)
+                    logging.error("option tag string not found in search field: %s" % tag)
 
             if search_filters.get_description_str() is not None:
                 # find index of desc filter in search text (e.g. "desc" in "what #cmd @desc")
@@ -78,7 +78,7 @@ class PageSelector(PageGeneric):
                     # cut string with unprinted section
                     search_text = search_text[index_desc_end:]
                 else:
-                    logging.error("option tag string not found in search field: " + search_filters.get_description_str())
+                    logging.error("option tag string not found in search field: %s" % search_filters.get_description_str())
 
             # print the rest of the unprinted text
             # NOTE: this is printed with color and it can contain "#" and "@"

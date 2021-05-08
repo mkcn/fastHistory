@@ -111,7 +111,7 @@ class TLDRParser(object):
             self.enabled_os_folders = ["common", "linux"]  # "windows", "osx",
         self.pages_path = os.path.abspath(os.path.dirname(__file__)) + "/" + self.FOLDER_TLDR_PAGES
         if not os.path.isdir(self.pages_path):
-            logging.error("TLDRParser: %s not found " % self.pages_path)
+            logging.error("TLDR pages path not found: %s" % self.pages_path)
         if cached_in_memory_pages is None:
             self.cached_in_memory_pages = {}
         else:
@@ -209,7 +209,7 @@ class TLDRParser(object):
                             parsed_tldr_example.append_example_row(clean_cmd)
                         else:
                             parsed_tldr_example.append_example_row(line)
-                            logging.error("parse_tld_page - bad format: %s -> %s" % (path_tldr_page, line))
+                            logging.error("bad format: %s -> %s" % (path_tldr_page, line))
                     else:
                         parsed_tldr_example.append_generic_row(line)
         return parsed_tldr_example

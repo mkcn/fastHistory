@@ -81,7 +81,7 @@ class TestTLDRParser(TestCase):
             start_time = time.time()
             results = searcher.find_match_command(test)
             execution_time = (time.time() - start_time)
-            logging.info("--- %s seconds ---" % execution_time)
+            logging.info("execution_time: %s seconds" % execution_time)
             self.assertTrue(execution_time < 0.5, msg="execution takes too long")
 
     def test_TLDR_search_with_simulated_manual_input(self):
@@ -117,8 +117,8 @@ class TestTLDRParser(TestCase):
                 time.sleep(0.01)
 
             execution_time = (time.time() - start_time)
-            logging.info("%s -> %s seconds" % (test, execution_time))
-            self.assertTrue(execution_time < 1.5, msg="execution takes too long")
+            logging.info("execution_time: %s -> %s seconds" % (test, execution_time))
+            self.assertTrue(execution_time < 3.0, msg="execution takes too long")
 
     def test_TLDR_parser(self):
         searcher = TLDRParser()
@@ -131,7 +131,7 @@ class TestTLDRParser(TestCase):
         ]
 
         for test in test_strings:
-            logging.debug("test: %s" % test)
+            logging.debug("input test: %s" % test)
             results = searcher.find_match_command(test[0])
 
             self.assertTrue(len(results) > 0, msg="no results, check if the 'pages' folder exist")

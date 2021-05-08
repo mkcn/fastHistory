@@ -15,8 +15,8 @@ class DataManager(object):
 		INDEX_DESC = 1
 		INDEX_TAGS = 2
 
-	DATABASE_MODE_SQLITE = 0
-	DATABASE_MODE_MYSQL = 1
+	DATABASE_TYPE_SQLITE = 0
+	DATABASE_TYPE_MYSQL = 1
 
 	_OLD_DB_RELATIVE_PATHS = [
 		"../../../fastHistory/data/fh_v1.db",
@@ -26,14 +26,14 @@ class DataManager(object):
 
 	DUMMY_INPUT_DATA = InputData(False, "", [])
 
-	def __init__(self, path_data_folder, name_db_file, mode=DATABASE_MODE_SQLITE):
+	def __init__(self, path_data_folder, name_db_file, mode=DATABASE_TYPE_SQLITE):
 		self.last_search = None
 		self.filtered_data = None
-		if mode == self.DATABASE_MODE_SQLITE:
+		if mode == self.DATABASE_TYPE_SQLITE:
 			from fastHistory.database.databaseSQLite import DatabaseSQLite
 			self.database = DatabaseSQLite(path_data_folder, name_db_file, DataManager._OLD_DB_RELATIVE_PATHS)
 		else:
-			logging.error("database mode not supported")
+			logging.error("database type not supported")
 		# set dummy as default
 		self.search_filters = self.DUMMY_INPUT_DATA
 		# define special chars based on the chosen database

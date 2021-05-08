@@ -53,10 +53,10 @@ class InputParser(object):
         """
         match = re.search(InputParser.REGEXP_INPUT_TAGS, tags_str, flags=re.UNICODE)
         if match:
-            logging.debug("tag parser: regex matches")
+            logging.debug("regex matches")
             tags_str = match.group(1)
         else:
-            logging.error("tag parser: regex does NOT match")
+            logging.error("regex does NOT match")
             return None
 
         tags = []
@@ -65,7 +65,7 @@ class InputParser(object):
             return []
 
         if tags_str is not None:
-            logging.debug("tags_str: " + str(tags_str))
+            logging.debug("tags_str: %s" % str(tags_str))
             tags_tmp = tags_str.split(InputParser.TAG_SIGN)
             if len(tags_tmp) >= 2:
                 tags_tmp = tags_tmp[1:]
@@ -97,22 +97,22 @@ class InputParser(object):
 
         match = re.search(InputParser.REGEXP_INPUT_DESCRIPTION, description, flags=re.UNICODE)
         if match:
-            logging.debug("description parser: regex matches")
+            logging.debug("regex matches")
             desc_str = match.group(1)
         else:
-            logging.error("description parser: regex does NOT match")
+            logging.error("regex does NOT match")
             return None
 
         # remove @ and spaces from description
         if desc_str is not None:
-            logging.debug("description parser - desc_str: " + desc_str)
+            logging.debug("desc_str: %s" % desc_str)
             if desc_str[0] == InputParser.DESCRIPTION_SIGN:
                 desc = desc_str[1:].strip()
             else:
-                logging.error("description parser - description does not start with @")
+                logging.error("description does not start with @")
                 desc = None
         else:
-            logging.error("description parser - description is null")
+            logging.error("description is null")
             desc = None
 
         return desc
@@ -129,7 +129,7 @@ class InputParser(object):
         match = re.search(InputParser.REGEXP_INSERT_STR, cmd_str, flags=re.UNICODE)
 
         if match:
-            logging.debug("command parser: regex matches")
+            logging.debug("regex matches")
             tags_str = match.group(1)
             desc_str = match.group(2)
 
@@ -139,7 +139,7 @@ class InputParser(object):
                 logging.debug("command contains tag and/or description")
                 return False
         else:
-            logging.debug("command parser: regex does not match (correct)")
+            logging.debug("regex does not match (correct)")
             return True
 
     @staticmethod
@@ -176,7 +176,7 @@ class InputParser(object):
             match = re.search(InputParser.REGEXP_INSERT_STR, input_str, flags=re.UNICODE)
 
         if match:
-            logging.debug("input parser: regex matches")
+            logging.debug("regex matches")
             tags_str = match.group(1)
             desc_str = match.group(2)
 
@@ -191,13 +191,13 @@ class InputParser(object):
                 input_str = input_str[:-char_to_cut]
             input_str = input_str.strip()
         else:
-            logging.debug("input parser: regex does NOT match")
+            logging.debug("regex does NOT match")
             return None
 
         # tags
         tags = []
         if tags_str is not None and tags_str != InputParser.EMTPY_STRING:
-            logging.debug("tags_str: " + str(tags_str))
+            logging.debug("tags_str: %s" % str(tags_str))
             tags_tmp = tags_str.split(InputParser.TAG_SIGN)
             if len(tags_tmp) >= 2:
                 tags_tmp = tags_tmp[1:]
@@ -213,7 +213,7 @@ class InputParser(object):
 
         # remove @ and spaces from description
         if desc_str is not None:
-            logging.debug("desc_str: " + desc_str)
+            logging.debug("desc_str: %s" % desc_str)
             if desc_str[0] == InputParser.DESCRIPTION_SIGN:
                 desc = desc_str[1:].strip()
             else:  # desc_str[1] == InputParser.DESCRIPTION_SIGN:

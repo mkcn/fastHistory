@@ -103,7 +103,7 @@ class DatabaseSQLite(object):
 
                 # get history table structure
                 tmp_struct_old = tmp_cursor_old.execute("PRAGMA table_info('%s')" % self.TABLE_NAME).fetchall()
-                logging.debug("database import structure: " + str(tmp_struct_old))
+                logging.debug("database import structure: %s" % str(tmp_struct_old))
 
                 number_of_imported_items = 0
 
@@ -184,13 +184,13 @@ class DatabaseSQLite(object):
                     self.save_changes()
                     return number_of_imported_items
                 else:
-                    logging.error("database migration - unknown database type: %s" % str(old_db_path))
+                    logging.error("unknown database type: %s" % str(old_db_path))
                     return error
             else:
-                logging.debug("database migration - database file not found: %s" % str(old_db_path))
+                logging.debug("database file not found: %s" % str(old_db_path))
                 return error
         except Exception as e:
-            logging.error("database migration - error: %s" % str(e))
+            logging.error("error: %s" % str(e))
             self.rollback_changes()
             return error
 
@@ -207,7 +207,7 @@ class DatabaseSQLite(object):
         in case of exceptions this should be called to clean the local changes
         :return:
         """
-        logging.error("database error detected - rollback changes")
+        logging.error("database error detected, rollback changes")
         self.conn.rollback()
 
     def reset_entire_db(self):
@@ -244,7 +244,7 @@ class DatabaseSQLite(object):
 
         :return:
         """
-        logging.info("database - create database")
+        logging.info("create database")
         self.cursor.execute("CREATE TABLE %s ( %s )" % (self._DATABASE_TABLE_NAME, self._DATABASE_STRUCTURE))
 
         # note: sqlite automatically adds a column called "rowID"
@@ -352,8 +352,8 @@ class DatabaseSQLite(object):
         # execute query
         self.cursor.execute(query, parameters)
 
-        logging.debug("database:search - query: " + query)
-        logging.debug("database:search - parameters: " + str(parameters))
+        logging.debug("search query: %s" % query)
+        logging.debug("search parameters: %s" % str(parameters))
 
         return self._cast_return_type(self.cursor.fetchall())
 
@@ -381,21 +381,19 @@ class DatabaseSQLite(object):
 
             # check if description and tags contains an illegal char (@ or #)
             if description is not None and (self.CHAR_TAG in description or self.CHAR_DESCRIPTION in description):
-                logging.error("database:add element - description contains illegal char " +
-                              self.CHAR_DESCRIPTION + ": " + description)
+                logging.error("description contains illegal char %s: %s" % (self.CHAR_DESCRIPTION, description))
                 return False
             if tags is not None and type(tags) == list:
                 for tag in tags:
                     if self.CHAR_TAG in tag or self.CHAR_DESCRIPTION in tag:
-                        logging.error("database:add element - tags contains illegal char " +
-                                      self.CHAR_DESCRIPTION + ": " + tag)
+                        logging.error("tags contains illegal char %s: %s" % (self.CHAR_DESCRIPTION, tag))
                         return False
 
-            logging.debug("database:add element - add command: " + str(cmd))
-            logging.debug("database:add element - tags: " + str(tags))
-            logging.debug("database:add element - description: " + str(description))
-            logging.debug("database:add element - counter: " + str(counter))
-            logging.debug("database:add element - synced: " + str(synced))
+            logging.debug("add command: %s" % str(cmd))
+            logging.debug("tags: %s" % str(tags))
+            logging.debug("description: %s" % str(description))
+            logging.debug("counter: %s" % str(counter))
+            logging.debug("synced: %s" % str(synced))
 
             self.cursor.execute("SELECT rowid, description, tags, counter, date FROM history WHERE command=?", (cmd,))
             matches = self.cursor.fetchall()
@@ -422,7 +420,7 @@ class DatabaseSQLite(object):
                     return False
                 else:
                     self.save_changes()
-                    logging.debug("database:add element - added NEW")
+                    logging.debug("added new element")
                     return True
             elif matches_number == 1:
                 # note: in this case the given 'date' and 'sync' values are ignored
@@ -437,13 +435,13 @@ class DatabaseSQLite(object):
                     return False
                 else:
                     self.save_changes()
-                    logging.debug("database:add element - added NEW (merged)")
+                    logging.debug("added new element (merged)")
                     return True
             else:
-                logging.error("database:add element - command entry is not unique: " + cmd)
+                logging.error("command entry is not unique: %s" % cmd)
                 return False
         except Exception as e:
-            logging.error("database:add element - thrown an error: %s" % str(e))
+            logging.error("error: %s" % str(e))
             self.rollback_changes()
             return False
 
@@ -522,7 +520,7 @@ class DatabaseSQLite(object):
                                  date,
                                  synced
                                  )).rowcount != 1:
-                logging.error("database:merge element - insert failed")
+                logging.error("insert failed")
                 return False
         else:
             if self.cursor.execute("UPDATE history SET command=?, description=?, tags=?, counter=?, date=? WHERE rowid=?", (
@@ -532,10 +530,10 @@ class DatabaseSQLite(object):
                     counter,
                     date,
                     old_id)).rowcount != 1:
-                logging.error("database:merge element - update failed")
+                logging.error("update failed")
                 return False
 
-        logging.debug("database:merge element - command updated: " + new_cmd)
+        logging.debug("command updated: %s" % new_cmd)
         return True
 
     def update_command_field(self, old_cmd, new_cmd):
@@ -550,13 +548,13 @@ class DatabaseSQLite(object):
         """
         try:
             if new_cmd is None or new_cmd == "":
-                logging.error("database - update_command_field: new command is null")
+                logging.error("new command is null")
                 return False
             if old_cmd == new_cmd:
-                logging.debug("database - update_command_field: no change needed")
+                logging.debug("no change needed")
                 return False
 
-            logging.debug("database - update_command_field: replace " + str(old_cmd) + "  with " + str(new_cmd))
+            logging.debug("replace '%s' with '%s'" % (str(old_cmd), str(new_cmd)))
             self.cursor.execute("SELECT rowid, description, tags, counter, date FROM history WHERE command=?", (old_cmd,))
             old_matches = self.cursor.fetchall()
             matches_number = len(old_matches)
@@ -597,17 +595,17 @@ class DatabaseSQLite(object):
                         self.save_changes()
                         return True
                 else:
-                    logging.debug("database - update_command_field - command entry is not unique: " + new_cmd)
+                    logging.debug("command entry is not unique: %s" % new_cmd)
                     return False
             elif matches_number == 0:
-                logging.error("database - update_command_field - command entry is not unique: " + old_cmd)
+                logging.error("command entry is not unique: %s" % old_cmd)
                 return False
             else:
-                logging.error("database - update_command_field - fail because of no matched command")
+                logging.error("fail because of no matched command")
                 return False
 
         except Exception as e:
-            logging.error("database: update_command_field - throw an error: %s" % str(e))
+            logging.error("error: %s" % str(e))
             self.rollback_changes()
             return False
 
@@ -622,10 +620,10 @@ class DatabaseSQLite(object):
         """
         try:
             if tags is None:
-                logging.error("database - update_tags_field: tags is null")
+                logging.error("tags is null")
                 return False
 
-            logging.debug("database - update_tags_field: " + str(cmd) + " with " + str(tags))
+            logging.debug("input: %s with %s" % (str(cmd), str(tags)))
             self.cursor.execute("SELECT  rowid, tags, date FROM history WHERE command=?", (cmd,))
             matches = self.cursor.fetchall()
             matches_number = len(matches)
@@ -646,13 +644,13 @@ class DatabaseSQLite(object):
                     self.save_changes()
                     return True
                 else:
-                    logging.debug("database - update_tags_field - no changed")
+                    logging.debug("no changed")
                     return True
             else:
-                logging.error("database - update_tags_field - fail because of no matched command")
+                logging.error("fail because of no matched command")
                 return False
         except Exception as e:
-            logging.error("database - update_tags_field error: %s" % str(e))
+            logging.error("error: %s" % str(e))
             self.rollback_changes()
             return False
 
@@ -669,7 +667,7 @@ class DatabaseSQLite(object):
             if description is None:
                 return False
 
-            logging.debug("database - update_description_field: " + str(cmd) + " with " + str(description))
+            logging.debug("input: %s with %s" % (str(cmd), str(description)))
             self.cursor.execute("SELECT  rowid, description, date FROM history WHERE command=?", (cmd,))
             matches = self.cursor.fetchall()
             matches_number = len(matches)
@@ -694,10 +692,10 @@ class DatabaseSQLite(object):
                 else:
                     return True
             else:
-                logging.error("database - update_description_field - fail because of no matched command")
+                logging.error("fail because of no matched command")
                 return False
         except Exception as e:
-            logging.error("database - update_description_field error: %s" % str(e))
+            logging.error("error: %s" % str(e))
             self.rollback_changes()
             return False
 
@@ -712,7 +710,7 @@ class DatabaseSQLite(object):
         :return:        True is the database was successfully changed, False otherwise
         """
         try:
-            logging.debug("database - update_position_element: " + str(cmd))
+            logging.debug("input: %s" % str(cmd))
             self.cursor.execute("SELECT  rowid, description, tags, counter, date, synced FROM history WHERE command=?", (cmd,))
             matches = self.cursor.fetchall()
             matches_number = len(matches)
@@ -735,10 +733,10 @@ class DatabaseSQLite(object):
                     self.save_changes()
                     return True
             else:
-                logging.error("database - update_position_element - fail because of no matched command")
+                logging.error("fail because of no matched command")
                 return False
         except Exception as e:
-            logging.error("database - update_position_element error: %s" % str(e))
+            logging.error("error: %s" % str(e))
             self.rollback_changes()
             return False
 
@@ -750,7 +748,7 @@ class DatabaseSQLite(object):
         :return:        true is successfully deleted, false otherwise
         """
         try:
-            logging.debug("delete command: " + str(cmd))
+            logging.debug("delete command: %s" % str(cmd))
             if cmd is None:
                 logging.error("remove_element: cmd is None")
                 return False
@@ -766,7 +764,7 @@ class DatabaseSQLite(object):
                 logging.debug("delete completed")
                 return True
         except Exception as e:
-            logging.error("database - remove_element error: %s" % str(e))
+            logging.error("error: %s" % str(e))
             self.rollback_changes()
             return False
 
@@ -794,13 +792,13 @@ class DatabaseSQLite(object):
                 if len(match) == 1:
                     return match[0]
                 else:
-                    logging.error("database - get_column_field: match length <> 1")
+                    logging.error("match length <> 1")
                     return None
             else:
-                logging.error("database - get_column_field: matches length <> 1")
+                logging.error("matches length <> 1")
                 return None
         except:
-            logging.error("database - get_column_field: unexpected error")
+            logging.error("unexpected error")
             return None
 
     def _cast_return_type(self, data):
@@ -850,7 +848,7 @@ class DatabaseSQLite(object):
         :return:
         """
         if type(tags) is not list:
-            logging.error("database - _tag_array_to_string - wrong type")
+            logging.error("tags type not list")
             return None
 
         tags_string = ""

@@ -22,8 +22,6 @@ class Picker(object):
     SEARCH_FIELD_MARGIN = 23
     TEXT_NOT_ALLOWED_STR = "text not allowed"
 
-    DEBUG_MODE = True
-
     def __init__(self, data_manager, theme, last_column_size, is_tldr_search=False, search_text="", multi_select=False):
         """
         initialize variables and get filtered list starting options to show
@@ -310,10 +308,8 @@ class Picker(object):
             elif type(c) is str:
                 command_t.add_string(c, self.data_manager.get_forbidden_chars())
                 input_error_msg = None
-            elif type(c) is int:
-                logging.debug("loop edit command - integer input not handled: " + repr(c))
             else:
-                logging.error("loop edit command - input not handled: " + repr(c))
+                logging.error("input not handled: %s" % repr(c))
 
     def run_loop_edit_description(self, blocks_shift, bash_parser_thread):
         """
@@ -407,10 +403,8 @@ class Picker(object):
                     input_error_msg = self.TEXT_NOT_ALLOWED_STR
                 else:
                     input_error_msg = None
-            elif type(c) is int:
-                logging.debug("loop edit description - integer input not handled: " + repr(c))
             else:
-                logging.error("loop edit description - input not handled: " + repr(c))
+                logging.error("input not handled: %s" % repr(c))
 
     def run_loop_edit_tags(self, bash_parser_thread):
         """
@@ -511,10 +505,8 @@ class Picker(object):
                     input_error_msg = self.TEXT_NOT_ALLOWED_STR
                 else:
                     input_error_msg = None
-            elif type(c) is int:
-                logging.debug("loop edit tag - integer input not handled: " + repr(c))
             else:
-                logging.error("loop edit tag - input not handled: " + repr(c))
+                logging.error("input not handled: %s" % repr(c))
 
     def run_loop_info(self):
         """
@@ -540,6 +532,7 @@ class Picker(object):
 
             # wait for char
             c = self.drawer.wait_next_char(multi_threading_mode=bash_parser_thread.is_alive())
+            logging.debug("pressed char: %s" % repr(c))
 
             if c == Keys.KEY_TIMEOUT:
                 continue
@@ -607,7 +600,7 @@ class Picker(object):
                 self.drawer.reset()
                 self.search_t.set_max_x(self.drawer.get_max_x())
             else:
-                logging.error("loop info - input not handled: " + repr(c))
+                logging.error("input not handled: %s" % repr(c))
 
     def run_loop_tldr(self):
         from fastHistory.pick.pageTLDRLoop import PageTLDRLoop
@@ -638,6 +631,7 @@ class Picker(object):
 
             # wait for char
             c = self.drawer.wait_next_char()
+            logging.debug("pressed char: %s" % repr(c))
 
             if c == Keys.KEY_TIMEOUT:
                 continue
@@ -723,8 +717,6 @@ class Picker(object):
                     self.option_to_draw = None
                     self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.get_number_options_to_draw())
                     self.update_options_to_draw(initialize_index=True)
-            elif type(c) is int:
-                logging.debug("loop select - integer input not handled: " + repr(c))
             else:
-                logging.error("loop select - input not handled: " + repr(c))
+                logging.error("input not handled: %s" % repr(c))
 

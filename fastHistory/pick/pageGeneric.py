@@ -160,7 +160,6 @@ class PageGeneric(object):
             unmatched_tags = []
             for tag in tags:
                 sections = self.find_sections_to_mark(tag, filter_tags)
-                # logging.debug("tag sections: " + str(sections))
 
                 sections_len = len(sections)
                 # if at least one filter tag matches
@@ -188,7 +187,6 @@ class PageGeneric(object):
             elif filter_desc is not None:
                 # TODO when "@" is searched, show description before tags
                 sections = self.find_sections_to_mark(desc, filter_desc)
-                # logging.debug("desc sections: " + str(sections))
                 sections_len = len(sections)
                 # if at least one filter tag matches
                 if sections_len >= 2 or (sections_len == 1 and sections[0][self.INDEX_SECTION_IS_MARKED] == 1):

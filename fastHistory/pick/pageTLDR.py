@@ -22,7 +22,6 @@ class PageTLDRSearchDrawer(PageGeneric):
     MSG_WAITING = "Loading.."
     MSG_NO_MATCH = "No match found"
     MSG_NO_EXAMPLE = "No example found"
-    DEBUG_MODE = False
 
     SEARCH_FIELD_MARGIN = 23
     TLDR_PAGES_COLUMN_SIZE = 27
@@ -50,7 +49,7 @@ class PageTLDRSearchDrawer(PageGeneric):
         """
         self.clean_page()
 
-        logging.debug("PageTLDRSearch - draw_page")
+        logging.debug("draw page PageTLDRSearch")
         self.drawer.draw_row(self.TITLE_DEFAULT)
         title_len = len(self.TITLE_DEFAULT)
         self.drawer.draw_row(": ")
@@ -70,7 +69,7 @@ class PageTLDRSearchDrawer(PageGeneric):
                     # cut string with unprinted section
                     search_text = search_text[index_cmd_end:]
                 else:
-                    logging.error("option cmd string not found in search field: " + input_data.get_main_str())
+                    logging.error("option cmd string not found in search field: %s" % input_data.get_main_str())
 
             for tag in input_data.get_tags(strict=True):
                 # find index of tag filter in search text (e.g. "cmd" in "what #cmd @desc")
@@ -83,7 +82,7 @@ class PageTLDRSearchDrawer(PageGeneric):
                     # cut string with unprinted section
                     search_text = search_text[index_tag_end:]
                 else:
-                    logging.error("option tag string not found in search field: " + tag)
+                    logging.error("option tag string not found in search field: %s" % tag)
 
             if input_data.get_description_str() is not None:
                 # find index of desc filter in search text (e.g. "desc" in "what #cmd @desc")
@@ -96,7 +95,7 @@ class PageTLDRSearchDrawer(PageGeneric):
                     # cut string with unprinted section
                     search_text = search_text[index_desc_end:]
                 else:
-                    logging.error("option tag string not found in search field: " + input_data.get_description_str())
+                    logging.error("option tag string not found in search field: %s" % input_data.get_description_str())
             # print the rest of the unprinted text
             # NOTE: this is printed with color and it can contain "#" and "@"
             self.drawer.draw_row(search_text, color=self.drawer.color_hash_tag_disable)

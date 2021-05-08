@@ -96,6 +96,7 @@ class PageTLDRLoop(object):
 
             # wait for char
             c = self.drawer.wait_next_char(multi_threading_mode=tldr_parser_thread.is_alive())
+            logging.debug("pressed char: %s" % repr(c))
 
             tldr_ui_reload = True
             if c == Keys.KEY_TIMEOUT:
@@ -148,10 +149,8 @@ class PageTLDRLoop(object):
             elif type(c) is str:
                 if self.add_str(c):
                     tldr_options_reload_needed = True
-            elif type(c) is int:
-                logging.debug("loop TLDR page - integer input not handled: " + repr(c))
             else:
-                logging.error("loop TLDR page - input not handled: " + repr(c))
+                logging.error("input not handled: %s" % repr(c))
 
     def get_selected_example(self, search_input: InputData, copied: bool = False):
         res = self.tldr_examples.get_current_selected_example(self.tldr_examples_index)
@@ -208,7 +207,7 @@ class PageTLDRLoop(object):
                 self.tldr_examples_draw_index = self.tldr_examples.get_first_example_index()
             return False
         else:
-            logging.error("move_up: out of focus")
+            logging.error("out of focus")
             return False
 
     def move_down(self):
@@ -256,7 +255,7 @@ class PageTLDRLoop(object):
                     self.tldr_examples_draw_index += next_example_delta_index
             return False
         else:
-            logging.error("move_up: out of focus")
+            logging.error("out of focus")
             return False
 
     def move_right(self):
@@ -268,7 +267,7 @@ class PageTLDRLoop(object):
         elif self.focus == PageTLDRSearchDrawer.Focus.AREA_EXAMPLES:
             self.example_content_shift.shift_context_right()
         else:
-            logging.error("move_right: out of focus")
+            logging.error("out of focus")
 
     def move_left(self):
         if self.focus == PageTLDRSearchDrawer.Focus.AREA_EXAMPLES:
@@ -280,7 +279,7 @@ class PageTLDRLoop(object):
             if not self.search_field.is_cursor_at_the_beginning():
                 self.search_field.move_cursor_left()
         else:
-            logging.error("move_left: out of focus")
+            logging.error("out of focus")
 
     def reset_indexes(self):
         self.tldr_options_index = 0
