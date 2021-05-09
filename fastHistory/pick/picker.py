@@ -672,12 +672,15 @@ class Picker(object):
                 if res is not None:
                     return res
             # search TLDR
-            elif c == Keys.KEY_CTRL_F:
+            elif c == Keys.KEY_CTRL_T:
                 res = self.run_loop_tldr()
                 if res is not None and res[1] is not None:
                     return res
                 else:
                     continue
+            elif c == Keys.KEY_CTRL_R:
+                # TODO this will open the bash history tab
+                pass
             # -> command
             elif c == Keys.KEY_RIGHT:
                 if self.search_t.is_cursor_at_the_end():

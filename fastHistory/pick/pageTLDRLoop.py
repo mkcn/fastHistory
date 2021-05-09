@@ -117,7 +117,7 @@ class PageTLDRLoop(object):
             elif c == Keys.KEY_TAB:
                 self.flip_focus()
             # go back to main page
-            elif c == Keys.KEY_CTRL_F or c == Keys.KEY_ESC:
+            elif c == Keys.KEY_CTRL_F or c == Keys.KEY_CTRL_T or c == Keys.KEY_ESC:
                 return None
             elif c == Keys.KEY_UP:
                 if self.move_up():

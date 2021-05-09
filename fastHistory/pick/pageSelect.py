@@ -136,6 +136,7 @@ class PageSelector(PageGeneric):
         :return:
         """
         msg_no_result = "no result"
+        msg_try_tldr = "try TDLR search (ctrl+t)"
         if search_filters.is_advanced():
             shift = 3
         else:
@@ -143,11 +144,12 @@ class PageSelector(PageGeneric):
 
         for y in range(int(self.drawer.get_max_y()/2 - shift)):
             self.drawer.new_line()
-        msg_space = int(self.drawer.get_max_x()/2 - len(msg_no_result)/2 - 1)
+        msg_no_result_space = int(self.drawer.get_max_x()/2 - len(msg_no_result)/2 - 1)
+        msg_try_tldr_space = int(self.drawer.get_max_x()/2 - len(msg_try_tldr)/2 - 1)
 
-        self.drawer.fill_row(max_x=msg_space)
-        self.drawer.draw_row(msg_no_result)
-
+        self.drawer.draw_row(msg_no_result, x=msg_no_result_space)
+        self.drawer.new_line()
+        self.drawer.draw_row(msg_try_tldr, x=msg_try_tldr_space)
         self.drawer.new_line()
         self.drawer.new_line()
 
@@ -175,7 +177,7 @@ class PageSelector(PageGeneric):
         self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("More", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("Ctrl+f", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Ctrl+t", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("TLDR", x_indent=1, allow_last_row=True)
 
         self.drawer.draw_row("Del", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)

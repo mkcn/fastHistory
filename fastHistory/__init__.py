@@ -280,7 +280,7 @@ def handle_arguments(logger_console, config_reader, path_data_folder, path_code_
 		elif arg1 == "--add-explicit" and args_len == 3:
 			input_cmd = str(sys.argv[2]).strip()
 			handle_add_request(logger_console, input_cmd, path_data_folder, error_feedback=False)
-		elif arg1 == "-f" or arg1 == "--find" or arg1 == "--tldr":
+		elif arg1 == "-t" or arg1 == "--tldr":
 			input_cmd = retrieve_parameters_from_bash_hook(arg1=arg1)
 			handle_search_request(logger_console, input_cmd, path_data_folder, config_reader.get_theme(),
 								  config_reader.get_last_column_size(), is_tldr_search=True)
