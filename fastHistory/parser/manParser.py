@@ -125,10 +125,10 @@ class ManParser(object):
                 if result is not None:
                     result = result.group(2)
                 else:
-                    logging.debug("get_flag_meaning: regex does not match '%s'" % flag)
+                    logging.debug("regex does not match: '%s'" % flag)
                     return None
-            except sre_constants.error:
-                logging.error("flag meaning parser: %s" % sys.exc_info()[0])
+            except Exception:
+                logging.debug("regex does not match with error: %s" % flag)
                 return None
 
         rows = result.split("\n")

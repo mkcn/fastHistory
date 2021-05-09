@@ -27,7 +27,8 @@ class TestBashParser(TestCase):
             ["sudo blkid -trv | grep swap -r",          [[['blkid', None], [['-trv', None]]], [['grep', None], [['swap', None], ['-r', None]]]]],
             ["srm -lsv /media/cecss/  # comment",       [[['srm', None], [['-lsv', None], ['/media/cecss/', None]]]]],
             ['cat "$(ls)" -v',                          [[['cat', None], [['$(ls)', None], ['-v', None]]]]],
-            ['while true; do lsof /path/to/file; done;', [[['lsof', None], [['/path/to/file', None]]]]]
+            ['while true; do lsof /path/to/file; done;', [[['lsof', None], [['/path/to/file', None]]]]],
+            ["echo -e '\e]8;;htts://twitter.com/\aTwitter link\e]8;;\a'",  [[['echo', None], [['-e', None], ['\\e]8;;htts://twitter.com/\x07Twitter link\\e]8;;\x07', None]]]]]  # this break regex engine
         ]
 
         for test in test_list:
@@ -60,7 +61,8 @@ class TestBashParser(TestCase):
         self.parser = bashParser.BashParser()
         test_list = [
             ["ls -ls", True],
-            ["sudo blkid -trv | grep swap -r", True]
+            ["sudo blkid -trv | grep swap -r", True],
+            ["echo -e '\e]8;;htts://twitter.com/\aTwitter link\e]8;;\a'", True]
         ]
 
         for res in test_list:
