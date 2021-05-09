@@ -26,6 +26,7 @@ class ParsedTLDRExample(object):
         self.command = ""
         self.cmd_folder = ""
         self.rows = []
+        self.url_more_info = None
 
     def set_command(self, command: str) -> None:
         self.command = command
@@ -84,6 +85,15 @@ class ParsedTLDRExample(object):
                 first_example_index = i
                 return first_example_index
         return 0
+
+    def set_url_more_info(self, url_more_info):
+        self.url_more_info = url_more_info
+
+    def get_url_more_info(self):
+        return self.url_more_info
+
+    def has_url_more_info(self):
+        return self.url_more_info is not None
 
 
 class TLDRParser(object):
@@ -190,6 +200,18 @@ class TLDRParser(object):
     def _find_match_command_sort_key(arr):
         return arr[0]
 
+    @staticmethod
+    def _get_url_from_more_info_row(row):
+        if "<" in row:
+            row = row.split("<")[1]
+            if ">" in row:
+                return row.split(">")[0]
+            else:
+                logging.error("row with wrong url format: %s" % row)
+        else:
+            logging.error("row with wrong url format: %s" % row)
+            return row
+
     def get_tldr_cmd_examples(self, tldr_page_match: list) -> ParsedTLDRExample:
         parsed_tldr_example = ParsedTLDRExample()
         path_tldr_page = tldr_page_match[self.INDEX_TLDR_MATCH_FULL_PATH]
@@ -210,6 +232,9 @@ class TLDRParser(object):
                         else:
                             parsed_tldr_example.append_example_row(line)
                             logging.error("bad format: %s -> %s" % (path_tldr_page, line))
+                    elif line.startswith(self.PAGE_CMD_DESC_MORE_INFO_STR):
+                        parsed_tldr_example.set_url_more_info(TLDRParser._get_url_from_more_info_row(line))
+                        parsed_tldr_example.append_generic_row(line)
                     else:
                         parsed_tldr_example.append_generic_row(line)
         return parsed_tldr_example

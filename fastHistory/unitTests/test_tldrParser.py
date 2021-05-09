@@ -124,10 +124,11 @@ class TestTLDRParser(TestCase):
         searcher = TLDRParser()
 
         test_strings = [
-            # input, excepted first example cmd, number of example
-            # NOTE: this values may change with new dataset
-            [InputData(False, "gunzip archive", ["gunzip", "archive"]), "gunzip {{archive.tar.gz}}", 3],
-            [InputData(False, "apk update", ["apk", "update"]), "apk update", 6]
+            # input: [ Input object, excepted first example cmd, expected url, number of example ]
+            # NOTE: this values may change with new TLDR version
+            [InputData(False, "gunzip archive", ["gunzip", "archive"]), "gunzip {{archive.tar.gz}}", "https://manned.org/gunzip" , 3],
+            [InputData(False, "list directory permission", ["list", "directory", "permission"]), "ls -1", "https://www.gnu.org/software/coreutils/ls" , 7],
+            [InputData(False, "apk update", ["apk", "update"]), "apk update", None, 6]
         ]
 
         for test in test_strings:
@@ -138,9 +139,12 @@ class TestTLDRParser(TestCase):
             first_result = results[0]
             parsed_tldr_example = searcher.get_tldr_cmd_examples(first_result)
             example_count = 0
+
             for row in parsed_tldr_example.get_rows():
                 if row[ParsedTLDRExample.INDEX_EXAMPLE_TYPE] == ParsedTLDRExample.Type.EXAMPLE:
                     if example_count == 0:
                         self.assertEqual(test[1], row[ParsedTLDRExample.INDEX_EXAMPLE_VALUE], msg="wrong command found: %s -> %s" % (test, row))
                     example_count += 1
-            self.assertEqual(test[2], example_count, msg="wrong number of command found")
+
+            self.assertEqual(test[2], parsed_tldr_example.get_url_more_info(), msg="wrong number of command found: %s" % test)
+            self.assertEqual(test[3], example_count, msg="wrong number of command found: %s" % test)

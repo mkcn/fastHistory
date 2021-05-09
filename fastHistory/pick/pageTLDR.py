@@ -43,6 +43,7 @@ class PageTLDRSearchDrawer(PageGeneric):
                   example_draw_index: int = 0,
                   tldr_options_draw_index: int = 0,
                   focus_area: Focus = Focus.AREA_FILES,
+                  has_url_more_info: bool = False,
                   is_waiting: bool = False):
         """
         :return:
@@ -140,7 +141,8 @@ class PageTLDRSearchDrawer(PageGeneric):
                                      focus_area == self.Focus.AREA_EXAMPLES)
 
         # help line in the last line
-        self._draw_help_line_selector(focus_area == self.Focus.AREA_EXAMPLES)
+        self._draw_help_line_selector(is_focus_examples=focus_area == self.Focus.AREA_EXAMPLES,
+                                      has_url_more_info=has_url_more_info)
 
         # cursor set position
         self.drawer.show_cursor()
@@ -227,7 +229,7 @@ class PageTLDRSearchDrawer(PageGeneric):
         self.drawer.fill_row(x=x, max_x=msg_space)
         self.drawer.draw_row(msg)
 
-    def _draw_help_line_selector(self, is_focus_examples: bool):
+    def _draw_help_line_selector(self, is_focus_examples: bool, has_url_more_info: bool):
         self.drawer.set_y(self.drawer.get_max_y() - 1)
         if is_focus_examples:
             self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
@@ -239,6 +241,10 @@ class PageTLDRSearchDrawer(PageGeneric):
         if is_focus_examples:
             self.drawer.draw_row("Ctrl+space", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
             self.drawer.draw_row("Copy", x_indent=1, allow_last_row=True)
+
+        if has_url_more_info:
+            self.drawer.draw_row("Ctrl+l", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+            self.drawer.draw_row("Copy link", x_indent=1, allow_last_row=True)
 
         self.drawer.draw_row("Ctrl+f", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("My list", x_indent=1, allow_last_row=True)

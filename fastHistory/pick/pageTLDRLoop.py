@@ -92,6 +92,7 @@ class PageTLDRLoop(object):
                     example_draw_index=self.tldr_examples_draw_index,
                     example_content_shift=self.example_content_shift,
                     focus_area=self.focus,
+                    has_url_more_info=self.tldr_examples.has_url_more_info(),
                     is_waiting=tldr_options_waiting)
 
             # wait for char
@@ -110,6 +111,9 @@ class PageTLDRLoop(object):
                 res = self.get_selected_example(search_input=input_data, copied=True)
                 if res:
                     return res
+            elif c == Keys.KEY_CTRL_L:
+                if self.tldr_examples.has_url_more_info():
+                    return [False, self.tldr_examples.get_url_more_info()]
             elif c == Keys.KEY_TAB:
                 self.flip_focus()
             # go back to main page
