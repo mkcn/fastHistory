@@ -31,20 +31,39 @@ class TestTLDRParser(TestCase):
 
         test_strings = [
             # input, excepted cmd, max index of expected cmd
-            [InputData(False, "randomstringwithnomatch", ["randomstringwithnomatch"]), "", 0],
-            [InputData(False, "hex", ["hex"]), "hexdump", 3],
-            [InputData(False, "srm", ["srm"]), "srm", 1],
-            [InputData(False, "open port listen", ["open", "port", "listen"]), "netstat", 3],
-            [InputData(False, "time boot", ["time", "boot"]), "systemd-analyze", 4],
-            [InputData(False, "tar", ["tar"]), "tar", 1],  # tar is also a substring of many other cmds
-            [InputData(False, "extract file gz", ["extract", "file", "gz"]), "tar", 1],  # "e[x]tract" string special case
-            [InputData(False, "bios info", ["bios", "info"]), "dmidecode", 1],
-            [InputData(False, "dns reverse", ["dns", "reverse"]), "drill", 3],
-            [InputData(False, "keyboard layout", ["keyboard", "layout"]), "setxkbmap", 1]  # single result
+            ["randomstringwithnomatch", "", 0],
+            ["process", "ps", 2],  # TODO improve this
+            ["process list", "ps", 2],
+            ["process list", "ps", 2],
+            ["merge pdf page", "pdftk", 2],
+            ["locate program", "which", 1],
+            ["git diff", "git-diff", 2],
+            ["hex", "hexdump", 3],
+            ["srm", "srm", 1],
+            ["open port listen", "netstat", 2],
+            ["time boot", "uptime", 1],
+            ["time boot", "systemd-analyze", 4],
+            ["tar", "tar", 1],  # tar is also a substring of many other cmds
+            ["extract file gz", "tar", 1],  # "e[x]tract" string special case
+            ["bios info", "dmidecode", 1],
+            ["dns reverse", "drill", 2],
+            ["open default", "xdg-open", 1],
+            ["download file", "wget", 1],
+            ["download file", "curl", 5],  # TODO improve this
+            ["download package", "apt-get", 3],  # TODO improve this
+            ["keyboard layout", "setxkbmap", 1],  # single result
+            # security
+            ["extract from binary", "binwalk", 1],
+            ["secure disk overwrite", "sfill", 1],
+            ["scan network", "arp-scan", 1],
+            ["scan port script", "nmap", 1],
         ]
 
         for test in test_strings:
-            results = searcher.find_match_command(test[0])
+            input_array = test[0].split(" ")
+            input_data = InputData(False,  test[0], input_array)
+
+            results = searcher.find_match_command(input_data)
             # check if the expected cmd is within the first x results
             found = False
             i = 0
@@ -124,16 +143,19 @@ class TestTLDRParser(TestCase):
         searcher = TLDRParser()
 
         test_strings = [
-            # input: [ Input object, excepted first example cmd, expected url, number of example ]
+            # input: [ Input object, excepted first example cmd, expected url, number of example for the specific command]
             # NOTE: this values may change with new TLDR version
-            [InputData(False, "gunzip archive", ["gunzip", "archive"]), "gunzip {{archive.tar.gz}}", "https://manned.org/gunzip" , 3],
-            [InputData(False, "list directory permission", ["list", "directory", "permission"]), "ls -1", "https://www.gnu.org/software/coreutils/ls" , 7],
-            [InputData(False, "apk update", ["apk", "update"]), "apk update", None, 6]
+            ["process ps", "ps aux", None, 7],
+            ["gunzip archive", "gunzip {{archive.tar.gz}}", "https://manned.org/gunzip" , 3],
+            ["list directory permission", "ls -1", "https://www.gnu.org/software/coreutils/ls" , 7],
+            ["apk update", "apk update", None, 6]
         ]
 
         for test in test_strings:
             logging.debug("input test: %s" % test)
-            results = searcher.find_match_command(test[0])
+            input_array = test[0].split(" ")
+            input_data = InputData(False,  test[0], input_array)
+            results = searcher.find_match_command(input_data)
 
             self.assertTrue(len(results) > 0, msg="no results, check if the 'pages' folder exist")
             first_result = results[0]
@@ -147,4 +169,4 @@ class TestTLDRParser(TestCase):
                     example_count += 1
 
             self.assertEqual(test[2], parsed_tldr_example.get_url_more_info(), msg="wrong number of command found: %s" % test)
-            self.assertEqual(test[3], example_count, msg="wrong number of command found: %s" % test)
+            self.assertLessEqual(test[3], example_count, msg="wrong number of command found: %s" % test)

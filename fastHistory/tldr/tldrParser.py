@@ -1,7 +1,7 @@
 import logging
 import mmap
 import os
-import time
+import difflib
 from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -158,29 +158,30 @@ class TLDRParser(object):
                             # TODO try to use mmapls
                             # map_file = mmap.mmap(f.fileno(), 0, prot=mmap.ACCESS_READ)
                             for line in self.cached_in_memory_pages[os_folder + "/" + fname]:
+                                number_of_matches_in_a_line = 0
                                 for word in words_dict.keys():
                                     if word in line.lower():
+                                        number_of_matches_in_a_line += 1
                                         first_char = line[0]
                                         if first_char == self.PAGE_CMD_TITLE_CHAR:
                                             # check if title matches (e.g. "# tar\n")
-                                            if word == line[2:-1].strip().lower():
-                                                weight = 10
-                                            else:
-                                                weight = 1
+                                            command = line[2:-1].strip().lower()
+                                            ratio_match = difflib.SequenceMatcher(None, word, command).ratio()
+                                            weight = 20 * ratio_match
                                         elif first_char == self.PAGE_CMD_DESC_CHAR:
                                             if line.startswith(self.PAGE_CMD_DESC_MORE_INFO_STR):
                                                 weight = 1
                                             else:
-                                                weight = 4
-                                        elif first_char == self.PAGE_EXAMPLE_CHAR:
-                                            weight = 1
+                                                weight = 3
                                         elif first_char == self.PAGE_EXAMPLE_DESC_CHAR:
+                                            weight = 2
+                                        elif first_char == self.PAGE_EXAMPLE_CHAR:
                                             weight = 1
                                         else:
                                             # ignore line without the correct format
                                             weight = 0
                                         words_dict[word] += 1
-                                        total_weight += weight
+                                        total_weight += (weight * number_of_matches_in_a_line)
                         if all(count > 0 for count in words_dict.values()):
                             if fname.endswith(".md"):
                                 cmd_name = fname[:-3]
