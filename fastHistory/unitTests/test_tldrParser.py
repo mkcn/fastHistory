@@ -187,4 +187,7 @@ class TestTLDRParser(TestCase):
             self.assertEqual(test[2], parsed_tldr_example.get_url_more_info(), msg="wrong url: %s" % test)
             self.assertLessEqual(test[3], example_count, msg="wrong number of command found: %s" % test)
 
+    def test_format_tldr_pages(self):
+        searcher = TLDRParser()
+        self.assertRegex(searcher.format_tldr_pages(), "\d pages have been correctly formatted", msg="something wrong with TLDR pages, maybe the format has changed with a TLDR update")
 

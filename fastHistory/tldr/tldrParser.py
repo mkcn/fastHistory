@@ -254,9 +254,12 @@ class TLDRParser(object):
         else:
             return line_to_clean
 
-    def format_tldr_pages(self):
+    def format_tldr_pages(self) -> str:
         """
         this is used only by the update_tldr_pages.sh script
+
+        the goal is to optimise the .md files for the later parser
+        note: running this twice will have no side-effect on the file
         :return:
         """
         try:
