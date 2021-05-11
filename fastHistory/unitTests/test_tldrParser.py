@@ -87,18 +87,26 @@ class TestTLDRParser(TestCase):
         self.assertTrue(count_results > 100, msg="results are less then 100: %s" % count_results)
 
     def test_TLDR_search_time(self):
+        """
+        the first call load read from disk (excepted time ~0,08)
+        the second and third use the cached memory (expected time ~0,01)
+        #
+        :return:
+        """
         searcher = TLDRParser()
 
         test_strings = [
             # input, excepted cmd, max index of expected cmd
-            InputData(False, "", []),
-            InputData(False, "randomstringwithnomatch", ["randomstringwithnomatch"]),
-            InputData(False, "open port listen", ["open", "port", "listen"])
+            ["", 0.5],  # disk
+            ["randomstringwithnomatch", 0.05],  # memory
+            ["open port listen", 0.05],  # memory
         ]
 
         for test in test_strings:
+            input_array = test[0].split(" ")
+            input_data = InputData(False,  test[0], input_array)
             start_time = time.time()
-            results = searcher.find_match_command(test)
+            results = searcher.find_match_command(input_data)
             execution_time = (time.time() - start_time)
             logging.info("execution_time: %s seconds" % execution_time)
             self.assertTrue(execution_time < 0.5, msg="execution takes too long: %s sec" % execution_time)
@@ -170,3 +178,5 @@ class TestTLDRParser(TestCase):
 
             self.assertEqual(test[2], parsed_tldr_example.get_url_more_info(), msg="wrong number of command found: %s" % test)
             self.assertLessEqual(test[3], example_count, msg="wrong number of command found: %s" % test)
+
+

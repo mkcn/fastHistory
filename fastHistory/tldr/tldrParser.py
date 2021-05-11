@@ -1,6 +1,6 @@
 import logging
-import mmap
 import os
+import mmap
 import difflib
 from typing import Optional, TYPE_CHECKING
 
@@ -127,6 +127,26 @@ class TLDRParser(object):
         else:
             self.cached_in_memory_pages = cached_in_memory_pages
 
+    def _read_file(self, file_full_path: str) -> list:
+        context = []
+        with open(file_full_path, "r") as f:
+            for line in f:
+                context.append(line)
+        return context
+
+    def _read_file_with_mmap(self, file_full_path: str) -> list:
+        """
+        this is unused because it results in worst performance test
+        # TODO remove
+        :param file_full_path:
+        :return:
+        """
+        text = []
+        with open(file_full_path, mode="r", encoding="utf8") as file_obj:
+            with mmap.mmap(file_obj.fileno(), length=0, access=mmap.ACCESS_READ) as mmap_obj:
+                text = mmap_obj.read()
+        return text.split(b"\n")
+
     def find_match_command(self, input_data: "InputData", thread: "TLDRParseThread" = None) -> Optional[list]:
         # NO empty, already trimmed
         words = input_data.get_all_words()
@@ -144,12 +164,7 @@ class TLDRParser(object):
                         file_full_path = os.path.join(root, fname)
                         page = self.cached_in_memory_pages.get(os_folder + "/" + fname)
                         if page is None:
-                            context = []
-                            with open(file_full_path, "r") as f:
-                                for line in f:
-                                    context.append(line)
-                            self.cached_in_memory_pages[os_folder + "/" + fname] = context
-
+                            self.cached_in_memory_pages[os_folder + "/" + fname] = self._read_file(file_full_path)
                         # if dict is not empty read the file
                         if words_dict:
                             if thread and thread.has_been_stopped():
