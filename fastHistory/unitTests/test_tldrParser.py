@@ -172,11 +172,19 @@ class TestTLDRParser(TestCase):
 
             for row in parsed_tldr_example.get_rows():
                 if row[ParsedTLDRExample.INDEX_EXAMPLE_TYPE] == ParsedTLDRExample.Type.EXAMPLE:
+                    example_count += 1
                     if example_count == 0:
                         self.assertEqual(test[1], row[ParsedTLDRExample.INDEX_EXAMPLE_VALUE], msg="wrong command found: %s -> %s" % (test, row))
-                    example_count += 1
-
-            self.assertEqual(test[2], parsed_tldr_example.get_url_more_info(), msg="wrong number of command found: %s" % test)
+                        # this should get the same result as the previous assert
+                        self.assertTrue(example_count, parsed_tldr_example.get_first_example_index())
+                        self.assertEqual(test[1], parsed_tldr_example.get_current_selected_example(row_index=example_count), msg="wrong command found: %s -> %s" % (test, row))
+                        # there are 2 rows until the next example
+                        self.assertEqual(2, parsed_tldr_example.get_delta_next_example_index(example_count))
+                        # because this is the first, the delta is 0
+                        self.assertEqual(0, parsed_tldr_example.get_delta_previous_example_index(example_count))
+            if test[2]:
+                self.assertTrue(parsed_tldr_example.has_url_more_info(), msg="no url found: %s" % test)
+            self.assertEqual(test[2], parsed_tldr_example.get_url_more_info(), msg="wrong url: %s" % test)
             self.assertLessEqual(test[3], example_count, msg="wrong number of command found: %s" % test)
 
 
