@@ -7,7 +7,7 @@ jobs:
     strategy:
         matrix:
             os: [ubuntu-16.04, ubuntu-latest, macos-latest]
-            python-version: [3.6, 3.8]
+            python-version: [3.8]
 
     runs-on: ${{ matrix.os }}
 
@@ -74,24 +74,26 @@ jobs:
       run: |
         for i in $GITHUB_WORKSPACE/data_test/*.txt; do printf "\n\n## $i ## \n\n" ; cat "$i"; printf "\n" ; done ;
 
-    - name: Update with installer script
+    - name: Update with installer script and uninstall it
       run: |
         cd $(mktemp -d /tmp/f.XXXXX) && wget -O f mkcn.me/f?pythonUnitTest && tar -xvzf f && cd fastHistory-* && ./installer.sh
         $HOME/.local/bin/f --version --from-installer
+        $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything     
+        
+    - name: Run pip builder, install local whl and uninstall it
+      run: |
+        $GITHUB_WORKSPACE/pip/build.sh <<< "N"
+        pip3 install --user --no-deps $GITHUB_WORKSPACE/pip/dist/fastHistory-*.whl
+        # setup environment
+        $HOME/.local/bin/f --setup
+        $HOME/.local/bin/f --version --from-installer
+        $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything
 
-    - name: Install with pip test
+    - name: Install with pip test and uninstall it
       run: |
         # bashlex is not present in the test pypi, therefore it must installed separately
         pip3 install --user --index-url https://test.pypi.org/simple/ --no-deps fastHistory
         # setup environment
         $HOME/.local/bin/f --setup
         $HOME/.local/bin/f --version --from-installer
-
-    - name: Install with pip
-      run: |
-        pip3 install -U --no-cache-dir --user fastHistory && $HOME/.local/bin/f --setup
-        $HOME/.local/bin/f --version --from-installer
-
-    - name: Uninstall pip
-      run: |
         $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything
