@@ -82,7 +82,13 @@ jobs:
         
     - name: Run pip builder, install local whl and uninstall it
       run: |
-        $GITHUB_WORKSPACE/pip/build.sh <<< "N"
+        cd $GITHUB_WORKSPACE/pip/
+        # create env
+        ./build.sh <<< "N" 
+        # build pip package
+        ./build.sh <<< "N"
+        cd $HOME
+        # install pip package
         pip3 install --user --no-deps $GITHUB_WORKSPACE/pip/dist/fastHistory-*.whl
         # setup environment
         $HOME/.local/bin/f --setup
