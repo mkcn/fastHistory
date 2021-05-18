@@ -47,7 +47,7 @@ if you know what I am talking about, **fastHistory** is the tool you are looking
 ```sh
 $ tar -xvzf file.tar.gz #
                        /\
-                        \-- fastHistory will store 'tar -xvzf file.tar.gz' in its internal database
+                        \-- fastHistory will store 'tar -xvzf file.tar.gz' in its local database
 ```
 
 You can specify one or more **tags**
@@ -79,7 +79,13 @@ $ f
 ![](https://github.com/mkcn/fastHistory/raw/master/images/advanced_search.gif)
 
 
-For each command you can get a quick summary from the man page
+(from v2.X.X) With the new [TDLR](https://github.com/tldr-pages/tldr) integration, you can now explore and find complete examples from a huge list of commonly used commands
+
+**fastHistory** will also show you which command is already available on your system (just check for the '+' symbol)
+
+![](https://github.com/mkcn/fastHistory/raw/master/images/tldr_search.gif)
+
+For each stored command you can get a quick summary from the man page
 
 **Warning**: this feature currently does not cover the syntax of all commands
 
