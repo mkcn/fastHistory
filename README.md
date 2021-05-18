@@ -10,10 +10,11 @@
 - [Install](https://github.com/mkcn/fastHistory/blob/master/README.md#How-to-install)
 - [Update](https://github.com/mkcn/fastHistory/blob/master/README.md#How-to-update)
 - [Commands and syntax](https://github.com/mkcn/fastHistory/wiki/Commands-and-syntax)
+- [Copyright and dependencies](https://github.com/mkcn/fastHistory/blob/master/README.md#Copyright-and-dependencies)
 - [License](https://github.com/mkcn/fastHistory/blob/master/README.md#License)
 
 
-fastHistory allows you to store, search and automatically paste all the important commands directly in your terminal
+**fastHistory** allows you to store, search and automatically paste all your important commands, plus all the [TDLR](https://github.com/tldr-pages/tldr) command examples, directly in your terminal, with a **new and faster way**!
 
 ![](https://github.com/mkcn/fastHistory/raw/master/images/add_and_search.gif)
 
@@ -175,6 +176,25 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 # Commands and systax
 
 Find out more about commands and systax in the [Wiki](https://github.com/mkcn/fastHistory/wiki/Commands-and-syntax) section 
+
+# Copyright and dependencies
+
+*  https://github.com/tldr-pages/tldr
+    *  **goal**: collaborative cheatsheets for console commands 
+    *  **changes**: The [page](https://github.com/tldr-pages/tldr/tree/main/pages) folder has been copied to support offline mode and the syntax modified to improve the search speed
+    *  **code section**: ```fastHistory/tldr/tldr/```
+*  https://github.com/wong2/pick
+    *  **goal**: python module modified to build the command-selection menu
+    *  **code section**: ```fastHistory/pick```
+*  https://github.com/rcaloras/bash-preexec 
+    *  **goal**: bash script used to hook the commands from the terminal
+    *  **code section**: ```fastHistory/bash/bash-preexec.sh```
+*  https://pypi.org/project/pyperclip/ 
+    *  **goal**: copy-to-clipboard feature
+    *  **code section**: ```(optional) pip module```
+*  https://pypi.org/project/bashlex/
+    *  **goal**: parse commands to fill the 'Man page info' section 
+    *  **code section**: ```(optional) pip module``` 
 
 # License
 
