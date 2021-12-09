@@ -43,5 +43,10 @@ class InputData(object):
 
     def get_all_words(self) -> list:
         if self.all_words is None:
-            self.all_words = list(set(self.main_words + self.tags_strict + self.description_words_strict))
+            l_new = []
+            l_old_with_duplicates = self.main_words + self.tags_strict + self.description_words_strict
+            for item in l_old_with_duplicates:
+                if item not in l_new:
+                    l_new.append(item)
+            self.all_words = l_new
         return self.all_words
