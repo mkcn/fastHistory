@@ -1,5 +1,4 @@
 import logging
-import time
 
 from fastHistory.pick.pageGeneric import PageGeneric
 from fastHistory.pick.textManager import ContextShifter
@@ -12,7 +11,7 @@ if TYPE_CHECKING:
     from fastHistory.pick.textManager import TextManager
 
 
-class PageTLDRSearchDrawer(PageGeneric):
+class PageSelectTLDR(PageGeneric):
     """
     Class to draw the page with the commands to select
     """

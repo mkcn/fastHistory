@@ -126,13 +126,13 @@ class DataManager(object):
 		"""
 		return self.database.update_description_field(cmd, description)
 
-	def update_element_order(self, cmd):
+	def update_selected_element_order(self, cmd):
 		"""
 		after a command was selected update the order
 		:param cmd:		command to update
 		:return:		True is the database was successfully changed, False otherwise
 		"""
-		return self.database.update_position_element(cmd)
+		return self.database.update_position_selected_element(cmd)
 
 	def delete_element(self, cmd):
 		"""

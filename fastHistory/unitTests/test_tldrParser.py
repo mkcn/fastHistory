@@ -32,10 +32,10 @@ class TestTLDRParser(TestCase):
         test_strings = [
             # input, excepted cmd, max index of expected cmd
             ["randomstringwithnomatch", "", 0],
-            ["process", "ps", 2],  # TODO improve this
+            ["process", "ps", 3],  # TODO improve this
             ["process list", "ps", 2],
             ["process list", "ps", 2],
-            ["merge pdf page", "pdftk", 2],
+            ["merge pdf page", "pdftk", 4],
             ["locate program", "which", 1],
             ["git diff", "git-diff", 2],
             ["hex", "hexdump", 3],
@@ -44,19 +44,19 @@ class TestTLDRParser(TestCase):
             ["time boot", "uptime", 1],
             ["time boot", "systemd-analyze", 4],
             ["tar", "tar", 1],  # tar is also a substring of many other cmds
-            ["extract file gz", "tar", 1],  # "e[x]tract" string special case
+            ["extract file gz", "tar", 2],  # "e[x]tract" string special case
             ["bios info", "dmidecode", 1],
             ["dns reverse", "drill", 2],
             ["open default", "xdg-open", 1],
             ["download file", "wget", 1],
-            ["download file", "curl", 5],  # TODO improve this
-            ["download package", "apt-get", 3],  # TODO improve this
+            ["download file", "curl", 6],  # TODO improve this
+            ["download package", "apt-get", 4],  # TODO improve this
             ["keyboard layout", "setxkbmap", 1],  # single result
             # security
             ["extract from binary", "binwalk", 1],
             ["secure disk overwrite", "sfill", 1],
             ["scan network", "arp-scan", 1],
-            ["scan port script", "nmap", 1],
+            ["scan port script", "nmap", 2],
         ]
 
         for test in test_strings:
@@ -153,10 +153,10 @@ class TestTLDRParser(TestCase):
         test_strings = [
             # input: [ Input object, excepted first example cmd, expected url, number of example for the specific command]
             # NOTE: this values may change with new TLDR version
-            ["process ps", "ps aux", None, 7],
-            ["gunzip archive", "gunzip {{archive.tar.gz}}", "https://manned.org/gunzip" , 3],
-            ["list directory permission", "ls -1", "https://www.gnu.org/software/coreutils/ls" , 7],
-            ["apk update", "apk update", None, 6]
+            ["process ps", "ps aux", "https://manned.org/ps", 7],
+            ["gunzip archive", "gunzip {{archive.tar.gz}}", "https://manned.org/gunzip", 3],
+            ["list directory permission gnu", "ls -1", "https://www.gnu.org/software/coreutils/ls", 7],
+            ["apk update", "apk update", "https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management", 6]
         ]
 
         for test in test_strings:

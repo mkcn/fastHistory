@@ -517,7 +517,7 @@ class TestDatabaseSQLite(unittest.TestCase):
         self.assertEqual(res[-1][DatabaseSQLite.COLUMN_INDEX_COMMAND], "ls 3")  # data is shown reversed in UI
         self.assertEqual(res[2][DatabaseSQLite.COLUMN_INDEX_COUNTER], 0)
 
-        self.assertTrue(db.update_position_element("ls 1"))
+        self.assertTrue(db.update_position_selected_element("ls 1"))
         res = db.get_all_data()
         self.assertEqual(len(res), 3)
         self.assertEqual(res[-1][DatabaseSQLite.COLUMN_INDEX_COMMAND], "ls 1")

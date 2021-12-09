@@ -699,7 +699,7 @@ class DatabaseSQLite(object):
             self.rollback_changes()
             return False
 
-    def update_position_element(self, cmd):
+    def update_position_selected_element(self, cmd):
         """
         when a command is selected two changes are made:
             - counter increased (+1)

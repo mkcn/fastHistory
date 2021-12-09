@@ -3,7 +3,7 @@ import logging
 from fastHistory.pick.pageGeneric import PageGeneric
 
 
-class PageSelector(PageGeneric):
+class PageSelectFavourites(PageGeneric):
     """
     Class to draw the page with the commands to select
     """

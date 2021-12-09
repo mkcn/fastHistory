@@ -26,7 +26,7 @@ class PageGeneric(object):
     CHAR_EDIT = 'E'
 
     TITLE_DEFAULT = "fastHistory"
-    TAB_NAME_TLDR =  "    TLDR    "
+    TAB_NAME_TLDR = "    TLDR    "
     TAB_NAME_MY_LIST = "   My list   "
 
     INDEX_SECTION_VALUE = 0

@@ -15,7 +15,7 @@ class TextManager(object):
     use_lower = False
     max_x = None
 
-    def __init__(self, text="", use_lower=False, max_x=None):
+    def __init__(self, text="", use_lower=False, max_x=None, margin_x=0):
         self.text = text
         self.text_len = len(self.text)
         self.cursor_index = self.text_len
@@ -23,6 +23,7 @@ class TextManager(object):
         if self.use_lower:
             self.text_lower = text.lower()
         self.max_x = max_x
+        self.margin_x = margin_x
 
     def delete_char(self):
         """
@@ -95,8 +96,11 @@ class TextManager(object):
         else:
             return False
 
-    def set_max_x(self, max_x):
-        self.max_x = max_x
+    def set_max_x(self, max_x, with_margin_x=False):
+        if with_margin_x:
+            self.max_x = max_x - self.margin_x
+        else:
+            self.max_x = max_x
 
     def get_text(self):
         return self.text
