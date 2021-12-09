@@ -1,5 +1,6 @@
 # jobs
 > Display status of jobs in the current session.
+> More information: <https://manned.org/jobs>.
 
 - Show status of all jobs
 `jobs`

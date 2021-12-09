@@ -12,7 +12,7 @@
 - Generate at most 100 strings that match a regular expression
 `exrex --max-number {{100}} '{{regular_expression}}'`
 
-- Generate all possible strings that match a regular expression, joined together by a custom delimiter string
+- Generate all possible strings that match a regular expression, joined by a custom delimiter string
 `exrex --delimiter "{{, }}" '{{regular_expression}}'`
 
 - Print count of all possible strings that match a regular expression

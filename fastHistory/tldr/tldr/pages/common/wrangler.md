@@ -1,5 +1,5 @@
 # wrangler
-> Cloudflare Workers command line tool.
+> Cloudflare Workers command-line tool.
 > More information: <https://developers.cloudflare.com/workers/>.
 
 - Initialize a project with a skeleton configuration

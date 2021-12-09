@@ -1,5 +1,5 @@
 # emulator
-> Manager Android emulators from the command line.
+> Manager Android emulators from the command-line.
 > More information: <https://developer.android.com/studio/run/emulator-commandline>.
 
 - Display the help

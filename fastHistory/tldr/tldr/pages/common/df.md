@@ -5,7 +5,7 @@
 - Display all filesystems and their disk usage
 `df`
 
-- Display all filesystems and their disk usage in human readable form
+- Display all filesystems and their disk usage in human-readable form
 `df -h`
 
 - Display the filesystem and its disk usage containing the given file or directory

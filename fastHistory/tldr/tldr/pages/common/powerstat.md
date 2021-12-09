@@ -11,7 +11,7 @@
 - Measure power using Intel's RAPL interface
 `powerstat -R {{interval}} {{number_of_samples}}`
 
-- Show an histogram of the power measurements
+- Show a histogram of the power measurements
 `powerstat -H {{interval}} {{number_of_samples}}`
 
 - Enable all statistics gathering options

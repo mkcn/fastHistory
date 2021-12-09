@@ -1,5 +1,5 @@
 # kube-fzf
-> Shell commands for command line fuzzy searching of Kubernetes Pods.
+> Shell commands for command-line fuzzy searching of Kubernetes Pods.
 > See also `kubectl` for related commands.
 > More information: <https://github.com/thecasualcoder/kube-fzf>.
 

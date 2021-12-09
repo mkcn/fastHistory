@@ -15,7 +15,7 @@
 `pio platform install {{platform}}`
 
 - Update installed development platforms
-`pio platfom update`
+`pio platform update`
 
 - Uninstall a development platform
 `pio platform uninstall {{platform}}`

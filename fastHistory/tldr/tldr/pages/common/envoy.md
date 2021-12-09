@@ -14,7 +14,7 @@
 - Run a task and continue on failure
 `envoy run --continue {{task_name}}`
 
-- Dump a task as a bash script for inspection
+- Dump a task as a Bash script for inspection
 `envoy run --pretend {{task_name}}`
 
 - Connect to the specified server via SSH

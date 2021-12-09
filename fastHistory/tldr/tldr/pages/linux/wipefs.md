@@ -1,5 +1,6 @@
 # wipefs
 > Wipe filesystem, raid, or partition-table signatures from a device.
+> More information: <https://manned.org/wipefs>.
 
 - Display signatures for specified device
 `sudo wipefs {{/dev/sdX}}`

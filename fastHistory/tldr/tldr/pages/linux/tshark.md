@@ -1,5 +1,6 @@
 # tshark
-> Packet analysis tool, CLI version of wireshark.
+> Packet analysis tool, CLI version of Wireshark.
+> More information: <https://tshark.dev/>.
 
 - Monitor everything on localhost
 `tshark`

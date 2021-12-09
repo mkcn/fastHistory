@@ -1,5 +1,6 @@
 # colrm
 > Remove columns from stdin.
+> More information: <https://manned.org/colrm>.
 
 - Remove first column of stdin
 `colrm {{1 1}}`

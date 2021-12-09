@@ -1,5 +1,6 @@
 # afplay
 > Command-line audio player.
+> More information: <https://ss64.com/osx/afplay.html>.
 
 - Play a sound file (waits until playback ends)
 `afplay {{path/to/file}}`

@@ -1,5 +1,6 @@
 # ip address
 > IP Address management subcommand.
+> More information: <https://manned.org/ip-address>.
 
 - List network interfaces and their associated IP addresses
 `ip address`

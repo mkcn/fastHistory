@@ -7,7 +7,7 @@
 - Modify default ACL of a file for all users
 `setfacl -d -m u::rw {{file}}`
 
-- Remove ACL of a file for an user
+- Remove ACL of a file for a user
 `setfacl -x u:{{username}} {{file}}`
 
 - Remove all ACL entries of a file

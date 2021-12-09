@@ -2,7 +2,7 @@
 > R language interpreter.
 > More information: <https://www.r-project.org>.
 
-- Start an R interactive shell (REPL)
+- Start a REPL (interactive shell)
 `R`
 
 - Check R version

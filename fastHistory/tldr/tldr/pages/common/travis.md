@@ -1,5 +1,5 @@
 # travis
-> Command line client to interface with Travis CI.
+> Command-line client to interface with Travis CI.
 > More information: <https://github.com/travis-ci/travis.rb>.
 
 - Display the client version

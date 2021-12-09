@@ -1,6 +1,7 @@
 # lsof
 > Lists open files and the corresponding processes.
 > Note: Root privileges (or sudo) is required to list files opened by others.
+> More information: <https://manned.org/lsof>.
 
 - Find the processes that have a given file open
 `lsof {{path/to/file}}`
@@ -23,5 +24,5 @@
 - List open files in a directory
 `lsof +D {{path/to/directory}}`
 
-- Find the process that is listening on a local TCP port
-`lsof -iTCP:{{port}} -sTCP:LISTEN`
+- Find the process that is listening on a local IPv6 TCP port and don't convert network or port numbers
+`lsof -i6TCP:{{port}} -sTCP:LISTEN -n -P`

@@ -1,5 +1,6 @@
 # mpstat
 > Report CPU statistics.
+> More information: <https://manned.org/mpstat>.
 
 - Display CPU statistics every 2 seconds
 `mpstat {{2}}`

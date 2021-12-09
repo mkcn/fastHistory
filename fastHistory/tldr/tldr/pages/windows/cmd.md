@@ -2,26 +2,26 @@
 > The Windows command interpreter.
 > More information: <https://docs.microsoft.com/windows-server/administration/windows-commands/cmd>.
 
-- Start a new instance of the command interpreter
+- Start an interactive shell session
 `cmd`
 
-- Run the specified command and then exit
+- Execute a command
 `cmd /c "{{command}}"`
 
-- Run the specified command and then enter an interactive shell
+- Execute a script
+`cmd {{path/to/file.bat}}`
+
+- Execute a command and then enter an interactive shell
 `cmd /k "{{command}}"`
 
-- Disable the usage of `echo` in command output
+- Start an interactive shell session where `echo` is disabled in command output
 `cmd /q`
 
-- Enable or disable command extensions
-`cmd /e:{{on|off}}`
-
-- Enable or disable file or directory autocompletion
-`cmd /f:{{on|off}}`
-
-- Enable or disable environment variable expansion
+- Start an interactive shell session with delayed variable expansion enabled or disabled
 `cmd /v:{{on|off}}`
 
-- Force output to use unicode encoding
+- Start an interactive shell session with command extensions enabled or disabled
+`cmd /e:{{on|off}}`
+
+- Start an interactive shell session with used Unicode encoding
 `cmd /u`

@@ -1,5 +1,6 @@
 # base64
 > Encode and decode using Base64 representation.
+> More information: <https://www.unix.com/man-page/osx/1/base64/>.
 
 - Encode a file
 `base64 --input={{plain_file}}`

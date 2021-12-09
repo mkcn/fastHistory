@@ -1,5 +1,5 @@
 # fly
-> Command line tool for concourse-ci.
+> Command-line tool for concourse-ci.
 > More information: <https://concourse-ci.org/fly.html>.
 
 - Authenticate with and save concourse target

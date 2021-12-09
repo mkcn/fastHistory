@@ -1,5 +1,6 @@
 # phar
 > Create, update or extract PHP archives (PHAR).
+> More information: <https://manned.org/phar>.
 
 - Add space-separated files or directories to a Phar file
 `phar add -f {{path/to/phar_file}} {{files_or_directories}}`

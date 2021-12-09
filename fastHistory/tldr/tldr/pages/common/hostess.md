@@ -2,7 +2,7 @@
 > An idempotent command-line utility for managing the `/etc/hosts` file.
 > More information: <https://github.com/cbednarski/hostess>.
 
-- List domains, target ips and on/off status
+- List domains, target IP addresses and on/off status
 `hostess list`
 
 - Add a domain pointing to your machine to your hosts file
@@ -11,5 +11,5 @@
 - Remove a domain from your hosts file
 `hostess del {{local.example.com}}`
 
-- Disable a domain (but don't remove it completely)
+- Disable a domain (but don't remove it)
 `hostess off {{local.example.com}}`

@@ -11,11 +11,11 @@
 - Debug a malfunction
 `mixxx --debugAssertBreak --developer --loglevel trace`
 
-- Start mixxx using the specified settings file
+- Start Mixxx using the specified settings file
 `mixxx --resourcePath {{mixxx/res/controllers}} --settingsPath {{path/to/settings-file}}`
 
 - Debug a custom controller mapping
 `mixxx --controllerDebug --resourcePath {{path/to/mapping-directory}}`
 
-- Show command line help
+- Show command-line help
 `mixxx --help`

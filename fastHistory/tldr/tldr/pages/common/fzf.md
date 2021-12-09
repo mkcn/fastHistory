@@ -1,21 +1,22 @@
 # fzf
-> Command line fuzzy finder.
+> Command-line fuzzy finder.
+> Similar to `sk`.
 > More information: <https://github.com/junegunn/fzf>.
 
-- Start finder on all files from arbitrary locations
-`find {{path/to/search}} -type f | fzf`
+- Start fzf on all files in the specified directory
+`find {{path/to/directory}} -type f | fzf`
 
-- Start finder on running processes
+- Start fzf for running processes
 `ps aux | fzf`
 
 - Select multiple files with `Shift + Tab` and write to a file
-`find {{path/to/search_files}} -type f | fzf -m > {{filename}}`
+`find {{path/to/directory}} -type f | fzf --multi > {{filename}}`
 
-- Start finder with a given query
-`fzf -q "{{query}}"`
+- Start fzf with a specified query
+`fzf --query "{{query}}"`
 
-- Start finder on entries that start with core and end with either go, rb, or py
-`fzf -q "^core go$ | rb$ | py$"`
+- Start fzf on entries that start with core and end with either go, rb, or py
+`fzf --query "^core go$ | rb$ | py$"`
 
-- Start finder on entries that not match pyc and match exactly travis
-`fzf -q "!pyc 'travis"`
+- Start fzf on entries that not match pyc and match exactly travis
+`fzf --query "!pyc 'travis"`

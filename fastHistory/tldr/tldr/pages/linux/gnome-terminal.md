@@ -1,5 +1,6 @@
 # gnome-terminal
 > The GNOME Terminal emulator.
+> More information: <https://help.gnome.org/users/gnome-terminal/stable/>.
 
 - Open a new GNOME terminal window
 `gnome-terminal`

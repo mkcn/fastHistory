@@ -1,5 +1,6 @@
 # GetFileInfo
 > Get information about a file in an HFS+ directory.
+> More information: <https://www.unix.com/man-page/osx/1/GetFileInfo/>.
 
 - Display information about a given file
 `GetFileInfo {{path/to/filename}}`

@@ -1,5 +1,6 @@
 # zip
 > Package and compress (archive) files into zip file.
+> More information: <https://manned.org/zip>.
 
 - Package and compress files and directories recursively
 `zip -r {{compressed.zip}} {{path/to/file}} {{path/to/directory1}} {{path/to/directory2}}`
@@ -19,7 +20,7 @@
 - Delete files from an existing zip file
 `zip -d {{compressed.zip}} "{{foo/*.tmp}}"`
 
-- Archive a directory and its contents to a multi-part split zip file (e.g. 3GB parts)
+- Archive a directory and its contents to a multi-part split zip file (e.g. 3 GB parts)
 `zip -r -s {{3g}} {{compressed.zip}} {{path/to/directory}}`
 
 - List files within a specified archive (without extracting them)

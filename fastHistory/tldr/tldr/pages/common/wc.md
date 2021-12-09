@@ -1,18 +1,21 @@
 # wc
-> Count lines, words, or bytes.
+> Count lines, words, and bytes.
 > More information: <https://www.gnu.org/software/coreutils/wc>.
 
-- Count lines in file
-`wc -l {{file}}`
+- Count all lines in a file
+`wc --lines {{path/to/file}}`
 
-- Count words in file
-`wc -w {{file}}`
+- Count all words in a file
+`wc --words {{path/to/file}}`
 
-- Count characters (bytes) in file
-`wc -c {{file}}`
+- Count all bytes in a file
+`wc --bytes {{path/to/file}}`
 
-- Count characters in file (taking multi-byte character sets into account)
-`wc -m {{file}}`
+- Count all characters in a file (taking multi-byte characters into account)
+`wc --chars {{path/to/file}}`
 
-- Use standard input to count lines, words and characters (bytes) in that order
+- Count all lines, words and bytes from `stdin`
 `{{find .}} | wc`
+
+- Count the length of the longest line in number of characters
+`wc --max-line-length {{path/to/file}}`

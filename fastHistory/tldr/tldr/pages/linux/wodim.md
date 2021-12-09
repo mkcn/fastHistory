@@ -1,6 +1,7 @@
 # wodim
 > Command (aliased as `cdrecord` on some systems) for recording data to CDs or DVDs.
 > Some invocations of wodim can cause destructive actions, such as erasing all the data on a disc.
+> More information: <https://manned.org/wodim>.
 
 - Display optical drives available to `wodim`
 `wodim --devices`

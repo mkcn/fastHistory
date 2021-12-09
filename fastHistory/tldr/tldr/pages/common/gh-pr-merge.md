@@ -16,3 +16,6 @@
 
 - Squash the current pull request into one commit with the message body and merge
 `gh pr merge --squash --body="{{commit_message_body}}"`
+
+- Display help
+`gh pr merge --help`

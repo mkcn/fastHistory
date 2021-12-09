@@ -1,5 +1,6 @@
 # debman
 > Read man pages from uninstalled packages.
+> More information: <https://manpages.debian.org/latest/debian-goodies/debman.1.html>.
 
 - Read a man page for a command that is provided by a specified package name
 `debman -p {{package_name}} {{command_name}}`

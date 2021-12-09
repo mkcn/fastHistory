@@ -1,5 +1,6 @@
 # mkswap
 > Sets up a Linux swap area on a device or in a file.
+> More information: <https://manned.org/mkswap>.
 
 - Setup a given partition as swap area
 `sudo mkswap {{/dev/sdb7}}`

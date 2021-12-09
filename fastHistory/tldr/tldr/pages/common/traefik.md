@@ -1,5 +1,5 @@
 # traefik
-> A HTTP reverse proxy and load balancer.
+> An HTTP reverse proxy and load balancer.
 > More information: <https://traefik.io>.
 
 - Start server with default config

@@ -1,6 +1,7 @@
 # if
 > Simple shell conditional.
 > See also: `test`, `[`.
+> More information: <https://www.tcl.tk/man/tcl8.6.11/TclCmd/if.html>.
 
 - Execute two different commands based on a condition
 `if {{command}}; then {{echo "true"}}; else {{echo "false"}}; fi`

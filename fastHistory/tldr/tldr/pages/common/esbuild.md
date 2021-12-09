@@ -20,7 +20,7 @@
 - Bundle a JavaScript application enabling JSX syntax in `.js` files
 `esbuild --bundle app.js --loader:{{.js=jsx}} {{path/to/file.js}}`
 
-- Bundle and serve JavaScript application on an HTTP server
+- Bundle and serve a JavaScript application on an HTTP server
 `esbuild --bundle --serve={{port}} --outfile={{index.js}} {{path/to/file.js}}`
 
 - Bundle a list of files to an output directory

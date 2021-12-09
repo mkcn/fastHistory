@@ -1,17 +1,17 @@
 # grex
-> Simple command line tool to generate regular expressions.
+> Simple command-line tool to generate regular expressions.
 > More information: <https://github.com/pemistahl/grex>.
 
 - Generate a simple regular expression
 ` grex {{space_separated_strings}}`
 
-- Generate a case-insensitive regex
+- Generate a case-insensitive regular expression
 `grex -i {{space_separated_strings}}`
 
 - Replace digits with '\d'
 `grex -d {{space_separated_strings}}`
 
-- Replace unicode word character with '\w'
+- Replace Unicode word character with '\w'
 `grex -w {{space_separated_strings}}`
 
 - Replace spaces with '\s'

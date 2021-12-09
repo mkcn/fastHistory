@@ -1,5 +1,6 @@
 # sysctl
 > Access kernel state information.
+> More information: <https://ss64.com/osx/sysctl.html>.
 
 - Show all available variables and their values
 `sysctl -a`

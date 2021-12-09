@@ -1,5 +1,6 @@
 # rails db
 > Various database-related subcommands for Ruby on Rails.
+> More information: <https://guides.rubyonrails.org/command_line.html>.
 
 - Create databases, load the schema, and initialize with seed data
 `rails db:setup`

@@ -17,7 +17,7 @@
 - Start an interactive device monitor and set a specific baud rate (defaults to 9600)
 `pio device monitor --baud {{57600}}`
 
-- Start an interactive device monitor and set a specific EOL character (defults to `CRLF`)
+- Start an interactive device monitor and set a specific EOL character (defaults to `CRLF`)
 `pio device monitor --eol {{CRLF|CR|LF}}`
 
 - Go to the menu of the interactive device monitor

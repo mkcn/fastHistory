@@ -1,5 +1,6 @@
 # lsblk
 > Lists information about devices.
+> More information: <https://manned.org/lsblk>.
 
 - List all storage devices in a tree-like format
 `lsblk`

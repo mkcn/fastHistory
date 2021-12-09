@@ -1,5 +1,6 @@
 # unar
 > Extract contents from archive files.
+> More information: <https://manned.org/unar>.
 
 - Extract an archive to the current directory
 `unar {{archive}}`

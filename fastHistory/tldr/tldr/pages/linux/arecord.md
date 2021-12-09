@@ -8,7 +8,7 @@
 - Record a snippet in "CD" quality, with a fixed duration of 10 seconds
 `arecord -vv --format=cd --duration={{10}} {{path/to/file.wav}}`
 
-- Record a snippet and save it as mp3 (finish with Ctrl-C when done)
+- Record a snippet and save it as an MP3 (finish with Ctrl-C when done)
 `arecord -vv --format=cd --file-type raw | lame -r - {{path/to/file.mp3}}`
 
 - List all sound cards and digital audio devices

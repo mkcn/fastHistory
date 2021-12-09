@@ -15,7 +15,7 @@
 - Number all output lines
 `bat -n {{file}}`
 
-- Syntax highlight a json file
+- Syntax highlight a JSON file
 `bat --language json {{file.json}}`
 
 - Display all supported languages

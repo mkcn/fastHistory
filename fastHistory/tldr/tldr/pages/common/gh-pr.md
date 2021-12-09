@@ -1,5 +1,5 @@
 # gh pr
-> Manage GitHub pull requests from the command line.
+> Manage GitHub pull requests from the command-line.
 > More information: <https://cli.github.com/manual/gh_pr>.
 
 - Create a pull request

@@ -1,5 +1,6 @@
 # drutil
 > Interact with DVD burners.
+> More information: <https://ss64.com/osx/drutil.html>.
 
 - Eject a disk from the drive
 `drutil eject`

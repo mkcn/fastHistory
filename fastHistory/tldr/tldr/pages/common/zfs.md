@@ -1,5 +1,6 @@
 # zfs
 > Manage ZFS filesystems.
+> More information: <https://manned.org/zfs>.
 
 - List all available zfs filesystems
 `zfs list`

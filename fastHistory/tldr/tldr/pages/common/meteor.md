@@ -1,5 +1,5 @@
 # meteor
-> Full-stack javascript platform for building web applications.
+> Full-stack JavaScript platform for building web applications.
 > More information: <https://meteor.com>.
 
 - Run a meteor project from its root directory in development mode

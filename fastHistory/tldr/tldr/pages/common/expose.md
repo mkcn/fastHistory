@@ -11,7 +11,7 @@
 - Share the current working directory with a specific subdomain
 `expose --subdomain={{subdomain}}`
 
-- Share a local url
+- Share a local URL
 `expose share {{url}}`
 
 - Run the Expose server

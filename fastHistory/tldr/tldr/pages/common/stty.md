@@ -12,7 +12,7 @@
 `stty cols {{cols}}`
 
 - Get the actual transfer speed of a device
-`stty -f {{path/to/device_file}} speed`
+`stty -F {{path/to/device_file}} speed`
 
 - Reset all modes to reasonable values for the current terminal
 `stty sane`

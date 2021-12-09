@@ -1,5 +1,5 @@
 # gcalcli
-> Command line tool to interact with Google Calendar.
+> Command-line tool to interact with Google Calendar.
 > Requests Google API authorization upon first launch.
 > More information: <https://github.com/insanum/gcalcli>.
 

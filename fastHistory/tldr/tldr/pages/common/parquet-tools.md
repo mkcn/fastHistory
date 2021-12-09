@@ -1,6 +1,6 @@
 # parquet-tools
 > A tool to show, inspect and manipulate Parquet file.
-> More information: <https://github.com/apache/parquet-mr/tree/master/parquet-tools>.
+> More information: <https://github.com/apache/parquet-mr/tree/master/parquet-tools-deprecated>.
 
 - Display the content of a Parquet file
 `parquet-tools cat {{path/to/parquet}}`

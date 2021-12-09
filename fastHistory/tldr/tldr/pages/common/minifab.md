@@ -5,7 +5,7 @@
 - Bring up the default Hyperledger Fabric network
 `minifab up -i {{minifab_version}}`
 
-- Bring down the Hyperldger Fabric network
+- Bring down the Hyperledger Fabric network
 `minifab down`
 
 - Install chaincode onto a specified channel

@@ -1,5 +1,6 @@
 # unset
 > Remove shell variables or functions.
+> More information: <https://manned.org/unset>.
 
 - Remove the variable `foo`, or if the variable doesn't exist, remove the function `foo`
 `unset {{foo}}`

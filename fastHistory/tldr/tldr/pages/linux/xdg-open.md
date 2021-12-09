@@ -5,7 +5,7 @@
 - Open the current directory in the default file explorer
 `xdg-open .`
 
-- Open an URL in the default browser
+- Open a URL in the default browser
 `xdg-open {{https://example.com}}`
 
 - Open an image in the default image viewer

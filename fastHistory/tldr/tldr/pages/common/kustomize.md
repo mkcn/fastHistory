@@ -11,5 +11,5 @@
 - Set an image in the kustomization file
 `kustomize edit set image {{busybox=alpine:3.6}}`
 
-- Search for kubernetes resources in the current directory to be added to the kustomization file
+- Search for Kubernetes resources in the current directory to be added to the kustomization file
 `kustomize create --autodetect`

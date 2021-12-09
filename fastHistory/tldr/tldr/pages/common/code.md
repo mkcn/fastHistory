@@ -17,5 +17,5 @@
 - Compare two files in VS Code
 `code -d {{file1}} {{file2}}`
 
-- Open VS Code with super user (sudo) permissions
+- Open VS Code with superuser (sudo) permissions
 `sudo code {{path/to/file_or_directory}} --user-data-dir`

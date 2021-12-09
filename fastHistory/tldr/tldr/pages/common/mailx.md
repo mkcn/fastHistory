@@ -1,5 +1,6 @@
 # mailx
 > Send and receive mail.
+> More information: <https://manned.org/mailx>.
 
 - Send mail (the content should be typed after the command, and ended with `Ctrl+D`)
 `mailx -s "{{subject}}" {{to_addr}}`

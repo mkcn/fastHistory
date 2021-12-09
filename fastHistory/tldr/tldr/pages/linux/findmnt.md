@@ -1,5 +1,6 @@
 # findmnt
 > Find your filesystem.
+> More information: <https://manned.org/findmnt>.
 
 - List all mounted filesystems
 `findmnt`

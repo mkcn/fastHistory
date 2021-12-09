@@ -1,7 +1,8 @@
 # ifconfig
 > Network Interface Configurator.
+> More information: <https://net-tools.sourceforge.io/man/ifconfig.8.html>.
 
-- View network settings of an ethernet adapter
+- View network settings of an Ethernet adapter
 `ifconfig eth0`
 
 - Display details of all interfaces, including disabled interfaces

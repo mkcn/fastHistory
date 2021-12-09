@@ -5,8 +5,11 @@
 - Start an interactive shell session
 `fish`
 
-- Execute a command and then exit
-`fish -c "{{command}}"`
+- Start an interactive shell session without loading startup configs
+`fish --no-config`
+
+- Execute a command
+`fish --command "{{command}}"`
 
 - Execute a script
 `fish {{path/to/script.fish}}`
@@ -17,8 +20,8 @@
 - Start an interactive shell session in private mode, where the shell does not access old history or save new history
 `fish --private`
 
-- Display version information and exit
-`fish --version`
+- Define and export an environmental variable that persists across shell restarts (builtin)
+`set --universal --export {{variable_name}} {{variable_value}}`
 
-- Set and export environmental variables that persist across shell restarts (from within the shell only)
-`set -Ux {{variable_name}} {{variable_value}}`
+- Print the version
+`fish --version`

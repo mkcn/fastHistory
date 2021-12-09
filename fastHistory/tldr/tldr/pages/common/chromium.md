@@ -5,7 +5,7 @@
 - Open a file
 `chromium {{path/to/file.html}}`
 
-- Open an URL
+- Open a URL
 `chromium {{example.com}}`
 
 - Open in incognito mode

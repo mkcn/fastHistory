@@ -1,5 +1,5 @@
 # nrm
-> NPM registry manager.
+> npm registry manager.
 > Helps to easily switch between different npm registries.
 > More information: <https://github.com/Pana/nrm>.
 

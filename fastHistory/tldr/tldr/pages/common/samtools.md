@@ -1,6 +1,7 @@
 # samtools
 > Tools for handling high-throughput sequencing (genomics) data.
 > Used for reading/writing/editing/indexing/viewing of data in SAM/BAM/CRAM format.
+> More information: <https://www.htslib.org>.
 
 - Convert a SAM input file to BAM stream and save to file
 `samtools view -S -b {{input.sam}} > {{output.bam}}`

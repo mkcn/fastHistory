@@ -1,5 +1,6 @@
 # isoinfo
 > Utility programs for dumping and verifying ISO disk images.
+> More information: <https://manned.org/isoinfo>.
 
 - List all the files included in an ISO image
 `isoinfo -f -i {{path/to/image.iso}}`

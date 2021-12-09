@@ -2,7 +2,7 @@
 > Cross platform IDE for C#, F# and more.
 > More information: <https://www.monodevelop.com/>.
 
-- Start Monodevelop
+- Start MonoDevelop
 `monodevelop`
 
 - Open a specific file

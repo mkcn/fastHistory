@@ -14,7 +14,7 @@
 - Keep reading file until `Ctrl + C`
 `tail -f {{file}}`
 
-- Keep reading file until `Ctrl + C`, even if the file is rotated
+- Keep reading file until `Ctrl + C`, even if the file is inaccessible
 `tail -F {{file}}`
 
 - Show last 'num' lines in 'file' and refresh every 'n' seconds

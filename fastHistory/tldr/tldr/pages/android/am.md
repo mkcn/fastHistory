@@ -11,5 +11,5 @@
 - Start an activity matching a specific action and category
 `am start -a {{android.intent.action.MAIN}} -c {{android.intent.category.HOME}}`
 
-- Convert an intent to an URI
+- Convert an intent to a URI
 `am to-uri -a {{android.intent.action.VIEW}} -d {{tel:123}}`

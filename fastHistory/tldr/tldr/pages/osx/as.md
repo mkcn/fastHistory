@@ -1,6 +1,7 @@
 # as
 > Portable GNU assembler.
 > Primarily intended to assemble output from `gcc` to be used by `ld`.
+> More information: <https://www.unix.com/man-page/osx/1/as/>.
 
 - Assemble a file, writing the output to `a.out`
 `as {{file.s}}`

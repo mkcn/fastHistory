@@ -1,5 +1,6 @@
 # pinky
 > Print user information using the `finger` protocol.
+> More information: <https://manned.org/pinky>.
 
 - Display details about the current user
 `pinky`

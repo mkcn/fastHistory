@@ -1,5 +1,6 @@
 # pygmentize
 > Python-based syntax highlighter.
+> More information: <https://pygments.org/docs/cmdline/>.
 
 - Highlight file syntax and print to standard output (language is inferred from the file extension)
 `pygmentize {{file.py}}`

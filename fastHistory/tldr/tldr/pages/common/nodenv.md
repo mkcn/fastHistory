@@ -1,5 +1,5 @@
 # nodenv
-> A tool to manage NodeJS versions.
+> A tool to manage Node.js versions.
 > More information: <https://github.com/nodenv/nodenv>.
 
 - Install a specific version of Node.js

@@ -1,5 +1,6 @@
 # pdfimages
 > Utility for extracting images from PDFs.
+> More information: <https://manned.org/pdfimages>.
 
 - Extract all images from a PDF file and save them as PNGs
 `pdfimages -png {{path/to/file.pdf}} {{filename_prefix}}`

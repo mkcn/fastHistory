@@ -1,5 +1,6 @@
 # chflags
 > Change file or directory flags.
+> More information: <https://ss64.com/osx/chflags.html>.
 
 - Set the `hidden` flag for a file
 `chflags {{hidden}} {{path/to/file}}`

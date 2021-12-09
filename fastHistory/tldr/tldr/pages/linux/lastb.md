@@ -1,5 +1,6 @@
 # lastb
 > Show a listing of last logged in users.
+> More information: <https://manned.org/lastb>.
 
 - Show a list of all last logged in users
 `sudo lastb`

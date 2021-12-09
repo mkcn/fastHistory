@@ -1,7 +1,8 @@
 # s
 > Web search from the terminal.
+> More information: <https://github.com/zquestz/s>.
 
-- Search for a query on Google(default provider)
+- Search for a query on Google (default provider)
 `s {{query}}`
 
 - List all providers

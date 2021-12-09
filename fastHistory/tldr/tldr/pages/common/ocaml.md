@@ -8,3 +8,6 @@
 
 - Read OCaml commands from a file and execute them
 `ocaml {{path/to/file.ml}}`
+
+- Run OCaml script with modules
+`ocaml {{module1}} {{module2}} {{path/to/file.ml}}`

@@ -2,7 +2,7 @@
 > A light-weight password manager.
 > More information: <https://keepass.info>.
 
-- Start KeePass 2, opening the most recently-opened password database
+- Start KeePass 2, opening the most recently opened password database
 `keepass2`
 
 - Start KeePass 2, opening a specific password database

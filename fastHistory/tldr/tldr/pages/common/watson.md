@@ -11,7 +11,7 @@
 - Stop monitoring time for the current project
 `watson stop`
 
-- Display latest working sessions
+- Display the latest working sessions
 `watson log`
 
 - Edit most recent frame

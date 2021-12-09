@@ -1,6 +1,7 @@
 # lex
 > Lexical analyser generator.
 > Given the specification for a lexical analyser, generates C code implementing it.
+> More information: <https://manned.org/lex.1>.
 
 - Generate an analyser from a Lex file
 `lex {{analyser.l}}`

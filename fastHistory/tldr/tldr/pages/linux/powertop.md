@@ -1,5 +1,6 @@
 # powertop
 > Optimize battery power usage.
+> More information: <https://github.com/fenrus75/powertop>.
 
 - Calibrate power usage measurements
 `sudo powertop --calibrate`

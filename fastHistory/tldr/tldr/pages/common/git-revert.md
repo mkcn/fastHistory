@@ -3,7 +3,7 @@
 > More information: <https://git-scm.com/docs/git-revert>.
 
 - Revert the most recent commit
-`git revert {{@}}`
+`git revert {{HEAD}}`
 
 - Revert the 5th last commit
 `git revert HEAD~{{4}}`

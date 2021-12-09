@@ -8,7 +8,7 @@
 - Scan a domain, specifying the nameserver and performing a zone transfer
 `dnsrecon --domain {{example.com}} --name_server {{nameserver.example.com}} --type axfr`
 
-- Scan a domain, using a dictionary of subdomains and hostnames for bruteforcing
+- Scan a domain, using a brute-force attack and a dictionary of subdomains and hostnames
 `dnsrecon --domain {{example.com}} --dictionary {{path/to/dictionary.txt}} --type brt`
 
 - Scan a domain, performing a reverse lookup of IP ranges from the SPF record and saving the results to a JSON file

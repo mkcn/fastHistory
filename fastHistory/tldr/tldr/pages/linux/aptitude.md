@@ -17,7 +17,7 @@
 - Remove a package and all packages depending on it
 `aptitude remove {{package}}`
 
-- Upgrade installed packages to newest available versions
+- Upgrade installed packages to the newest available versions
 `aptitude upgrade`
 
 - Upgrade installed packages (like `aptitude upgrade`) including removing obsolete packages and installing additional packages to meet new package dependencies

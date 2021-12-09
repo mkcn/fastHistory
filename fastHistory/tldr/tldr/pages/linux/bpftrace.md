@@ -8,7 +8,7 @@
 - List all available probes
 `sudo bpftrace -l`
 
-- Run a one-liner program (e.g syscall count by program)
+- Run a one-liner program (e.g. syscall count by program)
 `sudo bpftrace -e '{{tracepoint:raw_syscalls:sys_enter { @[comm] = count(); }}}'`
 
 - Run a program from a file

@@ -1,5 +1,6 @@
 # unrar
 > Extract RAR archives.
+> More information: <https://manned.org/unrar>.
 
 - Extract files with original directory structure
 `unrar x {{compressed.rar}}`

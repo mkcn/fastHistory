@@ -1,8 +1,8 @@
 # molecule
-> Molecule helps testing ansible roles.
+> Molecule helps testing Ansible roles.
 > More information: <https://molecule.readthedocs.io>.
 
-- Create a new ansible role
+- Create a new Ansible role
 `molecule init role --role-name {{role_name}}`
 
 - Run tests
@@ -14,5 +14,5 @@
 - Configure the instance
 `molecule converge`
 
-- Login into the instance
+- Log in into the instance
 `molecule login`

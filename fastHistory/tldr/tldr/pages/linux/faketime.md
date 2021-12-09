@@ -8,5 +8,5 @@
 - Open a new `bash` shell, which uses yesterday as the current date
 `faketime '{{yesterday}}' {{bash}}`
 
-- Simulate how any program would act next friday night
-`faketime '{{next Friday 1 am}}' {{path/to/any/program}}`
+- Simulate how a program would act next Friday night
+`faketime '{{next Friday 1 am}}' {{path/to/program}}`

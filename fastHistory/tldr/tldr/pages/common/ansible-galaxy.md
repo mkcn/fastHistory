@@ -3,10 +3,10 @@
 > More information: <https://docs.ansible.com/ansible/latest/cli/ansible-galaxy.html>.
 
 - Install a role
-`ansible-galaxy install {{username.role_name}}`
+`ansible-galaxy install {{username}}.{{role_name}}`
 
 - Remove a role
-`ansible-galaxy remove {{username.role_name}}`
+`ansible-galaxy remove {{username}}.{{role_name}}`
 
 - List installed roles
 `ansible-galaxy list`
@@ -16,3 +16,9 @@
 
 - Create a new role
 `ansible-galaxy init {{role_name}}`
+
+- Get information about a user role
+`ansible-galaxy role info {{username}}.{{role_name}}`
+
+- Get information about a collection
+`ansible-galaxy collection info {{username}}.{{collection_name}}`

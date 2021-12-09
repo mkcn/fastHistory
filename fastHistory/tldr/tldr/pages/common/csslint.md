@@ -17,5 +17,5 @@
 - Specify certain rules as warnings
 `csslint --warnings={{box-sizing,selector-max,floats}} {{file.css}}`
 
-- Specify certain rules to completely ignore
+- Specify certain rules to ignore
 `csslint --ignore={{ids,rules-count,shorthand}} {{file.css}}`

@@ -17,5 +17,5 @@
 - Display available updates for installed packages
 `yum check-update`
 
-- Upgrade installed packages to newest available versions
+- Upgrade installed packages to the newest available versions
 `yum upgrade`

@@ -2,7 +2,7 @@
 > Upload code to https://gist.github.com.
 > More information: <https://github.com/defunkt/gist>.
 
-- Login in gist on this computer
+- Log in in gist on this computer
 `gist --login`
 
 - Create a gist from any number of text files
@@ -20,5 +20,5 @@
 - List all public gists for any user
 `gist --list {{username}}`
 
-- Update a gist using the id from URL
+- Update a gist using the ID from URL
 `gist --update {{GIST_ID}} {{file.txt}}`

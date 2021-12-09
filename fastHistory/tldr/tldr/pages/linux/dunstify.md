@@ -1,6 +1,7 @@
 # dunstify
 > A notification tool that is an extension of notify-send, but has more features based around dunst.
 > Works with all options that work for notify-send.
+> More information: <https://wiki.archlinux.org/title/Dunst#Dunstify>.
 
 - Show a notification with a given title and message
 `dunstify "{{Title}}" "{{Message}}"`

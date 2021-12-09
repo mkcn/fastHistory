@@ -8,11 +8,11 @@
 - Decompress a xz file
 `xz -d {{file.xz}}`
 
-- Compress a file to the lzma file format
-`xz --format=lzma {{file}}`
+- Compress a file to the LZMA file format
+`xz --format={{lzma}} {{file}}`
 
-- Decompress an lzma file
-`xz -d --format=lzma {{file.lzma}}`
+- Decompress an LZMA file
+`xz -d --format={{lzma}} {{file.lzma}}`
 
 - Decompress a file and write to stdout
 `xz -dc {{file.xz}}`

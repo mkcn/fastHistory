@@ -1,5 +1,6 @@
 # hdiutil
 > Utility to create and manage disk images.
+> More information: <https://ss64.com/osx/hdiutil.html>.
 
 - Mount an image
 `hdiutil attach {{path/to/image_file}}`

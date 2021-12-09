@@ -1,5 +1,6 @@
 # timedatectl
 > Control the system time and date.
+> More information: <https://manned.org/timedatectl>.
 
 - Check the current system clock time
 `timedatectl`

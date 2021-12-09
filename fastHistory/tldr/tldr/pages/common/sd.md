@@ -1,7 +1,8 @@
 # sd
 > Intuitive find & replace CLI.
+> More information: <https://github.com/chmln/sd>.
 
-- Trim some whitespace using regex
+- Trim some whitespace using a regular expression
 `{{echo 'lorem ipsum 23   '}} | sd '\s+$' ''`
 
 - Replace words using capture groups

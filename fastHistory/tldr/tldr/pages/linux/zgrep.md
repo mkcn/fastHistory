@@ -1,5 +1,6 @@
 # zgrep
 > Grep text patterns from files within compressed file (equivalent to grep -Z).
+> More information: <https://manned.org/zgrep>.
 
 - Grep a pattern in a compressed file (case-sensitive)
 `zgrep {{pattern}} {{path/to/compressed/file}}`
@@ -17,7 +18,7 @@
 `zgrep -e "{{pattern_1}}" -e "{{pattern_2}}" {{path/to/compressed/file}}`
 
 - Use extended regular expressions (supporting `?`, `+`, `{}`, `()` and `|`)
-`zgrep -E {{^regex$}} {{path/to/file}}`
+`zgrep -E {{regular_expression}} {{path/to/file}}`
 
 - Print 3 lines of Context around, Before, or After each match
 `zgrep -{{C|B|A}} {{3}} {{pattern}} {{path/to/compressed/file}}`

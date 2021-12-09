@@ -11,4 +11,4 @@
 `pidof -x {{script.py}}`
 
 - Kill all processes with given name
-`kill "$(pidof {{name}})" `
+`kill $(pidof {{name}})`

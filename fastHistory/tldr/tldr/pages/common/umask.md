@@ -1,5 +1,6 @@
 # umask
 > Manage the read/write/execute permissions that are masked out (i.e. restricted) for newly created files by the user.
+> More information: <https://manned.org/umask>.
 
 - Display the current mask in octal notation
 `umask`

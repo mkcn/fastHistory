@@ -1,5 +1,5 @@
 # ctr
-> Manage Containerd containers and images.
+> Manage `containerd` containers and images.
 > More information: <https://containerd.io>.
 
 - List all containers (running and stopped)

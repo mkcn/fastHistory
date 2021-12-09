@@ -19,3 +19,9 @@
 
 - List files sorted by modification date (oldest first)
 `exa --long --sort={{modified}}`
+
+- List files with their headers, icons, and Git statuses
+`exa --long --header --icons --git`
+
+- Don't list files mentioned in `.gitignore`
+`exa --git-ignore`

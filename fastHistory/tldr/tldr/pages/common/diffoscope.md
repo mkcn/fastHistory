@@ -8,7 +8,7 @@
 - Compare two files without displaying a progress bar
 `diffoscope --no-progress {{path/to/file1}} {{path/to/file2}}`
 
-- Compare two files and write a HTML-report to a file (use `-` for stdout)
+- Compare two files and write an HTML-report to a file (use `-` for stdout)
 `diffoscope --html {{path/to/outfile|-}} {{path/to/file1}} {{path/to/file2}}`
 
 - Compare two directories excluding files with a name matching a specified pattern

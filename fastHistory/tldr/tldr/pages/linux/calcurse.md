@@ -1,5 +1,5 @@
 # calcurse
-> A text-based calendar and scheduling application for the command line.
+> A text-based calendar and scheduling application for the command-line.
 > More information: <https://calcurse.org>.
 
 - Start calcurse on interactive mode

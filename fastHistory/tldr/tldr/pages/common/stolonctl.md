@@ -11,5 +11,5 @@
 - Get cluster specification
 `stolonctl --cluster-name {{cluster_name}} --store-backend {{store_backend}} --store-endpoints {{store_endpoints}} spec`
 
-- Update cluster specification with a patch in json format
+- Update cluster specification with a patch in JSON format
 `stolonctl --cluster-name {{cluster_name}} --store-backend {{store_backend}} --store-endpoints {{store_endpoints}} update --patch '{{cluster_spec}}'`

@@ -1,5 +1,6 @@
 # hdparm
 > Get and set SATA and IDE hard drive parameters.
+> More information: <https://manned.org/hdparm>.
 
 - Request the identification info of a given device
 `sudo hdparm -I /dev/{{device}}`

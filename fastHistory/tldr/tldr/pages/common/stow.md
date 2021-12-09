@@ -16,4 +16,4 @@
 `stow --restow --target={{path/to/target_directory}} {{file1 directory1 file2 directory2}}`
 
 - Exclude files matching a regular expression
-`stow --ignore={{regex}} --target={{path/to/target_directory}} {{file1 directory1 file2 directory2}}`
+`stow --ignore={{regular_expression}} --target={{path/to/target_directory}} {{file1 directory1 file2 directory2}}`

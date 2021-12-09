@@ -1,5 +1,6 @@
 # sdiff
 > Compare the differences between and optionally merge 2 files.
+> More information: <https://manned.org/sdiff>.
 
 - Compare 2 files
 `sdiff {{path/to/file1}} {{path/to/file2}}`

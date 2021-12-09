@@ -1,5 +1,6 @@
 # ldd
 > Display shared library dependencies.
+> More information: <https://manned.org/ldd>.
 
 - Display shared library dependencies of a binary
 `ldd {{path/to/binary}}`

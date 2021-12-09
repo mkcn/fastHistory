@@ -1,5 +1,6 @@
 # ps
 > Information about running processes.
+> More information: <https://manned.org/ps>.
 
 - List all running processes
 `ps aux`
@@ -16,7 +17,7 @@
 - List all processes of the current user as a tree
 `ps --user $(id -u) f`
 
-- Get the parent pid of a process
+- Get the parent PID of a process
 `ps -o ppid= -p {{pid}}`
 
 - Sort processes by memory consumption

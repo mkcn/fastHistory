@@ -1,5 +1,6 @@
 # tput
 > View and modify terminal settings and capabilities.
+> More information: <https://manned.org/tput>.
 
 - Move the cursor to a screen location
 `tput cup {{y_coordinate}} {{x_coordinate}}`

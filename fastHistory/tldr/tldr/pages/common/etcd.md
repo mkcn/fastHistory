@@ -5,7 +5,7 @@
 - Start a single-node etcd cluster
 `etcd`
 
-- Start a single-node etcd cluster, listening for client requests on a custom url
+- Start a single-node etcd cluster, listening for client requests on a custom URL
 `etcd --advertise-client-urls {{http://127.0.0.1:1234}} --listen-client-urls {{http://127.0.0.1:1234}}`
 
 - Start a single-node etcd cluster with a custom name

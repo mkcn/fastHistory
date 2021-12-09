@@ -1,5 +1,5 @@
 # whois
-> Commandline client for the WHOIS (RFC 3912) protocol.
+> Command-line client for the WHOIS (RFC 3912) protocol.
 > More information: <https://github.com/rfc1036/whois>.
 
 - Get information about a domain name

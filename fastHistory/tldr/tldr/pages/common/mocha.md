@@ -9,7 +9,7 @@
 `mocha {{directory/with/tests}}`
 
 - Run tests that match a specific grep pattern
-`mocha --grep {{^regex$}}`
+`mocha --grep {{regular_expression}}`
 
 - Run tests on changes to JavaScript files in the current directory and once initially
 `mocha --watch`

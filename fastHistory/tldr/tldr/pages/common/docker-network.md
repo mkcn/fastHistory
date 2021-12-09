@@ -5,7 +5,7 @@
 - List all available and configured networks on docker daemon
 `docker network ls`
 
-- Create a user defined network
+- Create a user-defined network
 `docker network create --driver {{driver_name}} {{network_name}}`
 
 - Display detailed information of a space-separated list of networks

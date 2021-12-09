@@ -6,7 +6,7 @@
 - Check if an IP address is up, and guess the remote host's operating system
 `nmap -O {{ip_or_hostname}}`
 
-- Try to determine whether the specified hosts are up and what are their names
+- Try to determine whether the specified hosts are up and what their names are
 `nmap -sn {{ip_or_hostname}} {{optional_another_address}}`
 
 - Like above, but also run a default 1000-port TCP scan if host seems up

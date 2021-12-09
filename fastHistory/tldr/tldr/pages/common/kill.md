@@ -1,6 +1,7 @@
 # kill
 > Sends a signal to a process, usually related to stopping the process.
 > All signals except for SIGKILL and SIGSTOP can be intercepted by the process to perform a clean exit.
+> More information: <https://manned.org/kill>.
 
 - Terminate a program using the default SIGTERM (terminate) signal
 `kill {{process_id}}`

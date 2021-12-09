@@ -1,11 +1,11 @@
 # spectre-meltdown-checker
 > Spectre and Meltdown mitigation detection tool.
-> More information: <https://manned.org/spectre-meltdown-checker.1>.
+> More information: <https://manned.org/spectre-meltdown-checker>.
 
 - Check the currently running kernel for Spectre or Meltdown
 `sudo spectre-meltdown-checker`
 
-- Check the currently running kernel and show an explanation of the actions to take in order to mitigate a vulnerability
+- Check the currently running kernel and show an explanation of the actions to take to mitigate a vulnerability
 `sudo spectre-meltdown-checker --explain`
 
 - Check for specific variants (defaults to all)

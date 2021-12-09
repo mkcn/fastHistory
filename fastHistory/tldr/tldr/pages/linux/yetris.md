@@ -2,7 +2,7 @@
 > Clone of the game Tetris in the terminal.
 > More information: <https://github.com/alexdantas/yetris>.
 
-- Start a tetris game
+- Start a Tetris game
 `yetris`
 
 - Navigate the piece horizontally

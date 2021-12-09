@@ -1,5 +1,6 @@
 # watch
 > Execute a command repeatedly, and monitor the output in full-screen mode.
+> More information: <https://manned.org/watch>.
 
 - Monitor files in the current directory
 `watch {{ls}}`

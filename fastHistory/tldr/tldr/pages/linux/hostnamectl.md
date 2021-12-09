@@ -1,5 +1,6 @@
 # hostnamectl
 > Get or set the hostname of the computer.
+> More information: <https://manned.org/hostnamectl>.
 
 - Get the hostname of the computer
 `hostnamectl`

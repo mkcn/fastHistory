@@ -12,8 +12,8 @@
 - create a gzipped archive from a directory using relative paths
 `tar czf {{target.tar.gz}} --directory={{path/to/directory}} .`
 
-- Extract a (compressed) archive file into the current directory
-`tar xf {{source.tar[.gz|.bz2|.xz]}}`
+- Extract a (compressed) archive file into the current directory verbosely
+`tar xvf {{source.tar[.gz|.bz2|.xz]}}`
 
 - Extract a (compressed) archive file into the target directory
 `tar xf {{source.tar[.gz|.bz2|.xz]}} --directory={{directory}}`

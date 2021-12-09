@@ -21,7 +21,7 @@
 `pip3 freeze > {{requirements.txt}}`
 
 - Install packages from a file
-`pip3 install --requirements {{requirements.txt}}`
+`pip3 install --requirement {{requirements.txt}}`
 
 - Show installed package info
 `pip3 show {{package_name}}`

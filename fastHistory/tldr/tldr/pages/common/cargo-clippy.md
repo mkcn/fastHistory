@@ -15,10 +15,10 @@
 `cargo clippy --package {{package}}`
 
 - Treat warnings as errors
-`RUSTFLAGS="-Dwarnings" cargo clippy -- -D warnings`
+`cargo clippy -- --deny warnings`
 
 - Run checks and ignore warnings
-`cargo clippy -- -A warnings`
+`cargo clippy -- --allow warnings`
 
-- Apply Clippy suggestion automatically (experimental and only supported on the nightly channel)
-`cargo clippy --fix -Z unstable-options`
+- Apply Clippy suggestions automatically
+`cargo clippy --fix`

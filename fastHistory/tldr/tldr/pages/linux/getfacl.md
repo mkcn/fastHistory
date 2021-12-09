@@ -1,5 +1,6 @@
 # getfacl
 > Get file access control lists.
+> More information: <https://manned.org/getfacl>.
 
 - Display the file access control list
 `getfacl {{path/to/file_or_directory}}`

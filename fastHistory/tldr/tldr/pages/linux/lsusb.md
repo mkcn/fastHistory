@@ -1,5 +1,6 @@
 # lsusb
 > Display information about USB buses and devices connected to them.
+> More information: <https://manned.org/lsusb>.
 
 - List all the USB devices available
 `lsusb`
@@ -13,5 +14,5 @@
 - List detailed information about a USB device
 `lsusb -D {{device}}`
 
-- List devices with a specified vendor and product id only
+- List devices with a specified vendor and product ID only
 `lsusb -d {{vendor}}:{{product}}`

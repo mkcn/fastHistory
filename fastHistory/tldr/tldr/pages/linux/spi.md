@@ -11,7 +11,7 @@
 - Upgrade all installed packages to the latest versions available
 `spi --upgrade`
 
-- Locate packages or slackbuilds of interest by package name or description
+- Locate packages or slackbuilds by package name or description
 `spi {{search_terms}}`
 
 - Display information about a package or slackbuild

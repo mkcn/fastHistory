@@ -1,6 +1,7 @@
 # obs
 > Open Broadcaster Software.
 > Video recording and livestreaming program.
+> More information: <https://obsproject.com/>.
 
 - Launch OBS
 `obs`

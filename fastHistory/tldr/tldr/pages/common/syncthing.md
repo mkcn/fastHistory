@@ -2,10 +2,10 @@
 > Continuous bidirectional decentralised folder synchronisation tool.
 > More information: <https://docs.syncthing.net/>.
 
-- Start syncthing
+- Start Syncthing
 `syncthing`
 
-- Start syncthing without opening a web browser
+- Start Syncthing without opening a web browser
 `syncthing -no-browser`
 
 - Print the device ID
@@ -20,8 +20,8 @@
 - Change the address upon which the web interface listens
 `syncthing -gui-address={{ip_address:port|path/to/socket.sock}}`
 
-- Show filepaths to the files used by syncthing
+- Show filepaths to the files used by Syncthing
 `syncthing -paths`
 
-- Disable the syncthing monitor process
+- Disable the Syncthing monitor process
 `syncthing -no-restart`

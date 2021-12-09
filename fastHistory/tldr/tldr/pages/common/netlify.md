@@ -2,7 +2,7 @@
 > Deploy sites and configure continuous deployment to the Netlify platform.
 > More information: <https://www.netlify.com/docs/cli/>.
 
-- Login to the Netlify account
+- Log in to the Netlify account
 `netlify login`
 
 - Deploy the contents of a directory to Netlify

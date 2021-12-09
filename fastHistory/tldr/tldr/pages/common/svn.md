@@ -1,5 +1,5 @@
 # svn
-> Subversion command line client tool.
+> Subversion command-line client tool.
 > More information: <https://subversion.apache.org>.
 
 - Check out a working copy from a repository

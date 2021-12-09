@@ -11,7 +11,7 @@
 - Start an interactive login to packtpub.com
 `packtpub login`
 
-- Logout from packtpub.com
+- Log out from packtpub.com
 `packtpub logout`
 
 - Display the daily offer

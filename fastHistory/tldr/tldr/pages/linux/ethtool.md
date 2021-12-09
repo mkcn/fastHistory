@@ -14,5 +14,5 @@
 - Blink one or more LEDs on an interface for 10 seconds
 `ethtool --identify {{eth0}} {{10}}`
 
-- Set the link speed, duplex mode, and parameter autonegotiation for a given interface
+- Set the link speed, duplex mode, and parameter auto-negotiation for a given interface
 `ethtool -s {{eth0}} speed {{10|100|1000}} duplex {{half|full}} autoneg {{on|off}}`

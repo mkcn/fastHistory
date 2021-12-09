@@ -8,7 +8,7 @@
 - Connect to a hypervisor
 `virt-manager --connect {{hypervisor_uri}}`
 
-- Don't fork virt-manager process into backgroun on startup
+- Don't fork virt-manager process into background on startup
 `virt-manager --no-fork`
 
 - Print debug output

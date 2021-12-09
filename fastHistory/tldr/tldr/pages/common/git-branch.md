@@ -2,11 +2,11 @@
 > Main Git command for working with branches.
 > More information: <https://git-scm.com/docs/git-branch>.
 
-- List local branches. The current branch is highlighted by `*`
-`git branch`
+- List all branches (local and remote; the current branch is highlighted by `*`)
+`git branch --all`
 
-- List all branches (local and remote)
-`git branch -a`
+- List which branches include a specific Git commit in their history
+`git branch --all --contains {{commit_hash}}`
 
 - Show the name of the current branch
 `git branch --show-current`

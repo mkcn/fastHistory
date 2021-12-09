@@ -1,5 +1,5 @@
 # terminalizer
-> Utility program which records the terminal and generate animated gifs or share a video.
+> Utility program which records the terminal and generate animated GIFs or share a video.
 > More information: <https://terminalizer.com>.
 
 - Create the global config directory
@@ -11,7 +11,7 @@
 - Play a recorded file on the terminal
 `terminalizer play {{filename}}`
 
-- Render a recording file as an animated gif image
+- Render a recording file as an animated GIF image
 `terminalizer render {{filename}}`
 
 - Upload a video to terminalizer.com

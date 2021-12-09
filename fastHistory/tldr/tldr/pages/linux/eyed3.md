@@ -1,6 +1,6 @@
 # eyeD3
 > Read and manipulate metadata of MP3 files.
-> More information: <https://eyed3.readthedocs.io/en/latest/>.
+> More information: <https://eyed3.readthedocs.io>.
 
 - View information about an MP3 file
 `eyeD3 {{filename.mp3}}`

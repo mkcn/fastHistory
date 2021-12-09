@@ -13,7 +13,7 @@
 `pacman --files {{filename}}`
 
 - Find the package that owns a specific file, using a regular expression
-`pacman --files --regex '{{search_pattern}}'`
+`pacman --files --regex '{{regular_expression}}'`
 
 - List only the package names
 `pacman --files --quiet {{filename}}`

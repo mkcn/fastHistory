@@ -1,5 +1,6 @@
 # autorandr
 > Automatically change screen layout.
+> More information: <https://github.com/phillipberndt/autorandr>.
 
 - Save the current screen layout
 `autorandr -s {{profile_name}}`

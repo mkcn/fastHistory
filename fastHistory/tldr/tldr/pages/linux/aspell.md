@@ -1,5 +1,6 @@
 # aspell
 > Interactive spell checker.
+> More information: <http://aspell.net/>.
 
 - Spell check a single file
 `aspell check {{path/to/file}}`
@@ -10,7 +11,7 @@
 - Show available dictionary languages
 `aspell dicts`
 
-- Run aspell with different language (takes two letter ISO 639 language code)
+- Run aspell with a different language (takes two-letter ISO 639 language code)
 `aspell --lang={{cs}}`
 
 - List misspelled words from standard input and ignore words from personal word list

@@ -2,7 +2,7 @@
 > An HTML, XML, SAX and Reader parser.
 > More information: <https://nokogiri.org>.
 
-- Parse the contents of a url or file
+- Parse the contents of a URL or file
 `nokogiri {{url|path/to/file}}`
 
 - Parse as a specific type

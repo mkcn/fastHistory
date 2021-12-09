@@ -23,5 +23,5 @@
 - Show the last N commits from a certain author
 `git log -n {{number}} --author={{author}}`
 
-- Show commits between two dates
-`git log --before={{date}} --after={{date}}`
+- Show commits between two dates (yyyy-mm-dd)
+`git log --before="{{2017-01-29}}" --after="{{2017-01-17}}"`

@@ -1,5 +1,6 @@
 # shutdown
 > Shutdown and reboot the system.
+> More information: <https://ss64.com/osx/shutdown.html>.
 
 - Power off (halt) immediately
 `shutdown -h now`

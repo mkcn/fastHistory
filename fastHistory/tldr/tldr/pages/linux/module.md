@@ -6,7 +6,7 @@
 `module avail`
 
 - Search for a module by name
-`module spider {{module_name}}`
+`module avail {{module_name}}`
 
 - Load a module
 `module load {{module_name}}`
@@ -15,7 +15,7 @@
 `module list`
 
 - Unload a specific loaded module
-`module {{module_name}}`
+`module unload {{module_name}}`
 
 - Unload all loaded modules
 `module purge`

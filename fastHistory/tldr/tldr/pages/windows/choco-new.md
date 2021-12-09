@@ -14,5 +14,5 @@
 - Create a new package in a custom output directory
 `choco new {{package_name}} --output-directory {{path/to/directory}}`
 
-- Create a new package with specific 32-bit and 64-bit installer urls
+- Create a new package with specific 32-bit and 64-bit installer URLs
 `choco new {{package_name}} url="{{url}}" url64="{{url}}"`

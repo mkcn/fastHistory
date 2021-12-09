@@ -1,5 +1,6 @@
 # cal
 > Prints calendar information.
+> More information: <https://ss64.com/osx/cal.html>.
 
 - Display a calendar for the current month
 `cal`

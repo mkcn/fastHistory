@@ -8,5 +8,5 @@
 - Show jobs from queue named 'a' (queues have single-character names)
 `atq -q {{a}}`
 
-- Show jobs of all users (run as super user)
+- Show jobs of all users (run as superuser)
 `sudo atq`

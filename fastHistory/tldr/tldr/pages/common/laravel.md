@@ -1,5 +1,5 @@
 # laravel
-> A command line installer for the Laravel framework.
+> A command-line installer for the Laravel framework.
 > More information: <https://laravel.com>.
 
 - Create a new Laravel application

@@ -15,7 +15,7 @@
 - List only files provided by a package located within the `bin` or `sbin` directory
 `pkgfile --list --binaries {{package_name}}`
 
-- Search for a package that owns a specific file using case insensitive matching
+- Search for a package that owns a specific file using case-insensitive matching
 `pkgfile --ignorecase {{filename}}`
 
 - Search for a package that owns a specific file in the `bin` or `sbin` directory

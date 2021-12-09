@@ -1,5 +1,6 @@
 # objdump
 > View information about object files.
+> More information: <https://manned.org/objdump>.
 
 - Display the file header information
 `objdump -f {{binary}}`

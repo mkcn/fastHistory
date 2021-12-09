@@ -11,7 +11,7 @@
 - Change the limit of results to work with
 `theHarvester --domain {{domain_name}} --source {{google}} --limit {{200}}`
 
-- Save the output to two files in xml and html format
+- Save the output to two files in XML and HTML format
 `theHarvester --domain {{domain_name}} --source {{google}} --file {{output_file_name}}`
 
 - Output all available options

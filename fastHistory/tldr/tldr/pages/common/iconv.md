@@ -1,5 +1,6 @@
 # iconv
 > Converts text from one encoding to another.
+> More information: <https://manned.org/iconv>.
 
 - Convert file to a specific encoding, and print to stdout
 `iconv -f {{from_encoding}} -t {{to_encoding}} {{input_file}}`

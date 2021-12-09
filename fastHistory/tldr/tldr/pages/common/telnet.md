@@ -1,5 +1,6 @@
 # telnet
 > Connect to a specified port of a host using the telnet protocol.
+> More information: <https://manned.org/telnet>.
 
 - Telnet to the default port of a host
 `telnet {{host}}`

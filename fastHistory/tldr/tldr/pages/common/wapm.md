@@ -17,7 +17,7 @@
 - Uninstall a package and remove it from the list of dependencies in `wapm.toml`
 `wapm uninstall {{package_name}}`
 
-- Print a tree of locally-installed dependencies
+- Print a tree of locally installed dependencies
 `wapm list`
 
 - List top-level globally installed packages

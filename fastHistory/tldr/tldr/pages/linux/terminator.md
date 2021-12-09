@@ -1,5 +1,6 @@
 # terminator
 > Arrange multiple GNOME terminals in one window.
+> More information: <https://gnome-terminator.org/>.
 
 - Start terminator window
 `terminator`

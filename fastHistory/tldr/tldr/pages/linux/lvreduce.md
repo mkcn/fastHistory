@@ -3,8 +3,8 @@
 > See also: `lvm`.
 > More information: <https://man7.org/linux/man-pages/man8/lvreduce.8.html>.
 
-- Reduce a volume's size to 120GB
+- Reduce a volume's size to 120 GB
 `lvreduce --size {{120G}} {{logical_volume}}`
 
-- Reduce a volume's size by 40GB as well as the underlying filesystem
+- Reduce a volume's size by 40 GB as well as the underlying filesystem
 `lvreduce --size -{{40G}} -r {{logical_volume}}`

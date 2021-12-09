@@ -1,5 +1,5 @@
 # html5validator
-> A command line tool for testing HTML5 validity.
+> A command-line tool for testing HTML5 validity.
 > More information: <https://github.com/svenkreiss/html5validator>.
 
 - Validate a specific file

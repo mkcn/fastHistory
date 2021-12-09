@@ -15,7 +15,7 @@
 - Stop compilation after generating object files (.o)
 `ghc -c {{file.hs}}`
 
-- Run Haskell interactive interpreter (REPL)
+- Start a REPL (interactive shell)
 `ghci`
 
 - Evaluate a single expression

@@ -1,6 +1,7 @@
 # eix
 > Utilities for searching local Gentoo packages.
 > Update local package cache using `eix-update`.
+> More information: <https://wiki.gentoo.org/wiki/Eix>.
 
 - Search for a package
 `eix {{package_name}}`

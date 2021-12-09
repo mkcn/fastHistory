@@ -9,7 +9,7 @@
 - Show only the subdomains found
 `subfinder --silent -d {{example.com}}`
 
-- Use bruteforcing to find subdomains
+- Use a brute-force attack to find subdomains
 `subfinder -d {{example.com}} -b`
 
 - Remove wildcard subdomains

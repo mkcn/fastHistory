@@ -1,5 +1,6 @@
 # lsb_release
 > Provides certain LSB (Linux Standard Base) and distribution-specific information.
+> More information: <https://manned.org/lsb_release>.
 
 - Print all available information
 `lsb_release -a`

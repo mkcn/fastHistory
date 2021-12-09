@@ -1,5 +1,5 @@
 # hsd-cli
-> The command line REST tool for the Handshake blockchain.
+> The command-line REST tool for the Handshake blockchain.
 > More information: <https://handshake.org>.
 
 - Retrieve information about the current server

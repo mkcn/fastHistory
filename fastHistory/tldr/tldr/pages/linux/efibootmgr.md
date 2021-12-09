@@ -1,5 +1,5 @@
 # efibootmgr
-> Manipulate the UEFI Boot Manager (the Bootoptions).
+> Manipulate the UEFI Boot Manager.
 > More information: <https://manned.org/efibootmgr>.
 
 - List the current settings / bootnums

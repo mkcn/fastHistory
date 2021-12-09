@@ -1,5 +1,6 @@
 # xattr
 > Utility to work with extended filesystem attributes.
+> More information: <https://ss64.com/osx/xattr.html>.
 
 - List key:value extended attributes for a given file
 `xattr -l {{file}}`

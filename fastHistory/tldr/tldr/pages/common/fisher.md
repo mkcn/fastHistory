@@ -9,7 +9,7 @@
 - Install a plugin from a GitHub gist
 `fisher {{gist_url}}`
 
-- Edit 'fishfile' by hand with your favorite editor and install multiple plugins
+- Edit 'fishfile' manually with your favorite editor and install multiple plugins
 `{{editor}} ~/.config/fish/fishfile; fisher`
 
 - List installed plugins

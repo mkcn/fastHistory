@@ -8,5 +8,5 @@
 - Search without restricting the output to the terminal width
 `apropos -l {{regular_expression}}`
 
-- Search for pages that contain all of the expressions given
+- Search for pages that contain all the expressions given
 `apropos {{regular_expression_1}} -a {{regular_expression_2}} -a {{regular_expression_3}}`

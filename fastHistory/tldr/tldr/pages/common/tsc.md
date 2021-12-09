@@ -14,7 +14,7 @@
 - Compile all `.ts` files of a TypeScript project defined in a `tsconfig.json` file
 `tsc --build {{tsconfig.json}}`
 
-- Run the compiler using command line options and arguments fetched from a text file
+- Run the compiler using command-line options and arguments fetched from a text file
 `tsc @{{args.txt}}`
 
 - Type-check multiple JavaScript files, and output only the errors

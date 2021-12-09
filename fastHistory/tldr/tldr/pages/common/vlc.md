@@ -1,6 +1,6 @@
 # vlc
 > Cross-platform multimedia player.
-> More information: <https://www.videolan.org/vlc/>.
+> More information: <https://wiki.videolan.org/Documentation:Command_line/>.
 
 - Play a file
 `vlc {{path/to/file}}`

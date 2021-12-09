@@ -1,5 +1,6 @@
 # task
 > TODO list manager.
+> More information: <https://manned.org/task>.
 
 - Add new task
 `task add {{thing_to_do}}`

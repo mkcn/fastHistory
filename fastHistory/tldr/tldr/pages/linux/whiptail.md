@@ -1,5 +1,6 @@
 # whiptail
 > Display text-based dialog boxes from shell scripts.
+> More information: <https://manned.org/whiptail>.
 
 - Display a simple message
 `whiptail --title "{{title}}" --msgbox "{{message}}" {{height_in_chars}} {{width_in_chars}}`

@@ -9,7 +9,7 @@
 - Split columns automatically and auto-align them in a tabular format
 `printf "header1 header2\nbar foo\n" | column --table`
 
-- Specify the column delimiter character for the `--table` option (e.g. "," for csv) (defaults to whitespace)
+- Specify the column delimiter character for the `--table` option (e.g. "," for CSV) (defaults to whitespace)
 `printf "header1,header2\nbar,foo\n" | column --table --separator {{,}}`
 
 - Fill rows before filling columns

@@ -1,5 +1,5 @@
 # cake
-> The command line processor for the CakePHP framework.
+> The command-line processor for the CakePHP framework.
 > More information: <https://cakephp.org>.
 
 - Display basic information about the current app and available commands
@@ -23,5 +23,5 @@
 - Start a development web server (defaults to port 8765)
 `cake server`
 
-- Start a REPL interactive shell instance
+- Start a REPL (interactive shell)
 `cake console`

@@ -5,7 +5,7 @@
 - Play a video or audio file
 `mpv {{file}}`
 
-- Play a video or audio file from an URL
+- Play a video or audio file from a URL
 `mpv '{{https://www.youtube.com/watch?v=dQw4w9WgXcQ}}'`
 
 - Jump backward/forward 5 seconds
@@ -14,7 +14,7 @@
 - Jump backward/forward 1 minute
 `DOWN <or> UP`
 
-- Decrease or increase playback speed by 10 %
+- Decrease or increase playback speed by 10%
 `[ <or> ]`
 
 - Play a file at a specified speed (0.01 to 100, default 1)

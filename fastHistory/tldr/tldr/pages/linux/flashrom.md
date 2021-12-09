@@ -14,5 +14,5 @@
 - Verify the flash against a file
 `flashrom -p {{programmer}} --verify {{path/to/file}}`
 
-- Probe the chip using RaspberryPi
+- Probe the chip using Raspberry Pi
 `flashrom -p {{linux_spi:dev=/dev/spidev0.0}}`

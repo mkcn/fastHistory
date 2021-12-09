@@ -1,5 +1,6 @@
 # mkfs.cramfs
 > Creates a ROM filesystem inside a partition.
+> More information: <https://manned.org/mkfs.cramfs>.
 
 - Create a ROM filesystem inside partition 1 on device b (`sdb1`)
 `mkfs.cramfs {{/dev/sdb1}}`

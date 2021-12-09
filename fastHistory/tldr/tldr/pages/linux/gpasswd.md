@@ -1,5 +1,6 @@
 # gpasswd
 > Administer `/etc/group` and `/etc/gshadow`.
+> More information: <https://manned.org/gpasswd>.
 
 - Define group administrators
 `sudo gpasswd -A {{user1,user2}} {{group}}`

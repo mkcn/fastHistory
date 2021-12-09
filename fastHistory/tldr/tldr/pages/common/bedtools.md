@@ -1,9 +1,9 @@
 # bedtools
 > A swiss-army knife of tools for genomic-analysis tasks.
 > Used to intersect, group, convert and count data in BAM, BED, GFF/GTF, VCF format.
-> More information: <https://bedtools.readthedocs.io/en/latest/>.
+> More information: <https://bedtools.readthedocs.io>.
 
-- Intersect two files with respect to the sequences' strand and save the result to {{`path/to/output_file`}}
+- Intersect two files regarding the sequences' strand and save the result to the specified file
 `bedtools intersect -a {{path/to/file_1}} -b {{path/to/file_2}} -s > {{path/to/output_file}}`
 
 - Intersect two files with a left outer join, i.e. report each feature from {{file_1}} and NULL if no overlap with {{file_2}}

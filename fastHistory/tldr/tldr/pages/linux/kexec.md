@@ -1,5 +1,6 @@
 # kexec
 > Directly reboot into a new kernel.
+> More information: <https://manned.org/kexec>.
 
 - Load a new kernel
 `kexec -l {{path/to/kernel}} --initrd={{path/to/initrd}} --command-line={{arguments}}`

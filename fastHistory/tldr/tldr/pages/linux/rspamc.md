@@ -1,5 +1,5 @@
 # rspamc
-> Command line client for rspamd servers.
+> Command-line client for rspamd servers.
 
 - Train the bayesian filter to recognise an email as spam
 `rspamc learn_spam {{path/to/email_file}}`

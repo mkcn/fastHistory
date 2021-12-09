@@ -1,5 +1,5 @@
 # ibmcloud
-> A command line tool for managing IBM Cloud apps and services.
+> A command-line tool for managing IBM Cloud apps and services.
 > More information: <https://cloud.ibm.com/docs/cli?topic=cli-ibmcloud_cli>.
 
 - Update `ibmcloud` to the latest version

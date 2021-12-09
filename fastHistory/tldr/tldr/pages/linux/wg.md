@@ -3,13 +3,13 @@
 > More information: <https://www.wireguard.com/quickstart/>.
 
 - Check status of currently active interfaces
-`sudo wg`
+`wg`
 
-- Print a new private key
+- Generate a new private key
 `wg genkey`
 
-- Print a new public key
-`echo {{private_key}} | wg pubkey`
+- Generate a public key from a private key
+`wg pubkey < {{path/to/private_key}} > {{path/to/public_key}}`
 
 - Generate a public and private key
-`wg genkey | tee {{privatekey.txt}} | wg pubkey > {{publickey.txt}}`
+`wg genkey | tee {{path/to/private_key}} | wg pubkey > {{path/to/public_key}}`

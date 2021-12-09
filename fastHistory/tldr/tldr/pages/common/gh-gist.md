@@ -1,5 +1,5 @@
 # gh gist
-> Work with GitHub Gists on the command line.
+> Work with GitHub Gists on the command-line.
 > More information: <https://cli.github.com/manual/gh_gist>.
 
 - Create a new Gist from a space-separated list of files

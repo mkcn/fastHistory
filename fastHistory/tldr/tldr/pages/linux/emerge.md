@@ -1,5 +1,6 @@
 # emerge
 > Gentoo Linux package manager utility.
+> More information: <https://wiki.gentoo.org/wiki/Portage#emerge>.
 
 - Synchronize all packages
 `emerge --sync`

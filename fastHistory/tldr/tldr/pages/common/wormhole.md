@@ -1,6 +1,6 @@
 # wormhole
 > Get things from one computer to another, safely.
-> More information: <https://magic-wormhole.readthedocs.io/en/latest/>.
+> More information: <https://magic-wormhole.readthedocs.io>.
 
 - Send a file
 `wormhole send {{path/to/file}}`

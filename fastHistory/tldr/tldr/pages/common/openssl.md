@@ -1,5 +1,6 @@
 # openssl
 > OpenSSL cryptographic toolkit.
+> Some subcommands such as `openssl req` have their own usage documentation.
 > More information: <https://www.openssl.org>.
 
 - Print a list of available subcommands

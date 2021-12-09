@@ -22,3 +22,6 @@
 
 - Change permissions recursively giving group and others the ability to write
 `chmod -R g+w,o+w {{directory}}`
+
+- Recursively give all users read permissions to files and eXecute permissions to sub-directories within a directory
+`chmod -R a+rX {{directory}}`

@@ -21,5 +21,5 @@
 - List pods in a project
 `oc get pods`
 
-- Logout from the current session
+- Log out from the current session
 `oc logout`

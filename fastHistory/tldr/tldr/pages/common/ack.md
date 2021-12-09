@@ -13,10 +13,10 @@
 `ack -o "{{search_pattern}}"`
 
 - Limit search to files of a specific type
-`ack --type={{ruby}} "{{search_pattern}}`
+`ack --type={{ruby}} "{{search_pattern}}"`
 
 - Do not search in files of a specific type
-`ack --type=no{{ruby}} "{{search_pattern}}`
+`ack --type=no{{ruby}} "{{search_pattern}}"`
 
 - Count the total number of matches found
 `ack --count --no-filename "{{search_pattern}}"`
@@ -24,5 +24,5 @@
 - Print the file names and the number of matches for each file only
 `ack --count --files-with-matches "{{search_pattern}}"`
 
-- List all values that can be used with `--type`
+- List all the values that can be used with `--type`
 `ack --help-types`

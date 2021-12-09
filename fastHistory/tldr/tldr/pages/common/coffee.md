@@ -11,7 +11,7 @@
 - Compile to JavaScript and save to a given output file
 `coffee --compile {{path/to/file.coffee}} --output {{path/to/file.js}}`
 
-- Run interactive REPL
+- Start a REPL (interactive shell)
 `coffee --interactive`
 
 - Watch script for changes and re-run script

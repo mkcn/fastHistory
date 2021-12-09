@@ -1,5 +1,6 @@
 # pssh
 > Parallel SSH program.
+> More information: <https://manned.org/pssh>.
 
 - Run a command on two hosts, and print its output on each server inline
 `pssh -i -H "{{host1}} {{host2}}" {{hostname -i}}`

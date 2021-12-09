@@ -1,5 +1,6 @@
 # ebuild
 > A low level interface to the Gentoo Portage system.
+> More information: <https://wiki.gentoo.org/wiki/Ebuild>.
 
 - Create or update the package manifest
 `ebuild {{path/to/file.ebuild}} manifest`

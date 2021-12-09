@@ -14,5 +14,5 @@
 - Display the user principal name (UPN) of the current user
 `whoami /upn`
 
-- Display the logon id of the current user
+- Display the logon ID of the current user
 `whoami /logonid`

@@ -1,5 +1,6 @@
 # gedit
 > Text editor of the GNOME Desktop project.
+> More information: <https://help.gnome.org/users/gedit/stable/>.
 
 - Open a text file
 `gedit {{path/to/file}}`
