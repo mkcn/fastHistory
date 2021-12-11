@@ -1,6 +1,8 @@
 import logging
 import os
 import difflib
+import re
+import time
 from typing import Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -26,6 +28,8 @@ class ParsedTLDRExample(object):
         self.cmd_folder = ""
         self.rows = []
         self.url_more_info = None
+        self.relative_tldr_page = None
+        self.url_base_source = "https://github.com/tldr-pages/tldr/tree/main/pages/"
 
     def set_command(self, command: str) -> None:
         self.command = command
@@ -88,11 +92,20 @@ class ParsedTLDRExample(object):
     def set_url_more_info(self, url_more_info):
         self.url_more_info = url_more_info
 
+    def set_relative_tldr_page(self, relative_tldr_page):
+        self.relative_tldr_page = relative_tldr_page
+
     def get_url_more_info(self):
         return self.url_more_info
 
     def has_url_more_info(self):
         return self.url_more_info is not None
+
+    def get_tldr_github_page(self):
+        if self.relative_tldr_page is None:
+            return self.url_base_source
+        else:
+            return self.url_base_source + self.relative_tldr_page
 
 
 class TLDRParser(object):
@@ -103,10 +116,11 @@ class TLDRParser(object):
     FOLDER_TLDR_PAGES = "tldr/pages/"
     PAGE_CMD_TITLE_CHAR = "#"
     PAGE_CMD_DESC_CHAR = ">"
-    PAGE_CMD_DESC_MORE_INFO_STR = "> More information"
+    PAGE_CMD_DESC_WITH_URL = "> More information"
     PAGE_EXAMPLE_CHAR = "`"
     PAGE_EXAMPLE_DESC_CHAR = "-"
 
+    INDEX_TLDR_MATCH_TOTAL_WEIGHT = 0
     INDEX_TLDR_MATCH_CMD_FOLDER = 1
     INDEX_TLDR_MATCH_CMD = 2
     INDEX_TLDR_MATCH_FULL_PATH = 3
@@ -146,7 +160,7 @@ class TLDRParser(object):
                         # this remove any empty word
                         words_dict = dict((word, 0) for word in words if len(word) > 0)
                         total_weight = 0
-
+                        trust_source_amplifier = 0
                         file_full_path = os.path.join(root, fname)
                         page = self.cached_in_memory_pages.get(os_folder + "/" + fname)
                         if page is None:
@@ -158,8 +172,13 @@ class TLDRParser(object):
                                 return []
                             # TODO try to use mmapls
                             # map_file = mmap.mmap(f.fileno(), 0, prot=mmap.ACCESS_READ)
-                            for line in self.cached_in_memory_pages[os_folder + "/" + fname]:
+                            lines = self.cached_in_memory_pages[os_folder + "/" + fname]
+                            for line in lines:
                                 number_of_matches_in_a_line = 0
+                                # TODO replace with pre-trust-calculation method
+                                if line.startswith(self.PAGE_CMD_DESC_WITH_URL):
+                                    trust_source_amplifier = self._is_trusted_source(
+                                        line[len(self.PAGE_CMD_DESC_WITH_URL) + 3:])
                                 for word in words_dict.keys():
                                     if word in line.lower():
                                         number_of_matches_in_a_line += 1
@@ -170,7 +189,7 @@ class TLDRParser(object):
                                             ratio_match = difflib.SequenceMatcher(None, word, command).ratio()
                                             weight = 20 * ratio_match
                                         elif first_char == self.PAGE_CMD_DESC_CHAR:
-                                            if line.startswith(self.PAGE_CMD_DESC_MORE_INFO_STR):
+                                            if line.startswith(self.PAGE_CMD_DESC_WITH_URL):
                                                 weight = 1
                                             else:
                                                 weight = 3
@@ -189,6 +208,8 @@ class TLDRParser(object):
                             else:
                                 logging.error("find_match_command: fname does not ends with md: %s" % fname)
                                 cmd_name = fname
+                            if trust_source_amplifier != 0:
+                                total_weight = total_weight + (total_weight * trust_source_amplifier / 100)
                             # NOTE: the system availability of the command (5' value) is calculated later only if needed
                             result.append([total_weight, os_folder, cmd_name, file_full_path, None])
             if words_dict:
@@ -197,6 +218,33 @@ class TLDRParser(object):
         except Exception as e:
             logging.error("find_match_command: %s" % e)
             return result
+
+    @staticmethod
+    def _is_trusted_source(url) -> int:
+        # full string: > More information: <https://www.7-zip.org>.
+        # input : https://www.7-zip.org>.
+
+        trusted_urls = [
+            "https://manned.org/",
+            "https://manpages.debian.org",
+            "https://man.archlinux.org",
+            "https://man7.org",
+            "https://www.gnu.org",
+            "http://manpages.ubuntu.com/",
+            "https://debian.pages.debian.net/",
+            "https://docs.docker.com/",
+            "https://docs.fedoraproject.org/",
+            "https://docs.kde.org/",
+            "https://docs.lnav.org/",
+            "https://en.opensuse.org/",
+            "https://curl.se",
+            "https://nmap.org"
+        ]
+        for trusted_url in trusted_urls:
+            if url.startswith(trusted_url):
+                return 30
+
+        return 0
 
     @staticmethod
     def _find_match_command_sort_key(arr):
@@ -217,6 +265,8 @@ class TLDRParser(object):
     def get_tldr_cmd_examples(self, tldr_page_match: list) -> ParsedTLDRExample:
         parsed_tldr_example = ParsedTLDRExample()
         path_tldr_page = tldr_page_match[self.INDEX_TLDR_MATCH_FULL_PATH]
+        parsed_tldr_example.set_relative_tldr_page(tldr_page_match[self.INDEX_TLDR_MATCH_CMD_FOLDER] + "/" +
+                                                   tldr_page_match[self.INDEX_TLDR_MATCH_CMD] + ".md")
         with open(path_tldr_page) as f:
             for line in f:
                 line = line.strip()
@@ -234,7 +284,7 @@ class TLDRParser(object):
                         else:
                             parsed_tldr_example.append_example_row(line)
                             logging.error("bad format: %s -> %s" % (path_tldr_page, line))
-                    elif line.startswith(self.PAGE_CMD_DESC_MORE_INFO_STR):
+                    elif line.startswith(self.PAGE_CMD_DESC_WITH_URL):
                         parsed_tldr_example.set_url_more_info(TLDRParser._get_url_from_more_info_row(line))
                         parsed_tldr_example.append_generic_row(line)
                     else:

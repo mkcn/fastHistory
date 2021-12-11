@@ -1,6 +1,6 @@
 import logging
 
-from fastHistory import DataManager
+from fastHistory import DataManager, ConsoleUtils
 from fastHistory.pick.keys import Keys
 from fastHistory.pick.loopInfo import LoopInfo
 from fastHistory.pick.pageSelectFavourites import PageSelectFavourites
@@ -32,6 +32,7 @@ class LoopSelectFavourites(object):
 
         """
         # get filtered starting options
+        msg_to_show = None
         self.options = self.data_manager.filter(self.search_t.get_text_lower(), self.get_number_options_to_draw())
         self.initialize_options_to_draw()
 
@@ -42,7 +43,10 @@ class LoopSelectFavourites(object):
                     options=self.get_options(),
                     search_t=self.search_t,
                     context_shift=self.context_shift,
-                    last_column_size=self.last_column_size)
+                    last_column_size=self.last_column_size,
+                    msg_to_show=msg_to_show)
+            if msg_to_show:
+                msg_to_show = None
 
             # wait for char
             c = self.drawer.wait_next_char()
@@ -60,9 +64,13 @@ class LoopSelectFavourites(object):
                         self.search_t.get_text_lower(),
                         self.index + self.get_number_options_to_draw())
             elif c in Keys.KEYS_ENTER:
-                return [True, [True, self.get_selected_and_update_db()]]
+                selected_cmd = self.get_selected_and_update_db()
+                if selected_cmd:
+                    return [True, [True, selected_cmd]]
             elif c == Keys.KEY_CTRL_SPACE:
-                return [True, [False, self.get_selected_and_update_db()]]
+                selected_cmd_to_copy = self.get_selected_and_update_db()
+                if selected_cmd_to_copy:
+                    msg_to_show = ConsoleUtils.copy_to_clipboard(selected_cmd_to_copy, show_data_in_msg=False)[1]
             # note: currently not implemented
             elif c == Keys.KEY_SELECT and self.multi_select:
                 self.mark_index()
@@ -82,8 +90,13 @@ class LoopSelectFavourites(object):
                     if res[0]:
                         if res[1] == "select":
                             return [True, [True, self.get_selected_and_update_db()]]
-                        else:  # res[1] == "copy":
-                            return [True, [False, self.get_selected_and_update_db()]]
+                        elif res[1] == "copy":
+                            selected_cmd_to_copy = self.get_selected_and_update_db()
+                            if selected_cmd_to_copy:
+                                msg_to_show = ConsoleUtils.copy_to_clipboard(selected_cmd_to_copy, show_data_in_msg=False)[1]
+                                break
+                        else:
+                            pass
                     else:
                         if res[1] == "update":
                             self.loop_select_options_reload()
@@ -98,12 +111,11 @@ class LoopSelectFavourites(object):
                         else:  # res[1] == None
                             break
             # search TLDR
-            elif c == Keys.KEY_CTRL_T:
+            elif c == Keys.KEY_CTRL_D or c == Keys.KEY_CTRL_F:
                 return [False, 2]
-            elif c == Keys.KEY_CTRL_R:  
-                # TO IMPLEMENT this will open a bash history tab
+            # TODO IMPLEMENT this will open a bash history tab
+            elif c == Keys.KEY_CTRL_R:
                 pass
-                return [False, 1]
             # -> command
             elif c == Keys.KEY_RIGHT:
                 if self.search_t.is_cursor_at_the_end():
@@ -279,7 +291,7 @@ class LoopSelectFavourites(object):
         """
         option_count = len(self.options)
         if option_count == 0 or self.index >= option_count or self.index < 0:
-            return ""
+            return None
         selected_cmd = self.options[self.index][DataManager.OPTION.INDEX_CMD]
         # move selected command on top
         self.data_manager.update_selected_element_order(selected_cmd)

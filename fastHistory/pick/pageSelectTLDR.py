@@ -16,9 +16,11 @@ class PageSelectTLDR(PageGeneric):
     Class to draw the page with the commands to select
     """
 
-    FILE_COLUMN_NAME = "Command"
-    EXAMPLE_COLUMN_NAME = "Examples from tldr-pages"
-    MSG_WAITING = "Loading.."
+    FILE_COLUMN_NAME = "Commands"
+    EXAMPLE_COLUMN_NAME = "Examples from github.com/tldr-pages"
+    MSG_WAITING_1_DOT = "Loading.  "
+    MSG_WAITING_2_DOTS = "Loading.. "
+    MSG_WAITING_3_DOTS = "Loading..."
     MSG_NO_MATCH = "No match found"
     MSG_NO_EXAMPLE = "No example found"
 
@@ -32,6 +34,7 @@ class PageSelectTLDR(PageGeneric):
     def __init__(self, drawer):
         PageGeneric.__init__(self, drawer)
         self.last_words_to_mark = []
+        self.msg_waiting_count = 0
 
     def draw_page(self,
                   search_filters: "TextManager",
@@ -43,7 +46,8 @@ class PageSelectTLDR(PageGeneric):
                   tldr_options_draw_index: int = 0,
                   focus_area: Focus = Focus.AREA_FILES,
                   has_url_more_info: bool = False,
-                  is_waiting: bool = False):
+                  is_waiting: bool = False,
+                  msg_to_show: str = None):
         """
         :return:
         """
@@ -126,22 +130,24 @@ class PageSelectTLDR(PageGeneric):
             self.last_words_to_mark = words_to_mark
 
         # draw tldr command options
-        if self.draw_command_column(tldr_options_draw,
-                                    words_to_mark,
-                                    tldr_options_draw_index,
+        if self._draw_command_column(tldr_options_draw,
+                                     words_to_mark,
+                                     tldr_options_draw_index,
                                     focus_area == self.Focus.AREA_FILES,
-                                    is_waiting):
+                                     is_waiting):
             # draw tldr examples
             self.drawer.set_y(y=current_y, x=self.TLDR_PAGES_COLUMN_SIZE+2)
-            self.draw_example_column(tldr_examples_draw,
-                                     words_to_mark,
-                                     example_draw_index,
-                                     example_content_shift,
-                                     focus_area == self.Focus.AREA_EXAMPLES)
-
-        # help line in the last line
-        self._draw_help_line_selector(is_focus_examples=focus_area == self.Focus.AREA_EXAMPLES,
-                                      has_url_more_info=has_url_more_info)
+            self._draw_example_column(tldr_examples_draw,
+                                      words_to_mark,
+                                      example_draw_index,
+                                      example_content_shift,
+                                      focus_area == self.Focus.AREA_EXAMPLES)
+        # last line
+        if msg_to_show:
+            self.draw_msg_to_show(msg_to_show)
+        else:
+            self._draw_help_line_selector(is_focus_examples=focus_area == self.Focus.AREA_EXAMPLES,
+                                          has_url_more_info=has_url_more_info)
 
         # cursor set position
         self.drawer.show_cursor()
@@ -149,13 +155,23 @@ class PageSelectTLDR(PageGeneric):
 
         self.refresh_page()
 
-    def draw_command_column(self, tldr_options_draw, words_to_mark, selected_command_index, has_focus, is_waiting):
+    def _draw_command_column(self, tldr_options_draw, words_to_mark, selected_command_index, has_focus, is_waiting):
         number_options = len(tldr_options_draw)
         if number_options == 0:
             if is_waiting:
-                self.draw_just_msg(msg=self.MSG_WAITING)
+                self.msg_waiting_count += 1
+                if self.msg_waiting_count <= 3:
+                    self._draw_just_msg(msg=self.MSG_WAITING_1_DOT)
+                elif self.msg_waiting_count <= 6:
+                    self._draw_just_msg(msg=self.MSG_WAITING_2_DOTS)
+                elif self.msg_waiting_count < 9:
+                    self._draw_just_msg(msg=self.MSG_WAITING_3_DOTS)
+                else:
+                    self._draw_just_msg(msg=self.MSG_WAITING_3_DOTS)
+                    self.msg_waiting_count = 0
+
             else:
-                self.draw_just_msg(msg=self.MSG_NO_MATCH)
+                self._draw_just_msg(msg=self.MSG_NO_MATCH)
             return False
         else:
             command_context_shifter = ContextShifter()
@@ -187,12 +203,14 @@ class PageSelectTLDR(PageGeneric):
                 self.drawer.new_line()
             return True
 
-    def draw_example_column(self, tldr_examples_draw, words_to_mark, example_draw_index, example_content_shift, has_focus):
+    def _draw_example_column(self, tldr_examples_draw, words_to_mark, example_draw_index, example_content_shift, has_focus):
         if len(tldr_examples_draw) == 0:
-            self.draw_just_msg(msg=self.MSG_NO_EXAMPLE)
+            self._draw_just_msg(msg=self.MSG_NO_EXAMPLE)
         else:
             tldr_example_column_size = self.drawer.get_max_x() - self.TLDR_PAGES_COLUMN_SIZE
             self.drawer.set_x(self.TLDR_PAGES_COLUMN_SIZE)
+
+            self.drawer.new_line()
             for i in range(len(tldr_examples_draw)):
                 row_type = tldr_examples_draw[i][ParsedTLDRExample.INDEX_EXAMPLE_TYPE]
                 row_value = tldr_examples_draw[i][ParsedTLDRExample.INDEX_EXAMPLE_VALUE]
@@ -220,34 +238,36 @@ class PageSelectTLDR(PageGeneric):
                     self.drawer.fill_row(color=background_color, max_x=self.drawer.get_max_x() - 1)
                 self.drawer.new_line()
 
-    def draw_just_msg(self, msg: str, x: int = 0):
+    def _draw_just_msg(self, msg: str, x: int = 0):
         shift = 1
         for y in range(int(self.drawer.get_max_y()/2 - shift)):
             self.drawer.new_line()
         msg_space = int((self.drawer.get_max_x() - x) / 2 - len(msg) / 2 - 1)
         self.drawer.fill_row(x=x, max_x=msg_space)
-        self.drawer.draw_row(msg)
+        self.drawer.draw_row(msg, allow_last_row=True)
 
     def _draw_help_line_selector(self, is_focus_examples: bool, has_url_more_info: bool):
         self.drawer.set_y(self.drawer.get_max_y() - 1)
         if is_focus_examples:
-            self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+            self.drawer.draw_row("Enter", x_indent=1, color=self.drawer.color_columns_title, allow_last_row=True)
             self.drawer.draw_row("Select", x_indent=1, allow_last_row=True)
         else:
-            self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+            self.drawer.draw_row("Enter", x_indent=1, color=self.drawer.color_columns_title, allow_last_row=True)
             self.drawer.draw_row("Get examples", x_indent=1, allow_last_row=True)
 
         if is_focus_examples:
-            self.drawer.draw_row("Ctrl+space", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+            self.drawer.draw_row("Ctrl+space", x_indent=1, color=self.drawer.color_columns_title, allow_last_row=True)
             self.drawer.draw_row("Copy", x_indent=1, allow_last_row=True)
 
-        if has_url_more_info:
-            self.drawer.draw_row("Ctrl+l", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-            self.drawer.draw_row("Copy link", x_indent=1, allow_last_row=True)
-
-        self.drawer.draw_row("Ctrl+f", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Ctrl+f", x_indent=1, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("My list", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("Ctrl+c", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("Exit", x_indent=1, allow_last_row=True)
+        if has_url_more_info:
+            self.drawer.draw_row("Ctrl+l", x_indent=1, color=self.drawer.color_columns_title, allow_last_row=True)
+            self.drawer.draw_row("link info", x_indent=1, allow_last_row=True)
 
+        self.drawer.draw_row("Ctrl+e", x_indent=1, color=self.drawer.color_columns_title, allow_last_row=True)
+        if is_focus_examples:
+            self.drawer.draw_row("edit TDLR", x_indent=1, allow_last_row=True)
+        else:
+            self.drawer.draw_row("edit TDLR page", x_indent=1, allow_last_row=True)

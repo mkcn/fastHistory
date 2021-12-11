@@ -19,7 +19,7 @@ class PageSelectFavourites(PageGeneric):
     def __init__(self, drawer):
         PageGeneric.__init__(self, drawer)
 
-    def draw_page(self, search_filters, options, search_t, context_shift, last_column_size):
+    def draw_page(self, search_filters, options, search_t, context_shift, last_column_size, msg_to_show=None):
         """
         draw page where the user can select the command
 
@@ -118,9 +118,11 @@ class PageSelectFavourites(PageGeneric):
                                  selected=selected,
                                  context_shift=context_shift,
                                  last_column_size=index_tab_column)
-
-        # help line in the last line
-        self._draw_help_line_selector()
+        # last line
+        if msg_to_show:
+            self.draw_msg_to_show(msg_to_show)
+        else:
+            self._draw_help_line_selector()
 
         # cursor set position
         self.drawer.show_cursor()
@@ -136,7 +138,9 @@ class PageSelectFavourites(PageGeneric):
         :return:
         """
         msg_no_result = "no result"
-        msg_try_tldr = "try TDLR search (ctrl+t)"
+        msg_try_tldr_1 = "use "
+        msg_try_tldr_2 = "ctrl+d"
+        msg_try_tldr_3 = " to Discover more commands"
         if search_filters.is_advanced():
             shift = 3
         else:
@@ -145,11 +149,13 @@ class PageSelectFavourites(PageGeneric):
         for y in range(int(self.drawer.get_max_y()/2 - shift)):
             self.drawer.new_line()
         msg_no_result_space = int(self.drawer.get_max_x()/2 - len(msg_no_result)/2 - 1)
-        msg_try_tldr_space = int(self.drawer.get_max_x()/2 - len(msg_try_tldr)/2 - 1)
+        msg_try_tldr_space = int(self.drawer.get_max_x()/2 - len(msg_try_tldr_1 + msg_try_tldr_2 + msg_try_tldr_3)/2 - 1)
 
         self.drawer.draw_row(msg_no_result, x=msg_no_result_space)
         self.drawer.new_line()
-        self.drawer.draw_row(msg_try_tldr, x=msg_try_tldr_space)
+        self.drawer.draw_row(msg_try_tldr_1, x=msg_try_tldr_space)
+        self.drawer.draw_row(msg_try_tldr_2, color=self.drawer.color_columns_title)
+        self.drawer.draw_row(msg_try_tldr_3)
         self.drawer.new_line()
         self.drawer.new_line()
 
@@ -168,20 +174,20 @@ class PageSelectFavourites(PageGeneric):
 
     def _draw_help_line_selector(self):
         self.drawer.set_y(self.drawer.get_max_y() - 1)
-        self.drawer.draw_row("Enter", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Enter", x_indent=1, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Select", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("Ctrl+space", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Ctrl+space", x_indent=1, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Copy", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("Tab", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Tab", x_indent=1, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("More", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("Ctrl+t", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
-        self.drawer.draw_row("TLDR", x_indent=1, allow_last_row=True)
+        self.drawer.draw_row("Ctrl+d", x_indent=1, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Discover", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("Del", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Del", x_indent=1, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Delete", x_indent=1, allow_last_row=True)
 
-        self.drawer.draw_row("Ctrl+c", x_indent=2, color=self.drawer.color_columns_title, allow_last_row=True)
+        self.drawer.draw_row("Ctrl+c", x_indent=1, color=self.drawer.color_columns_title, allow_last_row=True)
         self.drawer.draw_row("Exit", x_indent=1, allow_last_row=True)

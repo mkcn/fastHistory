@@ -43,11 +43,14 @@ class ConsoleUtils:
 				return [False, "your terminal does not support auto-paste\ncopy-to-clipboard failed too with the following message:\n\t%s\nplease manually copy and use the following command:\n\t%s" % (res[1], data)]
 
 	@staticmethod
-	def copy_to_clipboard(data):
+	def copy_to_clipboard(data, show_data_in_msg=True):
 		try:
 			import pyperclip
 			pyperclip.copy(data)
-			return [True, "copied to clipboard: %s" % data]
+			if show_data_in_msg:
+				return [True, "copied! %s" % data]
+			else:
+				return [True, "copied!"]
 		except ImportError:
 			return [False, "pyperclip module not found (to install it run 'pip3 install pyperclip')"]
 		except Exception as e:

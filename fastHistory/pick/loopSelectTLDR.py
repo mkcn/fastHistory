@@ -1,6 +1,7 @@
 import logging
 
 from fastHistory import ConsoleUtils
+from fastHistory.console import consoleUtils
 from fastHistory.parser.InputData import InputData
 from fastHistory.parser.inputParser import InputParser
 from fastHistory.pick.textManager import ContextShifter
@@ -45,6 +46,7 @@ class LoopSelectTLDR(object):
         tldr_options_waiting = True
         tldr_examples_reload_needed = True
         tldr_ui_reload = True
+        msg_to_show = None
 
         page_tldr_search = PageSelectTLDR(self.drawer)
 
@@ -92,7 +94,11 @@ class LoopSelectTLDR(object):
                     example_content_shift=self.example_content_shift,
                     focus_area=self.focus,
                     has_url_more_info=self.tldr_examples.has_url_more_info(),
-                    is_waiting=tldr_options_waiting)
+                    is_waiting=tldr_options_waiting,
+                    msg_to_show=msg_to_show)
+
+            if msg_to_show:
+                msg_to_show = None
 
             # wait for char
             c = self.drawer.wait_next_char(multi_threading_mode=tldr_parser_thread.is_alive())
@@ -103,20 +109,23 @@ class LoopSelectTLDR(object):
                 tldr_ui_reload = False
                 continue
             elif c in Keys.KEYS_ENTER:
-                res = self.get_selected_example(search_input=input_data)
-                if res:
-                    return [True, res]
+                selected_example = self.get_selected_example(search_input=input_data)
+                if selected_example:
+                    return [True, [True, selected_example]]
             elif c == Keys.KEY_CTRL_SPACE:
-                res = self.get_selected_example(search_input=input_data, copied=True)
-                if res:
-                    return [True, res]
+                example_to_copy = self.get_selected_example(search_input=input_data, copied=True)
+                if example_to_copy:
+                    msg_to_show = ConsoleUtils.copy_to_clipboard(example_to_copy, show_data_in_msg=False)[1]
             elif c == Keys.KEY_CTRL_L:
                 if self.tldr_examples.has_url_more_info():
-                    return [True, [False, self.tldr_examples.get_url_more_info()]]
+                    msg_to_show = ConsoleUtils.copy_to_clipboard(self.tldr_examples.get_url_more_info())[1]
+            elif c == Keys.KEY_CTRL_E:
+                res = ConsoleUtils.copy_to_clipboard(self.tldr_examples.get_tldr_github_page())
+                msg_to_show = res[1]
             elif c == Keys.KEY_TAB:
                 self.flip_focus()
             # go back to main page
-            elif c == Keys.KEY_CTRL_F or c == Keys.KEY_CTRL_T or c == Keys.KEY_ESC:
+            elif c == Keys.KEY_CTRL_F or c == Keys.KEY_CTRL_D or c == Keys.KEY_ESC:
                 return [False, 0]
             elif c == Keys.KEY_UP:
                 if self.move_up():
@@ -159,6 +168,12 @@ class LoopSelectTLDR(object):
                 logging.error("input not handled: %s" % repr(c))
 
     def get_selected_example(self, search_input: InputData, copied: bool = False):
+        """
+        if copied is false, it adds all the search words as tags (es. selected_command #word1 #word2)
+        :param search_input:
+        :param copied:
+        :return:
+        """
         res = self.tldr_examples.get_current_selected_example(self.tldr_examples_index)
         if res is None:
             return None
@@ -172,10 +187,7 @@ class LoopSelectTLDR(object):
             res += ending
 
         if self.focus == PageSelectTLDR.Focus.AREA_EXAMPLES:
-            if not copied:
-                return [True, res]
-            else:
-                return [False, res]
+            return res
         else:
             self.focus = PageSelectTLDR.Focus.AREA_EXAMPLES
             self.search_field.move_cursor_to_end()

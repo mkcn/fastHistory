@@ -26,8 +26,8 @@ class PageGeneric(object):
     CHAR_EDIT = 'E'
 
     TITLE_DEFAULT = "fastHistory"
-    TAB_NAME_TLDR = "    TLDR    "
-    TAB_NAME_MY_LIST = "   My list   "
+    TAB_NAME_TLDR =    "  Discover  "
+    TAB_NAME_MY_LIST = "  My list  "
 
     INDEX_SECTION_VALUE = 0
     INDEX_SECTION_IS_MARKED = 1
@@ -284,3 +284,7 @@ class PageGeneric(object):
             sections.append([string[previous_index:], current_value == marked])
         return sections
 
+    def draw_msg_to_show(self, msg_to_show):
+        self.drawer.set_y(self.drawer.get_max_y() - 1)
+        self.drawer.fill_row(x=0, color=self.drawer.color_columns_title, max_x=self.drawer.get_max_x() - 1)
+        self.drawer.draw_row(msg_to_show, x=2, color=self.drawer.color_columns_title, allow_last_row=True)

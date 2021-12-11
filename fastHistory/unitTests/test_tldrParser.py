@@ -25,15 +25,18 @@ class TestTLDRParser(TestCase):
     def test_TLDR_search(self):
         """
         get the meaning ('name' field) from the man page
+        input   [<array_search_words>,<expected_command_result>,<worst_expected_command_result_index>]
         :return:
         """
         searcher = TLDRParser()
 
+        #test_strings = [["list file permission", "ls", 4]]
+
         test_strings = [
             # input, excepted cmd, max index of expected cmd
             ["randomstringwithnomatch", "", 0],
-            ["process", "ps", 3],  # TODO improve this
-            ["process list", "ps", 2],
+            ["list file permission", "ls", 2],
+            ["process", "ps", 2],
             ["process list", "ps", 2],
             ["merge pdf page", "pdftk", 4],
             ["locate program", "which", 1],
@@ -49,35 +52,49 @@ class TestTLDRParser(TestCase):
             ["dns reverse", "drill", 2],
             ["open default", "xdg-open", 1],
             ["download file", "wget", 1],
-            ["download file", "curl", 6],  # TODO improve this
-            ["download package", "apt-get", 4],  # TODO improve this
+            ["download file", "curl", 6],
+            ["post request", "curl", 6],
+            ["download package", "apt-get", 2],
             ["keyboard layout", "setxkbmap", 1],  # single result
             # security
             ["extract from binary", "binwalk", 1],
             ["secure disk overwrite", "sfill", 1],
             ["scan network", "arp-scan", 1],
-            ["scan port script", "nmap", 2],
+            ["scan network", "nmap", 5],
+            ["scan port script", "nmap", 5],
         ]
 
+        total_index_result = 0
         for test in test_strings:
             input_array = test[0].split(" ")
             input_data = InputData(False,  test[0], input_array)
+            logging.debug("#input: %s" % test)
 
             results = searcher.find_match_command(input_data)
             # check if the expected cmd is within the first x results
             found = False
             i = 0
             for i in range(len(results)):
-                if results[i][TLDRParser.INDEX_TLDR_MATCH_CMD].endswith(test[1]):
+                item = results[i]
+                logging.debug("%s" % results[i])
+                if item[TLDRParser.INDEX_TLDR_MATCH_CMD].endswith(test[1]):
                     found = True
                     break
 
+            total_index_result += i
             if test[2] > 0:
                 self.assertTrue(len(results) > 0, msg="no results, check if the 'pages' folder exist")
                 self.assertTrue(found, msg="expected cmd is not in the results: %s" % test)
-                self.assertTrue(i < test[2], msg="the cmd index is %s, expected: %s" % (i, test))
+                self.assertTrue(i <= test[2], msg="the cmd index is %s, expected: %s" % (i, test))
             else:
-                self.assertTrue(len(results) == 0)
+                self.assertTrue(len(results) == 0, msg="no result expected, more than one or more found instead")
+
+        # this is use to mesure how well the function behave
+        avg_index_result = total_index_result / len(test_strings)
+        logging.debug("total index result: %s " % total_index_result)
+        logging.debug("avg index result: %s " % avg_index_result)
+        self.assertTrue(avg_index_result <= 5, msg="the overall behavior of the function is not good enough")
+
 
     def test_TLDR_empty_input(self):
         searcher = TLDRParser()
