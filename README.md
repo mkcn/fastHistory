@@ -16,7 +16,7 @@
 
 **fastHistory** allows you to store, search and automatically paste all your important commands, plus all the [TDLR](https://github.com/tldr-pages/tldr) command examples, directly in your terminal, with a **new and faster way**!
 
-![](https://github.com/mkcn/fastHistory/raw/master/images/add_and_search.gif)
+![fh_main](https://user-images.githubusercontent.com/7307955/147797297-5a30cc72-b1c8-4527-8c7d-820d18098bc2.gif)
 
 # Intro
 ### Why you need it?
