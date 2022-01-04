@@ -133,7 +133,7 @@ class PageSelectTLDR(PageGeneric):
         if self._draw_command_column(tldr_options_draw,
                                      words_to_mark,
                                      tldr_options_draw_index,
-                                    focus_area == self.Focus.AREA_FILES,
+                                     focus_area == self.Focus.AREA_FILES,
                                      is_waiting):
             # draw tldr examples
             self.drawer.set_y(y=current_y, x=self.TLDR_PAGES_COLUMN_SIZE+2)
@@ -210,7 +210,6 @@ class PageSelectTLDR(PageGeneric):
             tldr_example_column_size = self.drawer.get_max_x() - self.TLDR_PAGES_COLUMN_SIZE
             self.drawer.set_x(self.TLDR_PAGES_COLUMN_SIZE)
 
-            self.drawer.new_line()
             for i in range(len(tldr_examples_draw)):
                 row_type = tldr_examples_draw[i][ParsedTLDRExample.INDEX_EXAMPLE_TYPE]
                 row_value = tldr_examples_draw[i][ParsedTLDRExample.INDEX_EXAMPLE_VALUE]
