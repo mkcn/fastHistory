@@ -140,7 +140,7 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 ## Install with installer.sh (offline mode) 
  
  1. download the latest release with this *easy-to-type* link or manually download [it](https://github.com/mkcn/fastHistory/releases)
-	 - `wget mkcn.me/f`2
+	 - `wget mkcn.me/f`
  2. move it to the target system
  2. extract it and run the installer with the target user 
 	 -  `tar -xvzf f` 
