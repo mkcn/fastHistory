@@ -15,5 +15,5 @@
 - Start a HTTP server with a password (To log in, leave the username blank and enter the password in the password field)
 `updog --password {{password}}`
 
-- Enable transport encryption via SSL
+- Enable transport encryption via SSL 
 `updog --ssl`

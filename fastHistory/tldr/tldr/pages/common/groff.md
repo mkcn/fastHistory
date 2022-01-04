@@ -6,7 +6,7 @@
 `groff {{path/to/input.roff}} > {{path/to/output.ps}}`
 
 - Render a man page using the ASCII output device, and display it using a pager
-`groff -man -T ascii {{path/to/manpage.1}} | less`
+`groff -man -T ascii {{path/to/manpage.1}} | less --RAW-CONTROL-CHARS`
 
 - Render a man page into an HTML file
 `groff -man -T html {{path/to/manpage.1}} > {{path/to/manpage.html}}`

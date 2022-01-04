@@ -9,4 +9,4 @@
 `namcap {{path/to/package.pkg.tar.zst}}`
 
 - Check a file, printing extra informational messages
-`nnamcap -i {{path/to/file}}`
+`namcap -i {{path/to/file}}`

@@ -1,22 +1,28 @@
 # if
-> Simple shell conditional.
+> Performs conditional processing in shell scripts.
 > See also: `test`, `[`.
-> More information: <https://www.tcl.tk/man/tcl8.6.11/TclCmd/if.html>.
+> More information: <https://www.gnu.org/software/bash/manual/bash.html#Conditional-Constructs>.
 
-- Execute two different commands based on a condition
-`if {{command}}; then {{echo "true"}}; else {{echo "false"}}; fi`
+- Execute the specified commands if the condition command's exit status is zero
+`if {{condition_command}}; then {{echo "Condition is true"}}; fi`
 
-- Check if a variable is defined
-`if [[ -n "{{$VARIABLE}}" ]]; then {{echo "defined"}}; else {{echo "not defined"}}; fi`
+- Execute the specified commands if the condition command's exit status is not zero
+`if ! {{condition_command}}; then {{echo "Condition is true"}}; fi`
 
-- Check if a file exists
-`if [[ -f "{{path/to/file}}" ]]; then {{echo "true"}}; else {{echo "false"}}; fi`
+- Execute the first specified commands if the condition command's exit status is zero otherwise execute the second specified commands
+`if {{condition_command}}; then {{echo "Condition is true"}}; else {{echo "Condition is false"}}; fi`
 
-- Check if a directory exists
-`if [[ -d "{{path/to/directory}}" ]]; then {{echo "true"}}; else {{echo "false"}}; fi`
+- Check whether a file exists
+`if [[ -f {{path/to/file}} ]]; then {{echo "Condition is true"}}; fi`
 
-- Check if a file or directory exists
-`if [[ -e "{{path/to/file_or_directory}}" ]]; then {{echo "true"}}; else {{echo "false"}}; fi`
+- Check whether a directory exists
+`if [[ -d {{path/to/directory}} ]]; then {{echo "Condition is true"}}; fi`
+
+- Check whether a file or directory exists
+`if [[ -e {{path/to/file_or_directory}} ]]; then {{echo "Condition is true"}}; fi`
+
+- Check whether a variable is defined
+`if [[ -n "${{variable}}" ]]; then {{echo "Condition is true"}}; fi`
 
 - List all possible conditions (`test` is an alias to `[`; both are commonly used with `if`)
 `man [`
