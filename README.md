@@ -1,5 +1,5 @@
 
-# fastHistory - speed up your terminal!
+# fastHistory 2 - speed up your terminal!
 
 [![](https://img.shields.io/pypi/status/fastHistory?color=00999b&style=for-the-badge)](https://pypi.org/project/fastHistory/)
 [![](https://img.shields.io/pypi/v/fastHistory?color=00999b&style=for-the-badge)](https://pypi.org/project/fastHistory/)
@@ -14,7 +14,7 @@
 - [License](https://github.com/mkcn/fastHistory/blob/master/README.md#License)
 
 
-**fastHistory** allows you to store, search and automatically paste all your important commands, plus all the [TDLR](https://github.com/tldr-pages/tldr) command examples, directly in your terminal, with a **new and faster way**!
+**fastHistory** allows you to store, search and automatically paste all your commands directly in your terminal with a **new and faster way**!
 
 ![fh_main](https://user-images.githubusercontent.com/7307955/147797297-5a30cc72-b1c8-4527-8c7d-820d18098bc2.gif)
 
