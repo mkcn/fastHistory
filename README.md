@@ -82,7 +82,6 @@ For each stored command you can get a quick summary from the man page
 
 ![man page](https://user-images.githubusercontent.com/7307955/147991707-45d8376c-8dd8-4c95-b5c6-5fd959b8cb2b.png)
 
-
 And easily edit the tag and description fields
 
 ![edit description](https://user-images.githubusercontent.com/7307955/147991818-a99795f0-d701-4d3e-b916-bec48852a2f4.png)
@@ -185,7 +184,7 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 
 # Commands and systax
 
-Find out more about commands and systax in the [Wiki](https://github.com/mkcn/fastHistory/wiki/Commands-and-syntax) section 
+Find out more about commands and syntax in the [Wiki](https://github.com/mkcn/fastHistory/wiki/Commands-and-syntax) section 
 
 # Copyright and dependencies
 
