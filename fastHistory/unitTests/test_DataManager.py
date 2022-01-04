@@ -46,7 +46,7 @@ class TestDataManager(unittest.TestCase):
         self.assertTrue(data_manager.add_new_element("cmd1", "desc1", ["tag1"]))
         self.assertTrue(data_manager.add_new_element("cmd2", "desc2", ["tag2"]))
         self.assertTrue(data_manager.add_new_element("cmd3", "desc3", ["tag3"]))
-        self.assertTrue(data_manager.update_element_order("cmd1"))
+        self.assertTrue(data_manager.update_selected_element_order("cmd1"))
         self.assertEqual(data_manager.get_data_from_db()[-1][DatabaseSQLite.COLUMN_INDEX_COMMAND], "cmd1")
 
     def test_get_forbidden_chars(self):

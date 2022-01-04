@@ -23,6 +23,7 @@ Search examples:
 
 OPTIONS
   -a, --add <command> #        add command (same as '# <command_to_save> #')
+  -f, --d, --discover          start directly with a Discovery search using TLDR pages 
   --config                     change configuration file
   --export [<output_name>]     export database with all stored commands
   -h, --help                   show this help message

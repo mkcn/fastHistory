@@ -63,7 +63,7 @@ class TestManParser(TestCase):
             "nmap"  # this need to be manually installed (sudo apt install nmap)
         ]
         for t in test_string:
-            logging.info("test: " + str(t))
+            logging.info("input test: %s" % str(t))
             self.assertTrue(parser.load_man_page(t))
             meaning = parser.get_cmd_meaning()
             self.assertTrue(meaning)
@@ -126,7 +126,7 @@ class TestManParser(TestCase):
                                       "-sN; -sF; -sX (TCP NULL, FIN, and Xmas scans) ."]],  # -sN; -sF; -sX (TCP NULL, FIN, and Xmas scans)
         ]
         for t in test_string:
-            logging.info("input: " + str(t[1]))
+            logging.info("input test: %s" % str(t[1]))
             if not t[0] or sys.platform.startswith('linux'):
                 if parser.load_man_page(t[1][0]):
                     flag_meaning = parser.get_flag_meaning(t[1][1])
@@ -148,8 +148,8 @@ class TestManParser(TestCase):
                         logging.debug(parser.get_man_page())
                         all_true = False
                 else:
-                    print("warning! this command may not be available in your system:" + t[1])
-                    logging.warning("warning! program not found in your system:" + t[1])
+                    print("warning! this command may not be available in your system: %s" % str(t[1]))
+                    logging.warning("warning! program not found in your system: %s" % str(t[1]))
                     all_true = False
             else:
                 logging.warning("check skipped because this is not a Linux OS")

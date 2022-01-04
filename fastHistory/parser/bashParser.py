@@ -29,7 +29,7 @@ class BashParser(object):
         pass
 
     def get_flags_from_bash_node(self, bash_node, result, cmd_main=None, first_cmd=False):
-        logging.debug("result: " + str(result))
+        logging.debug("result: %s" % str(result))
         # check if node is a list
         if type(bash_node) == list:
             for i in bash_node:
@@ -42,7 +42,7 @@ class BashParser(object):
             if bash_node.kind == self.CMD_NODE_TYPE_CMD:
                 items_len = len(bash_node.parts)
                 if items_len > 0 and bash_node.parts[0].kind == self.CMD_NODE_TYPE_WORD and bash_node.parts[0].word in self.WORD_TO_IGNORE:
-                    logging.debug("ignore word: " + bash_node.parts[0].word)
+                    logging.debug("ignore word: %s" % bash_node.parts[0].word)
                     bash_node.parts = bash_node.parts[1:]
 
                 for i in range(len(bash_node.parts)):
@@ -52,7 +52,7 @@ class BashParser(object):
                         self.get_flags_from_bash_node(bash_node.parts[i], result, cmd_main=cmd_main, first_cmd=False)
             # check if node is a word
             elif bash_node.kind == self.CMD_NODE_TYPE_WORD:
-                logging.debug("bash_node.word word: " + bash_node.word)
+                logging.debug("bash_node.word word: %s" % bash_node.word)
                 if first_cmd:
                     found = False
                     for item in result:
@@ -77,15 +77,15 @@ class BashParser(object):
                     else:
                         logging.error("error cmd main null")
 
-                logging.debug("word value: " + bash_node.word)
+                logging.debug("word value: %s" % bash_node.word)
             elif getattr(bash_node, "parts", None):
                 # check if node has parts
                 for i in bash_node.parts:
                     self.get_flags_from_bash_node(i, result)
             else:
-                logging.debug("other kind: " + bash_node.kind + "\n")
+                logging.debug("other kind: %s" % bash_node.kind)
         else:
-            logging.debug("unknown obj: " + str(bash_node) + "\n")
+            logging.debug("unknown obj: %s" % str(bash_node))
 
     @staticmethod
     def decompose_possible_concatenated_flags(flag_string):

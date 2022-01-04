@@ -15,7 +15,7 @@ class TextManager(object):
     use_lower = False
     max_x = None
 
-    def __init__(self, text="", use_lower=False, max_x=None):
+    def __init__(self, text="", use_lower=False, max_x=None, margin_x=0):
         self.text = text
         self.text_len = len(self.text)
         self.cursor_index = self.text_len
@@ -23,6 +23,7 @@ class TextManager(object):
         if self.use_lower:
             self.text_lower = text.lower()
         self.max_x = max_x
+        self.margin_x = margin_x
 
     def delete_char(self):
         """
@@ -84,10 +85,22 @@ class TextManager(object):
         self.cursor_index = 0
 
     def set_text(self, text):
-        self.text = text
+        if self.text != text:
+            text_len = len(text)
+            self.cursor_index = text_len
+            self.text_len = text_len
+            self.text = text
+            if self.use_lower:
+                self.text_lower = self.text.lower()
+            return True
+        else:
+            return False
 
-    def set_max_x(self, max_x):
-        self.max_x = max_x
+    def set_max_x(self, max_x, with_margin_x=False):
+        if with_margin_x:
+            self.max_x = max_x - self.margin_x
+        else:
+            self.max_x = max_x
 
     def get_text(self):
         return self.text
@@ -154,10 +167,8 @@ class ContextShifter(object):
          "..o 'test'"
     """
 
-    context_shift = 0
-
     def __init__(self):
-        pass
+        self.context_shift = 0
 
     def reset_context_shifted(self):
         self.context_shift = 0

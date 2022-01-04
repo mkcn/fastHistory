@@ -75,19 +75,19 @@ class ManParser(object):
             self.man_page = re.sub(r'.\x08', '', self.man_page)
             return True
         except subprocess.CalledProcessError as e:
-            logging.info("load_man_page - man page not found for: " + str(cmd))
+            logging.info("man page not found for: %s" % str(cmd))
             self.man_page = None
             return False
         except subprocess.TimeoutExpired as e:
-            logging.error("load man page - timeout: " + str(cmd))
+            logging.error("timeout: %s" % str(cmd))
             self.man_page = None
             return False
         except PermissionError as e:
-            logging.error("load man page - permission denied: " + str(cmd))
+            logging.error("permission denied: %s" % str(cmd))
             self.man_page = None
             return False
         except:
-            logging.warning("load man page - generic error")
+            logging.warning("generic error")
             self.man_page = None
             return False
 
@@ -104,7 +104,7 @@ class ManParser(object):
             else:
                 return None
         except:
-            logging.warning("man page error: " + cmd)
+            logging.warning("error: %s" % cmd)
             return None
 
     def get_flag_meaning(self, flag):
@@ -117,7 +117,7 @@ class ManParser(object):
         """
         final_result = []
         if self.man_page is None:
-            logging.debug("get_flag_meaning: man_page is None")
+            logging.debug("man_page is None")
             return None
         else:
             try:
@@ -125,10 +125,10 @@ class ManParser(object):
                 if result is not None:
                     result = result.group(2)
                 else:
-                    logging.debug("get_flag_meaning: regex does not match '%s'" % flag)
+                    logging.debug("regex does not match: '%s'" % flag)
                     return None
-            except sre_constants.error:
-                logging.error("flag meaning parser: ", sys.exc_info()[0])
+            except Exception:
+                logging.debug("regex does not match with error: %s" % flag)
                 return None
 
         rows = result.split("\n")
@@ -154,14 +154,14 @@ class ManParser(object):
         :return:        array of tuples
         """
         if self.man_page is None:
-            logging.error("get_cmd_meaning: man_page is empty")
+            logging.error("man_page is empty")
             return None
         else:
             search = re.search(self._regex_name, self.man_page, re.MULTILINE)
             if search is not None:
                 result = search.group(1)
             else:
-                logging.debug("get_cmd_meaning: regex does not match")
+                logging.debug("regex does not match")
                 return None
 
         final_result = []

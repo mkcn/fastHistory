@@ -27,7 +27,7 @@ try:
 	setup(name=project_name,
 		version=version,
 		# set relative working folder
-		package_dir={'':project_path},
+		package_dir={'': project_path},
 		description=description,
 		long_description=readme,
 		long_description_content_type="text/markdown",
@@ -48,6 +48,10 @@ try:
 				'bash/*.sh',
 				'config/default_fastHistory.conf', 
 				'config/default_version.txt',
+				'tldr/tldr/last_update_date.txt',
+				'tldr/tldr/last_tldr_commit.txt',
+				'tldr/tldr/LICENSE.md',
+				'tldr/tldr/pages/*/*.md',
 			],
 		},
 		# all python files to include

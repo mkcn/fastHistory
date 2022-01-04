@@ -45,7 +45,7 @@ class TestInputParser(TestCase):
         ]
 
         for test in test_cases:
-            res = InputParser.parse_input(test[0], is_search_cmd=False)
+            res = InputParser.parse_input(test[0], is_search_mode=False)
             if test[1] is None:
                 self.assertEqual(res, None)
             else:
@@ -96,7 +96,7 @@ class TestInputParser(TestCase):
         ]
 
         for test in test_cases:
-            res = InputParser.parse_input(test[0], is_search_cmd=True)
+            res = InputParser.parse_input(test[0], is_search_mode=True)
             self.assertEqual(res.get_main_str(), test[1][0])
             if res.is_advanced():
                 self.assertEqual(res.get_description_str(), test[1][1])
@@ -133,7 +133,7 @@ class TestInputParser(TestCase):
         ]
 
         for test in test_cases:
-            res = InputParser.parse_input(test[0], is_search_cmd=True)
+            res = InputParser.parse_input(test[0], is_search_mode=True)
             self.assertEqual(res.get_main_words(), test[1][0])
             if res.is_advanced():
                 self.assertEqual(res.get_description_words(strict=True), test[1][1])

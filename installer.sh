@@ -65,12 +65,13 @@ if [ -z "$1" ]; then
 	if command -v rsync >/dev/null 2>&1; then
 	  rm -f -r "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  mkdir -p "$FASTHISTORY_PATH_CODE_FOLDER" && \
-	  rsync -R fastHistory/*.py "$FASTHISTORY_PATH_CODE_FOLDER" && \
-	  rsync -R fastHistory/*/*.py "$FASTHISTORY_PATH_CODE_FOLDER" && \
-	  rsync -R fastHistory/bash/*.sh "$FASTHISTORY_PATH_CODE_FOLDER" && \
-	  rsync -R fastHistory/config/default_fastHistory.conf "$FASTHISTORY_PATH_CODE_FOLDER" && \
-	  rsync -R fastHistory/config/default_version.txt "$FASTHISTORY_PATH_CODE_FOLDER" && \
-	  rsync -R LICENSE "$FASTHISTORY_PATH_CODE_FOLDER"/fastHistory/
+	  rsync --relative fastHistory/*.py "$FASTHISTORY_PATH_CODE_FOLDER" && \
+	  rsync --relative fastHistory/*/*.py "$FASTHISTORY_PATH_CODE_FOLDER" && \
+	  rsync --relative fastHistory/bash/*.sh "$FASTHISTORY_PATH_CODE_FOLDER" && \
+	  rsync --relative fastHistory/config/default_fastHistory.conf "$FASTHISTORY_PATH_CODE_FOLDER" && \
+	  rsync --relative fastHistory/config/default_version.txt "$FASTHISTORY_PATH_CODE_FOLDER" && \
+	  rsync --relative LICENSE "$FASTHISTORY_PATH_CODE_FOLDER"/fastHistory/ && \
+	  rsync --relative --recursive fastHistory/tldr/tldr/ "$FASTHISTORY_PATH_CODE_FOLDER"/
 	else
 	  rm -f -r "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  mkdir -p "$FASTHISTORY_PATH_CODE_FOLDER" && \
@@ -79,14 +80,23 @@ if [ -z "$1" ]; then
 	  cp --parents fastHistory/bash/*.sh "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  cp --parents fastHistory/config/default_fastHistory.conf "$FASTHISTORY_PATH_CODE_FOLDER" && \
 	  cp --parents fastHistory/config/default_version.txt "$FASTHISTORY_PATH_CODE_FOLDER" && \
-	  cp --parents LICENSE "$FASTHISTORY_PATH_CODE_FOLDER"/fastHistory/
+	  cp --parents LICENSE "$FASTHISTORY_PATH_CODE_FOLDER"/fastHistory/ && \
+	  cp --parents --recursive fastHistory/tldr/tldr/ "$FASTHISTORY_PATH_CODE_FOLDER"/
 	fi
 	# check if all files have been copied
-	if [ $? -eq 0 ]; then
+	if [[ $? -eq 0 && -f "$FASTHISTORY_PATH_CODE_FOLDER"/fastHistory/LICENSE ]]; then
 		_fast_history_install_log "info" "code copied: $FASTHISTORY_PATH_CODE_FOLDER" 
 	else
 		_fast_history_install_log "error" "code copy failed, check the '$FASTHISTORY_PATH_CODE_FOLDER' folder permissions and try again"
 		exit 1
+	fi
+
+  # check if the 'ls' TLDR page has been correctly copied
+	if [[ -f "$FASTHISTORY_PATH_CODE_FOLDER"/fastHistory/tldr/tldr/pages/common/ls.md ]]; then
+			_fast_history_install_log "info" "TLDR pages: enabled"
+		else
+			_fast_history_install_log "error" "TLDR pages not enabled, check the '$FASTHISTORY_PATH_CODE_FOLDER/fastHistory/tldr/tldr/' folder"
+			exit 1
 	fi
 
 	# copy the third party software ('bashlex', 'pyperclip') to enable the 'man page' feature

@@ -1,6 +1,6 @@
 import logging
 
-from fastHistory.database.InputData import Input
+from fastHistory.parser.InputData import InputData
 from fastHistory.parser.inputParser import InputParser
 
 
@@ -15,8 +15,8 @@ class DataManager(object):
 		INDEX_DESC = 1
 		INDEX_TAGS = 2
 
-	DATABASE_MODE_SQLITE = 0
-	DATABASE_MODE_MYSQL = 1
+	DATABASE_TYPE_SQLITE = 0
+	DATABASE_TYPE_MYSQL = 1
 
 	_OLD_DB_RELATIVE_PATHS = [
 		"../../../fastHistory/data/fh_v1.db",
@@ -24,16 +24,16 @@ class DataManager(object):
 		"../../../fastHistory-0.1-beta/data/fh_v1.db"
 	]
 
-	DUMMY_INPUT_DATA = Input(False, "", [])
+	DUMMY_INPUT_DATA = InputData(False, "", [])
 
-	def __init__(self, path_data_folder, name_db_file, mode=DATABASE_MODE_SQLITE):
+	def __init__(self, path_data_folder, name_db_file, mode=DATABASE_TYPE_SQLITE):
 		self.last_search = None
 		self.filtered_data = None
-		if mode == self.DATABASE_MODE_SQLITE:
+		if mode == self.DATABASE_TYPE_SQLITE:
 			from fastHistory.database.databaseSQLite import DatabaseSQLite
 			self.database = DatabaseSQLite(path_data_folder, name_db_file, DataManager._OLD_DB_RELATIVE_PATHS)
 		else:
-			logging.error("database mode not supported")
+			logging.error("database type not supported")
 		# set dummy as default
 		self.search_filters = self.DUMMY_INPUT_DATA
 		# define special chars based on the chosen database
@@ -65,7 +65,7 @@ class DataManager(object):
 		search = search.lower()
 
 		# parse input search text
-		input_data = InputParser.parse_input(search, is_search_cmd=True)
+		input_data = InputParser.parse_input(search, is_search_mode=True)
 
 		if input_data:
 			self.search_filters = input_data
@@ -126,13 +126,13 @@ class DataManager(object):
 		"""
 		return self.database.update_description_field(cmd, description)
 
-	def update_element_order(self, cmd):
+	def update_selected_element_order(self, cmd):
 		"""
 		after a command was selected update the order
 		:param cmd:		command to update
 		:return:		True is the database was successfully changed, False otherwise
 		"""
-		return self.database.update_position_element(cmd)
+		return self.database.update_position_selected_element(cmd)
 
 	def delete_element(self, cmd):
 		"""

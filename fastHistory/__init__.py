@@ -7,17 +7,17 @@ from fastHistory.database.dataManager import DataManager
 from fastHistory.console.consoleUtils import ConsoleUtils
 from fastHistory.console import loggerBash
 
-FAST_HISTORY_EXECUTABLE="f"
+FAST_HISTORY_EXECUTABLE = "f"
 PATH_DATA_FOLDER = "/.local/share/fastHistory/"
 NAME_LOG_FILE = "fh.log"
 NAME_DATABASE_FILE = "fh_v1.db"
 NAME_CONFIGURATION_FILE = "fastHistory.conf"
 NAME_VERSION_FILE = "version.txt"
 
-DATABASE_MODE = DataManager.DATABASE_MODE_SQLITE
+DATABASE_MODE = DataManager.DATABASE_TYPE_SQLITE
 
 
-def handle_search_request(logger_console, input_cmd_str, path_data_folder, theme, last_column_size):
+def handle_search_request(logger_console, input_cmd_str, path_data_folder, theme, last_column_size, is_tldr_search=False):
 	"""
 	take input and show the filtered list of command to select
 
@@ -28,12 +28,16 @@ def handle_search_request(logger_console, input_cmd_str, path_data_folder, theme
 	if input_cmd_str is None:
 		logger_console.log_on_console_error("cannot read parameters from bash, please try to restart your terminal")
 	else:
-		logging.debug("search request parameters: '" + str(input_cmd_str) + "'")
+		logging.debug("search parameters: '%s'" % str(input_cmd_str))
 		# create data manger obj
 		data_manager = DataManager(path_data_folder, NAME_DATABASE_FILE, DATABASE_MODE)
 
 		# open picker to select from history
-		picker = Picker(data_manager, theme=theme, last_column_size=last_column_size, search_text=input_cmd_str)
+		picker = Picker(data_manager,
+						theme=theme,
+						last_column_size=last_column_size,
+						search_text=input_cmd_str,
+						is_tldr_search=is_tldr_search)
 		selected_option = picker.start()
 
 		if selected_option[0]:
@@ -57,13 +61,11 @@ def handle_add_request(logger_console, input_cmd_str, path_data_folder, error_fe
 	# local import to load this module only in case of an 'add' commands
 	from fastHistory.parser.inputParser import InputParser
 
-	input = InputParser.adjust_multi_line_input(input_cmd_str)
-
+	one_line_input = InputParser.adjust_multi_line_input(input_cmd_str)
 	# define log class
-	logging.debug("add request: '" + input[1] + "'")
-
+	logging.debug("input: '%s'" % one_line_input[1])
 	# parse tags and store the cmd
-	parser_res = InputParser.parse_input(input[1])
+	parser_res = InputParser.parse_input(one_line_input[1])
 
 	if parser_res is None:
 		if error_feedback:
@@ -83,7 +85,7 @@ def handle_add_request(logger_console, input_cmd_str, path_data_folder, error_fe
 		stored = data_manager.add_new_element(cmd, description, tags)
 		if stored:
 			logging.debug("command added")
-			if input[0]:
+			if one_line_input[0]:
 				logger_console.log_on_console_warn("command has been adjusted")
 				logger_console.log_on_console_warn("multi-line commands are not fully supported")
 			logger_console.log_on_console_info("command:    '%s'" % cmd)
@@ -104,19 +106,19 @@ def handle_import_db(logger_console, db_abs_path, path_data_folder):
 	"""
 	import data from external database
 	"""
-	logging.info("import database: %s" % str(db_abs_path))
+	logging.info("database path: %s" % str(db_abs_path))
 	logger_console.log_on_console_info("import database: %s" % str(db_abs_path))
 	data_manager = DataManager(path_data_folder, NAME_DATABASE_FILE, DATABASE_MODE)
 	imported_items = data_manager.import_data_to_db(db_abs_path)
 	if imported_items >= 0:
-		logging.info("import database: %s elements imported" % str(imported_items))
-		logger_console.log_on_console_info("import database: %s elements imported" % str(imported_items))
+		logging.info("%s elements imported" % str(imported_items))
+		logger_console.log_on_console_info("%s elements imported" % str(imported_items))
 		return
 	elif not os.path.isfile(db_abs_path):
 		logging.error("input file does not exist: %s" % str(db_abs_path))
 		logger_console.log_on_console_error("input file does not exist: %s" % str(db_abs_path))
 	else:
-		logging.error("import database: fail")
+		logging.error("import fail")
 		logger_console.log_on_console_error("please check your log file: %s" %
 											os.path.abspath(path_data_folder + NAME_LOG_FILE))
 	# show correct usage
@@ -258,7 +260,7 @@ def handle_arguments(logger_console, config_reader, path_data_folder, path_code_
 	if config_reader.get_log_level() == 'NOTSET' or config_reader.get_log_level() == 'NONE':
 		logging.disable(logging.CRITICAL)
 	else:
-		logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+		logging.basicConfig(format='[%(asctime)s][%(levelname)s][%(module)s][%(funcName)s] %(message)s',
 			datefmt='%Y-%m-%d %H:%M:%S',
 			filename=path_data_folder + NAME_LOG_FILE,
 			level=config_reader.get_log_level())
@@ -275,14 +277,18 @@ def handle_arguments(logger_console, config_reader, path_data_folder, path_code_
 		if arg1 == "-a" or arg1 == "--add":
 			input_cmd = retrieve_parameters_from_bash_hook(arg1=arg1)
 			handle_add_request(logger_console, input_cmd, path_data_folder, error_feedback=True)
-		elif (arg1 == "--add-explicit") and args_len == 3:
+		elif arg1 == "--add-explicit" and args_len == 3:
 			input_cmd = str(sys.argv[2]).strip()
 			handle_add_request(logger_console, input_cmd, path_data_folder, error_feedback=False)
-		elif (arg1 == "--config") and args_len == 2:
+		elif arg1 == "-f" or arg1 == "-d" or arg1 == "--discover":
+			input_cmd = retrieve_parameters_from_bash_hook(arg1=arg1)
+			handle_search_request(logger_console, input_cmd, path_data_folder, config_reader.get_theme(),
+								  config_reader.get_last_column_size(), is_tldr_search=True)
+		elif arg1 == "--config" and args_len == 2:
 			handle_config_file(logger_console, path_data_folder)
-		elif (arg1 == "--log") and args_len == 2:
+		elif arg1 == "--log" and args_len == 2:
 			handle_log_file(logger_console, path_data_folder)
-		elif (arg1 == "--setup") and args_len == 2:
+		elif arg1 == "--setup" and args_len == 2:
 			handle_setup(logger_console, path_data_folder, path_code_folder, config_reader, force=True)
 		elif arg1 == "--import" and args_len == 3:
 			import_file = sys.argv[2]

@@ -22,9 +22,13 @@ class Drawer(object):
         self.color_search_input = None
         self.color_search = None
         self.color_hash_tag = None
+        self.color_hash_tag_disable = None
         self.color_hash_tag_selected = None
-        self.color_border = None
+        self.color_tab_focus = None
+        self.color_tab_no_focus = None
+        self.color_cmd_sample = None
         self.color_selected_row = None
+        self.color_selected_row_no_focus = None
         self.color_selector = None
         self.color_columns_title = None
         self.init_colors(theme)
@@ -50,7 +54,10 @@ class Drawer(object):
         id_color_white_on_green = 8
         id_color_cyan = 9
         id_color_green = 10
+        id_color_black = 11
 
+        curses.init_pair(id_color_black, curses.COLOR_BLACK, -1)
+        self.color_hash_tag_disable = curses.color_pair(id_color_black) | curses.A_BOLD
         # set colors
         if theme == ConfigReader.THEME_AZURE:
             curses.init_pair(id_color_cyan, curses.COLOR_CYAN, -1)
@@ -60,13 +67,15 @@ class Drawer(object):
             curses.init_pair(id_color_cyan_on_white, curses.COLOR_CYAN, curses.COLOR_WHITE)
 
             self.color_search_input = curses.color_pair(id_color_cyan) | curses.A_BOLD
+            self.color_cmd_sample = curses.color_pair(id_color_cyan)
             self.color_hash_tag = curses.color_pair(id_color_cyan)
-            self.color_border = curses.color_pair(id_color_black_on_white)
+            self.color_tab_no_focus = curses.color_pair(id_color_black_on_white)
             self.color_selected_row = curses.color_pair(id_color_black_on_white) | curses.A_BOLD
+            self.color_selected_row_no_focus = curses.color_pair(id_color_white_on_cyan) | curses.A_BOLD
             self.color_search = curses.color_pair(id_color_white_on_cyan) | curses.A_BOLD
             self.color_hash_tag_selected = curses.color_pair(id_color_cyan_on_white)
             self.color_selector = curses.color_pair(id_color_black_on_white)
-            self.color_columns_title = curses.color_pair(id_color_white_on_cyan)
+            self.color_columns_title = curses.color_pair(id_color_white_on_cyan) | curses.A_BOLD
         else:
             curses.init_pair(id_color_green_on_black, curses.COLOR_GREEN, curses.COLOR_BLACK)
             curses.init_pair(id_color_white_on_black, curses.COLOR_WHITE, curses.COLOR_BLACK)
@@ -76,13 +85,16 @@ class Drawer(object):
             curses.init_pair(id_color_green, curses.COLOR_GREEN, -1)
 
             self.color_search_input = curses.color_pair(id_color_green) | curses.A_BOLD
+            self.color_cmd_sample = curses.color_pair(id_color_green)
             self.color_hash_tag = curses.color_pair(id_color_green) | curses.A_BOLD
-            self.color_border = curses.color_pair(id_color_green_on_black)
+            self.color_tab_no_focus = curses.color_pair(id_color_green_on_black)
             self.color_selected_row = curses.color_pair(id_color_white_on_black) | curses.A_BOLD
+            self.color_selected_row_no_focus = curses.color_pair(id_color_white_on_green) | curses.A_BOLD
             self.color_search = curses.color_pair(id_color_white_on_green) | curses.A_BOLD
             self.color_hash_tag_selected = curses.color_pair(id_color_green_on_black) | curses.A_BOLD
             self.color_selector = curses.color_pair(id_color_green_on_black)
-            self.color_columns_title = curses.color_pair(id_color_black_on_green)
+            self.color_columns_title = curses.color_pair(id_color_black_on_green) | curses.A_BOLD
+        self.color_tab_focus = self.color_columns_title
 
     def hide_cursor(self):
         """
@@ -134,7 +146,7 @@ class Drawer(object):
         this allows to have not blocking UI that works with threads
         """
         if not self.input_timeout_enabled:
-            curses.halfdelay(4)  # 400 ms
+            curses.halfdelay(1)  # 100 ms
             self.input_timeout_enabled = True
 
     def _disable_input_timeout(self):
@@ -189,6 +201,12 @@ class Drawer(object):
         self.x = x
         self.y = y
 
+    def get_y(self):
+        return self.y
+
+    def get_x(self):
+        return self.x
+
     def new_line(self, x=0):
         self.y += 1
         self.x = x
@@ -198,6 +216,18 @@ class Drawer(object):
 
     def get_max_y(self):
         return self.max_y
+
+    def fill_row(self, char=" ", x=None, max_x=None, color=1):
+        if x is not None:
+            self.x = x
+        if max_x is None:
+            max_x = self.max_x
+
+        if max_x - self.x >= 0:
+            text_len = max_x - self.x
+            text = char[0] * text_len
+            self.terminal_screen.addstr(self.y, self.x, str(text), color)
+            self.x += text_len
 
     def draw_row(self, text, x=None, x_indent=0, color=1, allow_last_row=False, return_unprinted=False):
         """

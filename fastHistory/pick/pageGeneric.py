@@ -25,6 +25,10 @@ class PageGeneric(object):
     CHAR_SPACE = " "
     CHAR_EDIT = 'E'
 
+    TITLE_DEFAULT = "fastHistory"
+    TAB_NAME_TLDR =    "  Discover  "
+    TAB_NAME_MY_LIST = "  My list  "
+
     INDEX_SECTION_VALUE = 0
     INDEX_SECTION_IS_MARKED = 1
 
@@ -156,7 +160,6 @@ class PageGeneric(object):
             unmatched_tags = []
             for tag in tags:
                 sections = self.find_sections_to_mark(tag, filter_tags)
-                # logging.debug("tag sections: " + str(sections))
 
                 sections_len = len(sections)
                 # if at least one filter tag matches
@@ -184,7 +187,6 @@ class PageGeneric(object):
             elif filter_desc is not None:
                 # TODO when "@" is searched, show description before tags
                 sections = self.find_sections_to_mark(desc, filter_desc)
-                # logging.debug("desc sections: " + str(sections))
                 sections_len = len(sections)
                 # if at least one filter tag matches
                 if sections_len >= 2 or (sections_len == 1 and sections[0][self.INDEX_SECTION_IS_MARKED] == 1):
@@ -282,3 +284,7 @@ class PageGeneric(object):
             sections.append([string[previous_index:], current_value == marked])
         return sections
 
+    def draw_msg_to_show(self, msg_to_show):
+        self.drawer.set_y(self.drawer.get_max_y() - 1)
+        self.drawer.fill_row(x=0, color=self.drawer.color_columns_title, max_x=self.drawer.get_max_x() - 1)
+        self.drawer.draw_row(msg_to_show, x=2, color=self.drawer.color_columns_title, allow_last_row=True)
