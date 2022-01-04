@@ -76,24 +76,17 @@ and the selected command wiil be **automatically pasted** into your terminal!
 $ f
 ```
 
-![](https://github.com/mkcn/fastHistory/raw/master/images/advanced_search.gif)
-
-
-(from v2.X.X) With the new [TDLR](https://github.com/tldr-pages/tldr) integration, you can now explore and find complete examples from a huge list of commonly used commands
-
-**fastHistory** will also show you which command is already available on your system (just check for the '+' symbol)
-
-![](https://github.com/mkcn/fastHistory/raw/master/images/tldr_search.gif)
-
 For each stored command you can get a quick summary from the man page
 
-**Warning**: this feature currently does not cover the syntax of all commands
+**note**: this feature does not cover the syntax of all commands
 
-![](https://github.com/mkcn/fastHistory/raw/master/images/man_page.png)
+![man page](https://user-images.githubusercontent.com/7307955/147991707-45d8376c-8dd8-4c95-b5c6-5fd959b8cb2b.png)
+
 
 And easily edit the tag and description fields
 
-![](https://github.com/mkcn/fastHistory/raw/master/images/edit_tag.gif)
+![edit description](https://user-images.githubusercontent.com/7307955/147991818-a99795f0-d701-4d3e-b916-bec48852a2f4.png)
+
 
 Furthermore, you can easily export/import all data to make __backups__ or to share your commands with a different machine
 
@@ -101,6 +94,17 @@ Furthermore, you can easily export/import all data to make __backups__ or to sha
 $ f --export
 $ f --import fastHistory_2020-03-02.db
 ```
+
+### Discover new commands 
+
+With the new [TDLR-pages](https://github.com/tldr-pages/tldr) integration, which contains more than 2500 different commands, you can discover, search and select ready-to-use command examples!
+
+Moreover, the **+** icon shows you which command is already installed on your system 
+
+![discover](https://user-images.githubusercontent.com/7307955/147991558-6f117139-da45-4494-91d4-1dc59971a473.png)
+
+**FastHistory** does not need any internet connection, so **you can use it also offline**! 
+
 
 # Supported OSs
 
@@ -110,14 +114,14 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 
 ### List of tested OSs:
 
-| OS         | OS Version | Shell | Python versions | fastHistory version | Test mode | Result | Comment   |
-| ---------- |:----------:| ------:|-------------:| -------------------:|----------:| ---------:| ---------:| 
-| Ubuntu     | 16.04, 18.04, 20.04* | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  |  * [xclip](https://howtoinstall.co/en/xclip) may need to be installed to enable the copy-to-clipboard feature |
-| macOS      | 10.15      | bash   | 3.6, 3.7, 3.8 | latest | unittest | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | python3 needs to be [installed](https://docs.python-guide.org/starting/install3/osx/)  |
-| Fedora     | 29         | bash   | 3.5           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |  pip3 requires the  [`--user` ](https://developer.fedoraproject.org/tech/languages/python/pypi-installation.html) flag |
-| Debian     | 9          | bash   | 3.5           | 2.1.3   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> |    |
-| Debian     | 10         | zsh*   | 3.7           | 2.0.0   | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%"> | *[syntax limitation](https://github.com/mkcn/fastHistory#Commands-and-syntax)   |
-| Windows*   | 10 (1809)  | bash   | 3.6           | 2.2.2  | manual          | <img src="https://github.githubassets.com/images/icons/emoji/unicode/2714.png" width="35%">  | *using the [Windows Subsystem for Linux](https://www.microsoft.com/en-us/p/ubuntu-2004-lts/9n6svws3rx71) (WSL) you can execute and store [Windows commands](https://docs.microsoft.com/en-us/windows/wsl/interop#run-windows-tools-from-linux) |
+| OS         | OS Version | Shell | Python versions | fastHistory version | Test mode  | Comment   |
+| ---------- |:----------:| ------:|-------------:| -------------------:|----------:| ---------:| 
+| Ubuntu  | 16.04, 18.04, 20.04* | bash   | 3.6, 3.7, 3.8 | latest | unittest |    * [xclip](https://howtoinstall.co/en/xclip) may need to be installed to enable the copy-to-clipboard feature |
+|  macOS      | 10.15      | bash   | 3.6, 3.7, 3.8 | latest | unittest |  python3 needs to be [installed](https://docs.python-guide.org/starting/install3/osx/)  |
+| Fedora     | 29         | bash   | 3.5           | 2.0.0   | manual          |  pip3 requires the  [`--user` ](https://developer.fedoraproject.org/tech/languages/python/pypi-installation.html) flag |
+| Debian     | 9          | bash   | 3.5           | 2.3.6   | manual          |    |
+| Debian     | 10         | zsh*   | 3.7           | 2.0.0   | manual          |  *[syntax limitation](https://github.com/mkcn/fastHistory#Commands-and-syntax)   |
+| Windows*   | 10 (1809)  | bash   | 3.6           | 2.3.6  | manual          | *using the [Windows Subsystem for Linux](https://www.microsoft.com/en-us/p/ubuntu-2004-lts/9n6svws3rx71) (WSL) you can execute and store [Windows commands](https://docs.microsoft.com/en-us/windows/wsl/interop#run-windows-tools-from-linux) |
 
 # How to install
 
@@ -134,15 +138,15 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 
 **Note**: be sure to not use `pip` (python2) nor `sudo` (install it only for the current user) 
 
-## Install with installer.sh
+## Install with installer.sh (offline mode) 
  
- 1.  download the latest release with this *easy-to-type* link or manually download [it](https://github.com/mkcn/fastHistory/releases)
-	 - `wget mkcn.me/f`
- 2. extract it
+ 1. download the latest release with this *easy-to-type* link or manually download [it](https://github.com/mkcn/fastHistory/releases)
+	 - `wget mkcn.me/f`2
+ 2. move it to the target system
+ 2. extract it and run the installer with the target user 
 	 -  `tar -xvzf f` 
- 3. run the installer with the target user
-	- `cd fastHistory-X.X`
-	 - `./installer.sh` (this works also offline)
+	 - `cd fastHistory-X.X`
+	 - `./installer.sh`
  4. close and reopen your terminal
  5. (optional) delete installation files
  	- `rm -r f fastHistory-X.X`
