@@ -20,14 +20,14 @@ jobs:
         run: |
             echo "FH_RELEASE_VERSION=$(cat $GITHUB_WORKSPACE/fastHistory/config/default_version.txt)" >> $GITHUB_ENV
       - name: Show version 
-        run: echo $FH_RELEASE_VERSION
+        run: echo ${{ env.FH_RELEASE_VERSION }} 
       - name: Create Github release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: v$FH_RELEASE_VERSION 
-          release_name: v$FH_RELEASE_VERSION 
+          tag_name: v${{ env.FH_RELEASE_VERSION }}
+          release_name: v${{ env.FH_RELEASE_VERSION }} 
           draft: false
           prerelease: false
