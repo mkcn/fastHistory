@@ -1,0 +1,29 @@
+name: Create new release
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'fastHistory/config/default_version.txt'
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Get release version from version file
+        run: |
+            cat $GITHUB_WORKSPACE/fastHistory/config/default_version.txt >> $FH_RELEASE_VERSION 
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: v$FH_RELEASE_VERSION 
+          release_name: v$FH_RELEASE_VERSION 
+          draft: false
+          prerelease: false
