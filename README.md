@@ -14,7 +14,9 @@
 - [License](https://github.com/mkcn/fastHistory/blob/master/README.md#License)
 
 
-**fastHistory** allows you to store, search and automatically paste all your commands directly in your terminal with a **new and faster way**!
+Store, search and automatically paste all your favourite commands directly in your terminal with a **new and faster way**!
+
+With the new [TDLR-pages](https://github.com/tldr-pages/tldr) integration, you can quickly discover and select more than 10000 ready-to-use command examples, directly in your terminal. 
 
 ![fh_main](https://user-images.githubusercontent.com/7307955/147797297-5a30cc72-b1c8-4527-8c7d-820d18098bc2.gif)
 
@@ -96,11 +98,11 @@ $ f --import fastHistory_2020-03-02.db
 
 ### Discover new commands 
 
-With the new [TDLR-pages](https://github.com/tldr-pages/tldr) integration, which contains more than 2500 different commands, you can discover, search and select ready-to-use command examples!
-
-Moreover, the **+** icon shows you which command is already installed on your system 
+In the *Discovery* mode, you can easily find examples of commands from the [TDLR-pages](https://github.com/tldr-pages/tldr), a collection of community-maintained help pages. The search works both by command name and description. Furthermore, the **+** icon shows you which command is already installed on your system. 
 
 ![discover](https://user-images.githubusercontent.com/7307955/147991558-6f117139-da45-4494-91d4-1dc59971a473.png)
+
+### Offline feature
 
 **FastHistory** does not need any internet connection, so **you can use it also offline**! 
 
@@ -120,7 +122,7 @@ fastHistory can work in any OS with `python3` and a `bash` terminal
 | Fedora     | 29         | bash   | 3.5           | 2.0.0   | manual          |  pip3 requires the  [`--user` ](https://developer.fedoraproject.org/tech/languages/python/pypi-installation.html) flag |
 | Debian     | 9          | bash   | 3.5           | 2.3.6   | manual          |    |
 | Debian     | 10         | zsh*   | 3.7           | 2.0.0   | manual          |  *[syntax limitation](https://github.com/mkcn/fastHistory#Commands-and-syntax)   |
-| Windows*   | 10 (1809)  | bash   | 3.6           | 2.3.6  | manual          | *using the [Windows Subsystem for Linux](https://www.microsoft.com/en-us/p/ubuntu-2004-lts/9n6svws3rx71) (WSL) you can execute and store [Windows commands](https://docs.microsoft.com/en-us/windows/wsl/interop#run-windows-tools-from-linux) |
+| Windows*   | 10 (1809)  | bash   | 3.6           | 2.4.1  | manual          | *using the [Windows Subsystem for Linux](https://www.microsoft.com/en-us/p/ubuntu-2004-lts/9n6svws3rx71) (WSL) you can execute and store [Windows commands](https://docs.microsoft.com/en-us/windows/wsl/interop#run-windows-tools-from-linux) |
 
 # How to install
 
