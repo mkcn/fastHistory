@@ -99,12 +99,3 @@ jobs:
         $HOME/.local/bin/f --setup
         $HOME/.local/bin/f --version --from-installer
         $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything
-
-    - name: Install with pip test and uninstall it
-      run: |
-        # bashlex is not present in the test pypi, therefore it must installed separately
-        pip3 install --user --index-url https://test.pypi.org/simple/ --no-deps fastHistory
-        # setup environment
-        $HOME/.local/bin/f --setup
-        $HOME/.local/bin/f --version --from-installer
-        $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything
