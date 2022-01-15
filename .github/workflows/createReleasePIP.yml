@@ -55,6 +55,7 @@ jobs:
             cd $GITHUB_WORKSPACE/pip/
             # TODO remove source
             source build-env/bin/activate
+            # TODO new secrets
             python3 -m twine upload -u __token__ -p ${{ secrets.TEST_PYPI_API_TOKEN }} --repository-url "https://test.pypi.org/legacy/" dist/*.whl 
 
       - name: Install it from test.pypi.org
@@ -66,7 +67,22 @@ jobs:
             $HOME/.local/bin/f --version --from-installer
             $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything
 
+      - name: deploy on pypi.org
+        run: |
+            cd $GITHUB_WORKSPACE/pip/
+            # TODO remove source
+            source build-env/bin/activate
+            python3 -m twine upload -u __token__ -p ${{ secrets.PYPI_API_TOKEN }} dist/*.whl 
 
+      - name: Install it from pypi.org
+        run: |
+            pip3 install --user fastHistory
+            # setup environment
+            $HOME/.local/bin/f --setup
+            $HOME/.local/bin/f --version --from-installer
+            $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything
+            
+            # TODO make rollback procedure if fails
 
 
 
