@@ -1,0 +1,79 @@
+name: Create release PIP
+
+# triggered manually or if file version changes
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - 'fastHistory/config/default_version.txt'
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get release version from version file
+        run: |
+            echo "FH_RELEASE_VERSION=$(cat $GITHUB_WORKSPACE/fastHistory/config/default_version.txt)" >> $GITHUB_ENV
+      - name: Show version
+        run: echo ${{ env.FH_RELEASE_VERSION }}
+
+      - name: Setup env
+        run: |
+            python3 --version
+            pip3 --version
+          
+            cd $GITHUB_WORKSPACE/pip/
+            # TODO improve this
+            # first run -> create env
+            ./build.sh <<< "N" 
+          
+            pip3 install bashlex
+            pip3 install pyperclip
+
+      - name: Run pip builder, install local whl and uninstall it
+        run: |
+            cd $GITHUB_WORKSPACE/pip/
+            # second run -> build pip package
+            ./build.sh <<< "N"
+            cd $HOME
+            # install pip package
+            pip3 install --user --no-deps $GITHUB_WORKSPACE/pip/dist/fastHistory-*.whl
+            # setup environment
+            $HOME/.local/bin/f --setup
+            $HOME/.local/bin/f --version --from-installer
+            $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything
+
+      - name: deploy on test.pypi.org
+        run: |
+            cd $GITHUB_WORKSPACE/pip/
+            # TODO remove source
+            source build-env/bin/activate
+            python3 -m twine upload -u __token__ -p ${{ secrets.TEST_PYPI_API_TOKEN }} --repository "test.pypi.org" dist/*.whl 
+
+      - name: Install it from test.pypi.org
+        run: |
+            # bashlex is not present in the test pypi, therefore it must installed separately
+            pip3 install --user --index-url https://test.pypi.org/simple/ --no-deps fastHistory
+            # setup environment
+            $HOME/.local/bin/f --setup
+            $HOME/.local/bin/f --version --from-installer
+            $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything
+
+
+
+
+
+
+
+
+
+
+
+

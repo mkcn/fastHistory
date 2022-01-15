@@ -1,4 +1,4 @@
-name: Create release
+name: Create release Github
 
 # triggered manually or if file version changes
 on: 
