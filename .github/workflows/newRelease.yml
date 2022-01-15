@@ -1,6 +1,8 @@
 name: Create release
 
-on:
+# triggered manually or if file version changes
+on: 
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -16,14 +18,16 @@ jobs:
         uses: actions/checkout@v2
       - name: Get release version from version file
         run: |
-            cat $GITHUB_WORKSPACE/fastHistory/config/default_version.txt >> $FH_RELEASE_VERSION 
-      - name: Create Release
+            echo "FH_RELEASE_VERSION=$(cat $GITHUB_WORKSPACE/fastHistory/config/default_version.txt)" >> $GITHUB_ENV
+      - name: Show version 
+        run: echo ${{ env.FH_RELEASE_VERSION }} 
+      - name: Create Github release
         id: create_release
-        uses: actions/create-release@latest
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: v$FH_RELEASE_VERSION 
-          release_name: v$FH_RELEASE_VERSION 
+          tag_name: v${{ env.FH_RELEASE_VERSION }}
+          release_name: v${{ env.FH_RELEASE_VERSION }} 
           draft: false
           prerelease: false
