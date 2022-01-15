@@ -211,31 +211,33 @@ class PageSelectTLDR(PageGeneric):
             self.drawer.set_x(self.TLDR_PAGES_COLUMN_SIZE)
 
             for i in range(len(tldr_examples_draw)):
-                row_type = tldr_examples_draw[i][ParsedTLDRExample.INDEX_EXAMPLE_TYPE]
-                row_value = tldr_examples_draw[i][ParsedTLDRExample.INDEX_EXAMPLE_VALUE]
-                complete_background_row = False
-                if row_type == ParsedTLDRExample.Type.EXAMPLE:
-                    if i == example_draw_index:
-                        if has_focus:
-                            background_color = self.drawer.color_selected_row
-                            complete_background_row = True
+                # this check is needed in case the screen get smaller while the last item is currently selected
+                if self.drawer.get_y() < self.drawer.get_max_y() - 1:
+                    row_type = tldr_examples_draw[i][ParsedTLDRExample.INDEX_EXAMPLE_TYPE]
+                    row_value = tldr_examples_draw[i][ParsedTLDRExample.INDEX_EXAMPLE_VALUE]
+                    complete_background_row = False
+                    if row_type == ParsedTLDRExample.Type.EXAMPLE:
+                        if i == example_draw_index:
+                            if has_focus:
+                                background_color = self.drawer.color_selected_row
+                                complete_background_row = True
+                            else:
+                                background_color = self.drawer.color_cmd_sample
                         else:
                             background_color = self.drawer.color_cmd_sample
                     else:
-                        background_color = self.drawer.color_cmd_sample
-                else:
-                    background_color = self.drawer.NULL_COLOR
-                row_value = example_content_shift.get_text_shifted(row_value, tldr_example_column_size)
-                # set starting point because we are in the second column
-                self.drawer.set_x(self.TLDR_PAGES_COLUMN_SIZE)
-                self.draw_marked_string(row_value,
-                                        words_to_mark,
-                                        recursive=True,
-                                        color_marked=self.drawer.color_search,
-                                        color_default=background_color)
-                if complete_background_row:
-                    self.drawer.fill_row(color=background_color, max_x=self.drawer.get_max_x() - 1)
-                self.drawer.new_line()
+                        background_color = self.drawer.NULL_COLOR
+                    row_value = example_content_shift.get_text_shifted(row_value, tldr_example_column_size)
+                    # set starting point because we are in the second column
+                    self.drawer.set_x(self.TLDR_PAGES_COLUMN_SIZE)
+                    self.draw_marked_string(row_value,
+                                            words_to_mark,
+                                            recursive=True,
+                                            color_marked=self.drawer.color_search,
+                                            color_default=background_color)
+                    if complete_background_row:
+                        self.drawer.fill_row(color=background_color, max_x=self.drawer.get_max_x() - 1)
+                    self.drawer.new_line()
 
     def _draw_just_msg(self, msg: str, x: int = 0):
         shift = 1

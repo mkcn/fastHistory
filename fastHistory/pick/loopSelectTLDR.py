@@ -141,6 +141,7 @@ class LoopSelectTLDR(object):
                 self.move_left()
             # this occurs when the console size changes
             elif c == Keys.KEY_RESIZE:
+                self.drawer.reset()
                 self.search_field.set_max_x(self.drawer.get_max_x(), with_margin_x=True)
                 self.update_tldr_options_to_draw()
             # move cursor to the beginning
