@@ -1,6 +1,11 @@
-name: Python UnitTest
+name: Run UnitTest
 
-on: [push]
+on:
+  push:
+    paths:
+      - 'installer.sh'
+      - 'fastHistory/**'
+      - 'pip/**'
 
 jobs:
   build:
