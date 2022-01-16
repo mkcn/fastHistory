@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Get release version from version file
         run: |
-            echo "FH_RELEASE_VERSION=$(cat $GITHUB_WORKSPACE/fastHistory/config/default_version.txt)" >> $GITHUB_ENV
+            echo "FH_RELEASE_VERSION=$(cat $GITHUB_WORKSPACE/fastHistory/config/default_version.txt | tr -d '\n')" >> $GITHUB_ENV
       - name: Show version 
         run: echo ${{ env.FH_RELEASE_VERSION }} 
       - name: Create Github release
