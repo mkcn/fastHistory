@@ -26,6 +26,11 @@ jobs:
       run: |
           python3 --version
           pip3 --version
+           
+          pip3 install setuptools
+          pip3 install wheel
+          pip3 install twine
+         
           pip3 install bashlex
           pip3 install pyperclip
           pip3 install coverage
@@ -85,17 +90,15 @@ jobs:
         $HOME/.local/bin/f --version --from-installer
         $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything     
         
-    - name: Run pip builder, install local whl and uninstall it
+    - name: Build whl package 
       run: |
         cd $GITHUB_WORKSPACE/pip/
-        # create env
-        ./build.sh <<< "N" 
-        # build pip package
-        ./build.sh <<< "N"
+        python3 setup.py bdist_wheel
+      
+    - name: Test installation from whl package 
+      run: |
         cd $HOME
-        # install pip package
-        pip3 install --user --no-deps $GITHUB_WORKSPACE/pip/dist/fastHistory-*.whl
-        # setup environment
+        pip3 install --user --no-deps --ignore-installed $GITHUB_WORKSPACE/pip/dist/fastHistory-*.whl
         $HOME/.local/bin/f --setup
         $HOME/.local/bin/f --version --from-installer
         $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything
