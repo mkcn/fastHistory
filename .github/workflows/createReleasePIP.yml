@@ -19,8 +19,10 @@ jobs:
 
       - name: Get release version from version file
         run: |
-            echo "FH_RELEASE_VERSION=$(cat $GITHUB_WORKSPACE/fastHistory/config/default_version.txt)" >> $GITHUB_ENV
-            echo ${{ env.FH_RELEASE_VERSION }}
+            echo "FH_RELEASE_VERSION=$(cat $GITHUB_WORKSPACE/fastHistory/config/default_version.txt | tr -d '\n')" >> $GITHUB_ENV
+            
+      - name: Show version 
+        run: echo ${{ env.FH_RELEASE_VERSION }}
 
       - name: Setup build env
         run: |
@@ -43,15 +45,20 @@ jobs:
         run: |
             pip3 install --user --no-deps --ignore-installed $GITHUB_WORKSPACE/pip/dist/fastHistory-*.whl
             $HOME/.local/bin/f --setup
-            echo "FH_WHL_VERSION=$($HOME/.local/bin/f --version --from-installer)" >> $GITHUB_ENV
-            echo ${{ env.FH_WHL_VERSION }}
+            $HOME/.local/bin/f --version --from-installer
+            echo "FH_WHL_VERSION=$($HOME/.local/bin/f --version --from-installer | tr -d '\n')" >> $GITHUB_ENV
             $GITHUB_WORKSPACE/installer.sh -u --yes-delete-everything
             
       - name: Check version matching
-        if: ${{ env.FH_WHL_VERSION }} != ${{ env.FH_RELEASE_VERSION }}
         run: |
-            echo "Error: something is wrong, the whl package and the repo have different versions"
-            exit 1
+            if [[ ${{ env.FH_WHL_VERSION }} == ${{ env.FH_RELEASE_VERSION }} ]]; then
+                echo "version ok: ${{ env.FH_WHL_VERSION }}"
+            else
+                echo "Error: something is wrong, the whl package and the repo have different versions"
+                echo "FH_WHL_VERSION: ${{ env.FH_WHL_VERSION }} "
+                echo "FH_RELEASE_VERSION: ${{ env.FH_RELEASE_VERSION }}"
+                exit 1
+            fi
 
       - name: Deploy on test.pypi.org
         run: |
