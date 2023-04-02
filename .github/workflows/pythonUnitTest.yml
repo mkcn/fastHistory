@@ -34,6 +34,9 @@ jobs:
           pip3 install bashlex
           pip3 install pyperclip
           pip3 install coverage
+          
+          echo "hello"
+          echo ${{ secrets.TEST }} 
 
           if [[ "$OSTYPE" == "linux-gnu" ]]; then
               echo "OS: Linux"
