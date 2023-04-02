@@ -275,7 +275,7 @@ else
 			exit 1
 		fi
 	else
-		echo "Usage:" 
+		echo "Usage:  " 
 		echo "    ./installer [-u] [--yes-delete-everything]"
 		echo "Sample:"
 		echo "    run './install' to install fastHistory"
